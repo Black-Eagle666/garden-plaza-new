@@ -192,11 +192,16 @@ p{margin:0}
 .cut-stage{flex:1;min-height:0;container-type:size;display:grid;place-items:center;opacity:0;transform:scale(.18);transform-origin:var(--ox,50%) var(--oy,20%);transition:opacity .5s ease,transform .5s ease}
 .hero.is-open .cut-stage{opacity:1;transform:none;transition:opacity .6s ease .45s,transform 1s cubic-bezier(.2,.8,.2,1) .45s}
 
-.plate{--pw:min(84cqw,142cqh);--u:calc(var(--pw) / 12);--h:calc(var(--u) * .28);--rx:56deg;--rz:30deg;position:relative;width:var(--pw);height:calc(var(--u) * 6.4);transform:translateY(var(--ty,8%)) rotateX(var(--rx)) rotateZ(calc(var(--rz) * -1));transform-style:preserve-3d;background:linear-gradient(135deg,#241B13,#15100B);border:1px solid rgba(232,204,148,.7);box-shadow:0 0 0 calc(var(--u) * .12) rgba(201,164,106,.12),0 0 calc(var(--u) * 1.2) rgba(232,204,148,.28)}
+.plate{--pw:min(84cqw,142cqh);--u:calc(var(--pw) / 12);--h:calc(var(--u) * .28);--rx:56deg;--rz:30deg;position:relative;width:var(--pw);height:calc(var(--u) * var(--rows,6.4));transform:translateY(var(--ty,8%)) rotateX(var(--rx)) rotateZ(calc(var(--rz) * -1));transform-style:preserve-3d;background:linear-gradient(135deg,#241B13,#15100B);border:1px solid rgba(232,204,148,.7);box-shadow:0 0 0 calc(var(--u) * .12) rgba(201,164,106,.12),0 0 calc(var(--u) * 1.2) rgba(232,204,148,.28)}
+/* майже квадратний поверх: план глибший, тож вужчий */
+.plate.is-deep{--pw:min(70cqw,calc(132cqh - 120px))}
 .hero.is-open .plate{animation:unfold 1.3s cubic-bezier(.2,.8,.2,1) .3s both}
 @keyframes unfold{from{transform:translateY(var(--ty,8%)) rotateX(84deg) rotateZ(-80deg) scale(.55)}}
 .plate .mk{position:absolute;font:italic 500 calc(var(--u) * .3)/1 var(--serif);color:var(--muted);transform:translate(-50%,-50%);white-space:nowrap}
 .plate .atrium{position:absolute;border:1px dashed var(--gold-lo);border-radius:6px}
+/* службове приміщення (туалет): є на плані, але не натискається */
+.plate .room{--c:rgba(201,164,106,.5);position:absolute;transform-style:preserve-3d;border:1px solid var(--c);background:rgba(201,164,106,.06)}
+.plate .room .pin{padding:4px 9px;background:rgba(14,11,8,.82);font-weight:500;font-size:11px;color:var(--muted);pointer-events:none}
 .blk{position:absolute;transform-style:preserve-3d;transform-origin:50% 50% 0;cursor:pointer;outline:none;animation:grow .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(1.2s + var(--i) * 70ms)}
 @keyframes grow{from{transform:scale3d(1,1,.01)}to{transform:none}}
 .blk i{position:absolute;display:block;transition:background .2s}
@@ -204,13 +209,23 @@ p{margin:0}
 .blk .wf{left:0;bottom:0;width:100%;height:var(--h);transform-origin:bottom;transform:rotateX(-90deg);background:#1D1610;background:color-mix(in srgb,var(--c) 22%,#0D0A07)}
 .blk .ws{left:0;top:0;width:var(--h);height:100%;transform-origin:left;transform:rotateY(-90deg);background:#15100B;background:color-mix(in srgb,var(--c) 13%,#0D0A07)}
 .blk:hover .top,.blk:focus-visible .top{background:#4A3A28;background:color-mix(in srgb,var(--c) 64%,#1A140F)}
+/* приміщення складної форми (Г-подібне): верхня грань — багатокутник. Стіни лишаються по рамці:
+   виріз у дальньому правому куті відкриває лише грані, яких з цього боку не видно */
+.blk.shaped{pointer-events:none}
+.blk.shaped .wf,.blk.shaped .ws,.blk.shaped .pin,.blk.shaped svg:not(.glow) polygon{pointer-events:auto}
+.blk .top.poly,.blk:hover .top.poly,.blk:focus-visible .top.poly{background:none;border:0}
+.blk .top.poly svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.blk .top.poly polygon{fill:#2B2118;fill:color-mix(in srgb,var(--c) 34%,#1A140F);stroke:var(--c);stroke-width:1px;vector-effect:non-scaling-stroke;transition:fill .2s}
+.blk .top.poly .glow{opacity:0;filter:blur(7px)}
+.blk .top.poly .glow polygon{fill:none;stroke:#FFDC8C;stroke-width:9px}
+.blk:hover .top.poly svg:not(.glow) polygon,.blk:focus-visible .top.poly svg:not(.glow) polygon{fill:#4A3A28;fill:color-mix(in srgb,var(--c) 64%,#1A140F)}
 .zone{position:absolute;transform-style:preserve-3d;cursor:pointer;outline:none}
 /* прозорість зони анімуємо на ::before: анімація на самому елементі «сплющила» б його, і підпис ліг би на підлогу */
 .zone::before{content:"";position:absolute;inset:0;border:1px dashed var(--gold-lo);background:repeating-linear-gradient(90deg,rgba(201,164,106,.16) 0 1px,transparent 1px calc(var(--u) * .5)),rgba(201,164,106,.05);animation:pinin .5s ease 1.6s both}
 .zone:focus-visible::before{border-color:var(--gold-hi)}
 
 /* підпис стоїть вертикально над блоком; --stem (висота ніжки) і --dx (зсув від краю) рахує layoutPins */
-.plate .lbl{position:absolute;left:50%;top:50%;width:0;height:0;transform:translateZ(var(--h)) rotateZ(var(--rz)) rotateX(calc(var(--rx) * -1))}
+.plate .lbl{position:absolute;left:var(--lx,50%);top:var(--ly,50%);width:0;height:0;transform:translateZ(var(--h)) rotateZ(var(--rz)) rotateX(calc(var(--rx) * -1))}
 .pin{position:absolute;left:0;bottom:var(--stem,14px);transform:translateX(calc(-50% + var(--dx,0px)));padding:5px 11px;border-radius:99px;border:1px solid var(--c);background:rgba(14,11,8,.92);font:600 12px/1 var(--sans);color:#fff;white-space:nowrap;animation:pinin .4s ease both;animation-delay:calc(1.7s + var(--i) * 70ms)}
 .pin::after{content:"";position:absolute;left:calc(50% - var(--dx,0px));top:100%;width:1px;height:var(--stem,14px);background:var(--c)}
 .pin small{font-weight:400;font-size:.85em;opacity:.6;margin-left:7px}
@@ -223,6 +238,11 @@ p{margin:0}
 .blk.hl .top{background:#5A4520;background:color-mix(in srgb,var(--c) 42%,#4A3818)}
 .blk.hl .wf{background:#C9A46A}
 .blk.hl .ws{background:#8A6E44}
+.blk.hl .top.poly{background:none;border:0;box-shadow:none}
+.blk.hl .top.poly::after{content:none}
+.blk.hl .top.poly svg:not(.glow){filter:drop-shadow(0 0 4px rgba(255,214,130,.95)) drop-shadow(0 0 14px rgba(232,190,110,.6))}
+.blk.hl .top.poly svg:not(.glow) polygon{fill:#5A4520;fill:color-mix(in srgb,var(--c) 42%,#4A3818);stroke:#FFE7B0;stroke-width:2px}
+.blk.hl .top.poly .glow{animation:neon 1.5s ease-in-out infinite alternate}
 .hl .pin{background:linear-gradient(180deg,#F6DEA8,#C9A46A);color:var(--espresso);border-color:#FFE7B0;box-shadow:0 0 18px rgba(255,214,130,.85)}
 .hl .pin small{opacity:.75}
 .hl .pin::after{background:#FFE7B0}
@@ -373,6 +393,7 @@ p{margin:0}
   .quick a{flex-direction:column;align-items:flex-start;gap:9px;padding:12px}
   .cut-stage{height:max(250px,min(94vw,62vh,480px));height:max(250px,min(94vw,62dvh,480px))}
   .plate{--pw:min(94cqw,calc(138cqh - 90px));--rx:50deg;--rz:55deg}
+  .plate.is-deep{--pw:min(72cqw,calc(116cqh - 87px))}
   .pin{font-size:10.5px;padding:4px 8px}
   .pin small{display:none}
 }
@@ -391,7 +412,8 @@ p{margin:0}
 /* старі браузери без одиниць контейнера (Safari до 16): розмір плану від вікна */
 @supports not (width:1cqw){
   .plate{--pw:min(80vw,64vh,620px)}
-  @media (max-width:640px){.plate{--pw:min(90vw,56vh)}}
+  .plate.is-deep{--pw:min(62vw,50vh,520px)}
+  @media (max-width:640px){.plate{--pw:min(90vw,56vh)}.plate.is-deep{--pw:min(68vw,44vh)}}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -430,19 +452,20 @@ section{padding:110px 0}
 .board-note{margin-top:14px;font-size:13px}
 
 #plan{width:100%;height:auto;display:block}
-#plan .unit rect{fill:var(--c);fill-opacity:.10;stroke:var(--c);stroke-opacity:.75;stroke-width:1.5;transition:fill-opacity .2s}
+#plan .unit :is(rect,polygon){fill:var(--c);fill-opacity:.10;stroke:var(--c);stroke-opacity:.75;stroke-width:1.5;transition:fill-opacity .2s}
 #plan .unit{cursor:pointer;outline:none}
-#plan .unit:hover rect,#plan .unit:focus-visible rect{fill-opacity:.24}
-#plan .unit:focus-visible rect{stroke:var(--gold-hi);stroke-width:3;stroke-opacity:1}
-#plan .unit.dim rect{fill-opacity:.02;stroke-opacity:.18}
+#plan .unit:hover :is(rect,polygon),#plan .unit:focus-visible :is(rect,polygon){fill-opacity:.24}
+#plan .unit:focus-visible :is(rect,polygon){stroke:var(--gold-hi);stroke-width:3;stroke-opacity:1}
+#plan .unit.dim :is(rect,polygon){fill-opacity:.02;stroke-opacity:.18}
 #plan .unit.dim text{opacity:.25}
-#plan .unit.on rect{fill-opacity:.85}
+#plan .unit.on :is(rect,polygon){fill-opacity:.85}
 #plan .unit.on text{fill:var(--espresso)}
 #plan .unit text{font-family:var(--sans);fill:var(--cream);pointer-events:none}
 #plan .u-no{font-size:14px;opacity:.55;dominant-baseline:hanging}
 #plan .u-name{font:500 24px var(--serif)}
 #plan .corridor{fill:#231C15}
 #plan .void{fill:none;stroke:var(--gold-lo);stroke-dasharray:5 7;stroke-width:1.2}
+#plan .room{fill:rgba(201,164,106,.06);stroke:var(--gold-lo);stroke-width:1.2}
 #plan .mark{font:italic 400 18px var(--serif);fill:var(--muted)}
 #plan .you{fill:var(--gold);stroke:var(--espresso);stroke-width:3}
 @media (max-width:640px){#plan .u-name{display:none}#plan .u-no{font-size:44px;opacity:.85}#plan .mark{font-size:34px}}
@@ -509,7 +532,8 @@ footer a{text-decoration:none;color:var(--cream)}
 footer a:hover{color:var(--gold-hi)}
 
 /* ═══════════ СПИСОК ЗАКЛАДІВ І КАРТКА В КАТАЛОЗІ ═══════════ */
-.results{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;max-height:440px;overflow:auto}
+.results{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;flex:1 1 0;min-height:320px;overflow:auto}
+@media (max-width:900px){.results{flex:none;min-height:0;max-height:440px}}
 .results button{width:100%;text-align:left;display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;min-height:66px;padding:8px 4px;border:0;border-bottom:1px solid var(--seam);background:none;color:var(--cream);font:400 15px/1.3 var(--sans);cursor:pointer}
 .results button:hover b{color:var(--gold-hi)}
 .results img{display:block;width:48px;height:48px;border-radius:8px;object-fit:cover;background:var(--roast)}
@@ -865,34 +889,38 @@ footer a:hover{color:var(--gold-hi)}
     home:{name:"Дім і готель",c:"--c-home"}, services:{name:"Послуги",c:"--c-services"},
     food:{name:"Їжа",c:"--c-food"}, fun:{name:"Спорт",c:"--c-fun"}
   };
-  const FLOOR_NOTES = {1:"Магазини і їжа", 2:"Одяг, взуття, дім", 3:"Ресторан, спорт, краса", 4:"Готель"};
+  const FLOOR_NOTES = {1:"Магазини і їжа", 2:"Одяг, взуття, дім", 3:"Ресторан, спорт, діти, краса", 4:"Готель"};
 
-  // x, y, w, h — у клітинках сітки 12×6; ряд 3 — коридор. ПРИКЛАД: замінити на справжніх орендарів
+  // x, y, w, h — рамка приміщення в клітинках плану свого поверху (сітка поверхів — FLOOR_GRID).
+  // shape — контур для приміщення складної форми (вершини за годинниковою стрілкою), label — де стоїть його підпис.
+  // 3 поверх розкладено за малюнком Миколи від 12.11.2026. 1 поверх — ПРИКЛАД: замінити на справжніх орендарів
   const UNITS_BASE = [
     {id:"1.01",f:1,x:0,y:0,w:3,h:3,cat:"grocery",name:"Супермаркет",about:"Свіжа випічка, м'ясо, овочі з місцевих господарств.",hours:"8:00–22:00",tags:"продукти супермаркет хліб м'ясо овочі"},
     {id:"1.02",f:1,x:3,y:0,w:2,h:3,cat:"services",name:"Аптека",about:"Ліки, вітаміни, засоби гігієни.",tags:"аптека ліки вітаміни"},
     {id:"1.03",f:1,x:5,y:0,w:2,h:3,cat:"services",name:"Банк",about:"Каса, обмін валют, оформлення карток.",tags:"банк обмін валюта картка гроші банкомат"},
     {id:"1.04",f:1,x:7,y:0,w:2,h:3,cat:"food",name:"Street Food",about:"Garden Street Food: бургери, шаурма, хот-доги й напої на швидку руку.",tags:"їжа бургер шаурма фастфуд street food"},
     {id:"1.05",f:1,x:9,y:0,w:3,h:3,cat:"home",name:"Квіти",about:"Букети на замовлення, кімнатні рослини.",tags:"квіти букет рослини"},
-    {id:"1.06",f:1,x:0,y:4,w:2,h:2,cat:"food",name:"Кава",about:"Кава, какао й тістечка біля входу.",tags:"кава кав'ярня"},
-    {id:"1.07",f:1,x:2,y:4,w:2,h:2,cat:"services",name:"Пошта",about:"Видача й відправлення посилок, поштомат.",tags:"пошта посилка поштомат"},
-    {id:"1.08",f:1,x:7,y:4,w:2,h:2,cat:"services",name:"Салон",about:"Стрижки, манікюр, догляд.",tags:"перукарня манікюр краса салон"},
-    {id:"1.09",f:1,x:9,y:4,w:3,h:2,cat:"services",name:"Оптика",about:"Перевірка зору, окуляри й лінзи.",tags:"окуляри лінзи зір оптика"},
+    {id:"1.06",f:1,x:0,y:4.4,w:2,h:2,cat:"food",name:"Кава",about:"Кава, какао й тістечка біля входу.",tags:"кава кав'ярня"},
+    {id:"1.07",f:1,x:2,y:4.4,w:2,h:2,cat:"services",name:"Пошта",about:"Видача й відправлення посилок, поштомат.",tags:"пошта посилка поштомат"},
+    {id:"1.08",f:1,x:7,y:4.4,w:2,h:2,cat:"services",name:"Салон",about:"Стрижки, манікюр, догляд.",tags:"перукарня манікюр краса салон"},
+    {id:"1.09",f:1,x:9,y:4.4,w:3,h:2,cat:"services",name:"Оптика",about:"Перевірка зору, окуляри й лінзи.",tags:"окуляри лінзи зір оптика"},
 
     {id:"2.01",f:2,x:0,y:0,w:3,h:3,cat:"fashion",name:"Джентельмен",about:"Чоловічий одяг: костюми, сорочки, верхній одяг.",tags:"джентельмен gentleman одяг чоловічий костюм сорочка"},
     {id:"2.02",f:2,x:3,y:0,w:2,h:3,cat:"fashion",name:"Взуття",about:"Взуттєвий магазин.",tags:"взуття черевики кросівки туфлі"},
     {id:"2.03",f:2,x:5,y:0,w:2,h:3,cat:"fashion",name:"Одяг",about:"Магазин одягу.",tags:"одяг"},
     {id:"2.04",f:2,x:7,y:0,w:2,h:3,cat:"fashion",name:"Сумки",about:"Сумки на будь-який випадок.",tags:"сумки рюкзаки гаманці аксесуари"},
     {id:"2.05",f:2,x:9,y:0,w:3,h:3,cat:"services",name:"Кредо клініка",about:"Медична клініка «Кредо».",tags:"кредо клініка лікар медицина"},
-    {id:"2.06",f:2,x:0,y:4,w:2,h:2,cat:"home",name:"Штори",about:"Штори, тюль, карнизи.",tags:"штори занавіски тюль карниз"},
-    {id:"2.07",f:2,x:2,y:4,w:2,h:2,cat:"home",name:"Килими",about:"Килими й доріжки для дому.",tags:"килими ковер доріжка"},
-    {id:"2.08",f:2,x:9,y:4,w:3,h:2,cat:"services",name:"Косметологія",about:"Кабінет косметології.",tags:"косметологія косметолог догляд шкіра"},
+    {id:"2.06",f:2,x:0,y:4.4,w:2,h:2,cat:"home",name:"Штори",about:"Штори, тюль, карнизи.",tags:"штори занавіски тюль карниз"},
+    {id:"2.07",f:2,x:2,y:4.4,w:2,h:2,cat:"home",name:"Килими",about:"Килими й доріжки для дому.",tags:"килими ковер доріжка"},
+    {id:"2.08",f:2,x:9,y:4.4,w:3,h:2,cat:"services",name:"Косметологія",about:"Кабінет косметології.",tags:"косметологія косметолог догляд шкіра"},
 
-    {id:"3.01",f:3,x:0,y:0,w:4,h:3,cat:"food",name:"Garden Plaza",about:"Ресторан: кухня й бар, бронювання столу, доставка. Меню з цінами на gardenplaza.com.ua.",tags:"ресторан їжа обід доставка garden plaza бар"},
-    {id:"3.02",f:3,x:4,y:0,w:4,h:3,cat:"fun",name:"GYM MAXI",about:"Спортзал GYM MAXI.",tags:"gym maxi джим максі спорт спортзал тренажерний зал фітнес бокс мма стретчинг тренер"},
-    {id:"3.03",f:3,x:8,y:0,w:4,h:3,cat:"tech",name:"Mezey Shop",about:"Техніка Apple.",tags:"mezey shop мезей apple епл айфон iphone macbook ipad airpods техніка телефон ремонт"},
-    {id:"3.04",f:3,x:0,y:4,w:4,h:2,cat:"services",name:"Tiffany Beauty Salon",about:"Салон краси Tiffany.",tags:"tiffany тіффані тифані салон краси перукарня стрижка фарбування зачіска макіяж манікюр педикюр брови вії косметологія масаж"},
-    {id:"3.05",f:3,x:8,y:4,w:4,h:2,cat:"services",name:"MonoTaxi",about:"Служба таксі MonoTaxi.",tags:"monotaxi mono taxi монотаксі таксі офіс доставка тверезий водій"},
+    {id:"3.01",f:3,x:3.6,y:0,w:5,h:3,cat:"food",name:"Garden Plaza",about:"Ресторан: кухня й бар, бронювання столу, доставка. Меню з цінами на gardenplaza.com.ua.",tags:"ресторан їжа обід доставка garden plaza бар"},
+    {id:"3.02",f:3,x:0,y:6,w:9.75,h:4.9,shape:[[0,6],[3.55,6],[3.55,9],[9.75,9],[9.75,10.9],[0,10.9]],label:[3.2,9.95],cat:"fun",name:"GYM MAXI",about:"Спортзал GYM MAXI.",tags:"gym maxi джим максі спорт спортзал тренажерний зал фітнес бокс мма стретчинг тренер"},
+    {id:"3.03",f:3,x:9.75,y:2.75,w:2.25,h:2.5,cat:"tech",name:"Mezey Shop",about:"Техніка Apple.",tags:"mezey shop мезей apple епл айфон iphone macbook ipad airpods техніка телефон ремонт"},
+    {id:"3.04",f:3,x:9.75,y:7.75,w:2.25,h:3.15,cat:"services",name:"Tiffany Beauty Salon",about:"Салон краси Tiffany.",tags:"tiffany тіффані тифані салон краси перукарня стрижка фарбування зачіска макіяж манікюр педикюр брови вії косметологія масаж"},
+    {id:"3.05",f:3,x:9.75,y:1.25,w:2.25,h:1.5,cat:"services",name:"MonoTaxi",about:"Служба таксі MonoTaxi.",tags:"monotaxi mono taxi монотаксі таксі офіс доставка тверезий водій"},
+    {id:"3.06",f:3,x:0,y:0,w:3.55,h:4.65,cat:"kids",name:"Дитяча кімната",about:"Дитяча ігрова кімната.",tags:"діти дитяча ігрова кімната зала розваги малеча"},
+    {id:"3.07",f:3,x:9.75,y:5.25,w:2.25,h:2.5,cat:"fashion",name:"Одяг",about:"Магазин одягу.",tags:"одяг"},
 
     {id:"4.01",f:4,x:0,y:0,w:12,h:3,cat:"home",name:"Готель",about:"Номери для гостей. Бронювання за телефоном (068) 535-00-99.",hours:"цілодобово",tags:"готель номер ночівля"}
   ];
@@ -924,6 +952,8 @@ footer a:hover{color:var(--gold-hi)}
     "3.03":{about:"Mezey Shop: нова та вживана техніка Apple — iPhone, iPad, MacBook, AirPods і фірмові аксесуари. Ремонт техніки будь-якої складності.", phones:["0968477627"], hours:"Пн–Сб 9:00–18:00, Нд вихідний", logo:"shops/logo/3.03.webp", pics:["shops/3.03-1.webp"]},
     "3.04":{about:"Салон краси Tiffany: фарбування й догляд за волоссям, стрижки, зачіски та макіяж, манікюр і педикюр, брови й вії, косметологія та масаж. Майстра обираєте самі.", phones:[], hours:"уточнюйте в салоні", logo:"shops/logo/3.04.webp"},
     "3.05":{about:"Служба таксі MonoTaxi: поїздки Нересницею та за її межі, «тверезий водій», кур'єрська доставка й доставка продуктів. Виклик авто безкоштовний, тариф від 29 грн/км, мінімальне замовлення — 150 грн. Офіс на третьому поверсі центру.", phones:["0981873000", "0981874000"], hours:"7:00–01:00", logo:"shops/logo/3.05.webp"},
+    "3.06":{about:"Ігрова кімната для дітей: гірки, сухий басейн, лабіринт і куточок для найменших. Малеча грається під наглядом, поки батьки в ресторані чи на покупках.", phone:"0680000306", hours:"10:00–21:00"},
+    "3.07":{about:"Магазин одягу на третьому поверсі: повсякденні речі, верхній одяг та аксесуари. Нові надходження щотижня.", phone:"0680000307", hours:"10:00–20:00"},
     "4.01":{about:"Готель на четвертому поверсі: затишні номери зі своєю ванною, Wi‑Fi і краєвидом на гори. Сніданок у ресторані Garden Plaza, безкоштовний паркінг для гостей.", phone:"0685350099", hours:"цілодобово"}
   };
   const UNITS = UNITS_BASE.map((u) => ({...u, ...SHOP_INFO[u.id]}));
@@ -1008,36 +1038,74 @@ footer a:hover{color:var(--gold-hi)}
     box.append(note);
   }
 
+  // сітка кожного поверху в клітинках; hall: вільний простір між приміщеннями — це хол, а не коридор-смуга
+  const FLOOR_GRID = {1:{cols:12, rows:6.4}, 2:{cols:12, rows:6.4}, 3:{cols:12, rows:10.9, hall:true}, 4:{cols:12, rows:6.4}};
+  // службові приміщення: їх видно на плані, але в каталозі закладів їх немає
+  const PLAN_ROOMS = [{f:3, x:9.85, y:0, w:2.15, h:.75, name:"Туалет"}];
+  // підписи на 2D-плані: x, y у клітинках
+  const PLAN_MARKS = {
+    1:[[5.5, 5.6, "Головний вхід"], [11.3, 4, "Сходи"]],
+    2:[[5.5, 5.6, "Атріум"], [11.3, 4, "Сходи"]],
+    3:[[6.6, 6, "Хол"]],
+    4:[[6, 5.6, "Тераса"], [11.3, 4, "Сходи"]]
+  };
+  // проміжок між сусідніми приміщеннями на 2D-плані, у його одиницях
+  const PLAN_GAP = 5;
+  // зсуває вершини прямокутного багатокутника (обхід за годинниковою стрілкою) всередину на d
+  const insetShape = (points, d) => points.map((p, i) => {
+    const prev = points[(i + points.length - 1) % points.length], next = points[(i + 1) % points.length];
+    const inward = (a, b) => [-Math.sign(b[1] - a[1]), Math.sign(b[0] - a[0])];
+    const n1 = inward(prev, p), n2 = inward(p, next);
+    return [p[0] + d * (n1[0] + n2[0]), p[1] + d * (n1[1] + n2[1])];
+  });
+
+  // назва приміщення на 2D-плані (в одиницях плану): відступ від краю, висота рядка, середня ширина літери
+  const PLAN_NAME = {inset:18, bottom:24, line:28, charWidth:13};
+  // ділить назву щонайбільше на два рядки по пробілу; те, що не вмістилось, обрізає
+  const nameLines = (name, maxChars) => {
+    if (name.length <= maxChars) return [name];
+    const clip = (text) => (text.length > maxChars ? text.slice(0, maxChars - 1) + "…" : text);
+    const cut = name.lastIndexOf(" ", maxChars);
+    return cut > 0 ? [name.slice(0, cut), clip(name.slice(cut + 1))] : [clip(name)];
+  };
+
   function renderPlanStatic(svg) {
-    svg.append(svgEl("rect", {class:"corridor", x:0, y:3*CELL, width:12*CELL, height:CELL+40}));
-    if (state.floor === 2 || state.floor === 3) svg.append(svgEl("rect", {class:"void", x:4*CELL+12, y:4*CELL+52, width:3*CELL-24, height:2*CELL-64, rx:10}));
-    const marks = {
-      1:[[5.5*CELL, 5.2*CELL, "Головний вхід"], [11.3*CELL, 3.6*CELL, "Сходи"]],
-      2:[[5.5*CELL, 5.2*CELL, "Атріум"], [11.3*CELL, 3.6*CELL, "Сходи"]],
-      3:[[5.5*CELL, 5.2*CELL, "Атріум"], [11.3*CELL, 3.6*CELL, "Сходи"]],
-      4:[[6*CELL, 5.2*CELL, "Тераса"], [11.3*CELL, 3.6*CELL, "Сходи"]]
-    }[state.floor];
-    marks.forEach(([x, y, t]) => {
-      const txt = svgEl("text", {class:"mark", x, y:y+40, "text-anchor":"middle"});
+    const grid = FLOOR_GRID[state.floor];
+    const walkway = grid.hall ? {x:0, y:0, width:grid.cols*CELL, height:grid.rows*CELL} : {x:0, y:3*CELL, width:grid.cols*CELL, height:1.4*CELL};
+    svg.append(svgEl("rect", {class:"corridor", ...walkway}));
+    if (state.floor === 2) svg.append(svgEl("rect", {class:"void", x:4*CELL+12, y:4*CELL+52, width:3*CELL-24, height:2*CELL-64, rx:10}));
+    PLAN_ROOMS.filter((r) => r.f === state.floor).forEach((r) => {
+      svg.append(svgEl("rect", {class:"room", x:r.x*CELL+PLAN_GAP, y:r.y*CELL+PLAN_GAP, width:r.w*CELL-2*PLAN_GAP, height:r.h*CELL-2*PLAN_GAP, rx:3}));
+      const label = svgEl("text", {class:"mark", x:(r.x + r.w / 2)*CELL, y:(r.y + r.h / 2)*CELL + 6, "text-anchor":"middle"});
+      label.textContent = r.name;
+      svg.append(label);
+    });
+    PLAN_MARKS[state.floor].forEach(([x, y, t]) => {
+      const txt = svgEl("text", {class:"mark", x:x*CELL, y:y*CELL, "text-anchor":"middle"});
       txt.textContent = t;
       svg.append(txt);
     });
-    if (state.floor === 1) svg.append(svgEl("circle", {class:"you", cx:5.5*CELL, cy:4.75*CELL+40, r:11}));
+    if (state.floor === 1) svg.append(svgEl("circle", {class:"you", cx:5.5*CELL, cy:5.15*CELL, r:11}));
   }
 
   function unitNode(u) {
-    const yOff = u.y >= 4 ? 40 : 0;
-    const x = u.x*CELL, y = u.y*CELL + yOff, w = u.w*CELL, h = u.h*CELL;
+    const x = u.x*CELL, y = u.y*CELL, w = u.w*CELL, h = u.h*CELL;
     const g = svgEl("g", {class:"unit", tabindex:0, role:"button", "aria-label":`${u.name}, ${u.id}`, style:`--c:${cssVar(CATS[u.cat].c)}`});
     if (isFiltering() && !matches(u)) g.classList.add("dim");
     if (state.selected === u.id) g.classList.add("on");
-    g.append(svgEl("rect", {x:x+5, y:y+5, width:w-10, height:h-10, rx:3}));
+    const outline = u.shape
+      ? svgEl("polygon", {points:insetShape(u.shape.map(([px, py]) => [px*CELL, py*CELL]), PLAN_GAP).map((point) => point.join(",")).join(" ")})
+      : svgEl("rect", {x:x+PLAN_GAP, y:y+PLAN_GAP, width:w-2*PLAN_GAP, height:h-2*PLAN_GAP, rx:3});
     const no = svgEl("text", {class:"u-no", x:x+18, y:y+18});
     no.textContent = u.id;
-    const maxChars = Math.floor(w / 13);
-    const nm = svgEl("text", {class:"u-name", x:x+18, y:y+h-24});
-    nm.textContent = u.name.length > maxChars ? u.name.slice(0, maxChars) + "…" : u.name;
-    g.append(no, nm);
+    const lines = nameLines(u.name, Math.max(1, Math.floor((w - 2 * PLAN_NAME.inset) / PLAN_NAME.charWidth)));
+    const nm = svgEl("text", {class:"u-name", x:x+PLAN_NAME.inset, y:y+h-PLAN_NAME.bottom});
+    lines.forEach((line, i) => {
+      const row = svgEl("tspan", {x:x+PLAN_NAME.inset, dy:i === 0 ? -(lines.length - 1) * PLAN_NAME.line : PLAN_NAME.line});
+      row.textContent = line;
+      nm.append(row);
+    });
+    g.append(outline, no, nm);
     const pick = () => setState({selected:u.id});
     g.addEventListener("click", pick);
     g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
@@ -1046,7 +1114,9 @@ footer a:hover{color:var(--gold-hi)}
 
   function renderPlan() {
     const svg = $("#plan");
+    const grid = FLOOR_GRID[state.floor];
     svg.replaceChildren();
+    svg.setAttribute("viewBox", `0 0 ${grid.cols*CELL} ${grid.rows*CELL}`);
     svg.setAttribute("aria-label", `План ${state.floor} поверху`);
     renderPlanStatic(svg);
     UNITS.filter((u) => u.f === state.floor).forEach((u) => svg.append(unitNode(u)));
@@ -1179,7 +1249,7 @@ footer a:hover{color:var(--gold-hi)}
   // x, y — точка на картинці mall.webp у відсотках; unit — приміщення на мапі нижче
   const HERO_FLOORS = {
     4:{label:"Готель", icon:"i-bed", x:66, y:28, title:"Готель", unit:"4.01"},
-    3:{label:"Ресторан, спорт, краса", icon:"i-food", x:58, y:41, title:"Ресторан Garden Plaza", unit:"3.01"},
+    3:{label:"Ресторан, спорт, діти, краса", icon:"i-food", x:58, y:41, title:"Ресторан Garden Plaza", unit:"3.01"},
     2:{label:"Одяг, взуття, дім", icon:"i-hanger", x:84, y:54, title:"Джентельмен", unit:"2.01"},
     1:{label:"Магазини і їжа", icon:"i-bag", x:44, y:68, title:"Супермаркет", unit:"1.01"}
   };
@@ -1239,7 +1309,7 @@ footer a:hover{color:var(--gold-hi)}
   const PLATE_MARKS = {
     1:[[5.5, 5.4, "Головний вхід"], [11.2, 3.2, "Сходи"]],
     2:[[5.5, 5.4, "Атріум"], [11.2, 3.2, "Сходи"]],
-    3:[[5.5, 5.4, "Атріум"], [11.2, 3.2, "Сходи"]],
+    3:[[6.6, 5.9, "Хол"]],
     4:[[6, 5.2, "Тераса"], [11.2, 3.2, "Сходи"]]
   };
   // floor — відкритий поверх (null, коли план закрито); last — останній відкритий; hl — підсвічений заклад;
@@ -1247,17 +1317,24 @@ footer a:hover{color:var(--gold-hi)}
   let cut = {floor:null, last:1, hl:null, opener:null};
   const cells = (n) => `calc(var(--u) * ${n})`;
 
+  // верхня грань приміщення складної форми: багатокутник у клітинках відносно рамки приміщення
+  const shapeSvg = (u, cls) => `<svg${cls ? ` class="${cls}"` : ""} viewBox="0 0 ${u.w} ${u.h}" preserveAspectRatio="none" aria-hidden="true"><polygon points="${u.shape.map(([px, py]) => `${px - u.x},${py - u.y}`).join(" ")}"/></svg>`;
+  // де стоїть підпис: зазвичай у центрі рамки, для складної форми — у точці label
+  const labelSpot = (u) => (u.label ? `;--lx:${(u.label[0] - u.x) / u.w * 100}%;--ly:${(u.label[1] - u.y) / u.h * 100}%` : "");
+
   function plateHtml(f) {
     const marks = PLATE_MARKS[f].map(([x, y, t]) => `<span class="mk" style="left:${cells(x)};top:${cells(y)}">${t}</span>`).join("");
-    const atrium = f === 2 || f === 3 ? `<span class="atrium" style="left:${cells(4.15)};top:${cells(4.55)};width:${cells(2.7)};height:${cells(1.7)}"></span>` : "";
+    const atrium = f === 2 ? `<span class="atrium" style="left:${cells(4.15)};top:${cells(4.55)};width:${cells(2.7)};height:${cells(1.7)}"></span>` : "";
+    const rooms = PLAN_ROOMS.filter((r) => r.f === f).map((r) =>
+      `<span class="room" style="--i:8;left:${cells(r.x)};top:${cells(r.y)};width:${cells(r.w)};height:${cells(r.h)}"><span class="lbl"><span class="pin">${r.name}</span></span></span>`).join("");
     const blocks = UNITS.filter((u) => u.f === f).map((u, i) => {
-      const top = u.y + (u.y >= 4 ? .4 : 0);
-      const style = `--c:${cssVar(CATS[u.cat].c)};--i:${i};left:calc(${cells(u.x)} + 3px);top:calc(${cells(top)} + 3px);width:calc(${cells(u.w)} - 6px);height:calc(${cells(u.h)} - 6px)`;
-      return `<div class="blk" role="button" tabindex="0" data-cut-unit="${u.id}" aria-label="${u.name}, приміщення ${u.id}" style="${style}"><i class="ws"></i><i class="wf"></i><i class="top"></i><span class="lbl"><span class="pin">${u.name}<small>${u.id}</small></span></span></div>`;
+      const style = `--c:${cssVar(CATS[u.cat].c)};--i:${i};left:calc(${cells(u.x)} + 3px);top:calc(${cells(u.y)} + 3px);width:calc(${cells(u.w)} - 6px);height:calc(${cells(u.h)} - 6px)${labelSpot(u)}`;
+      const top = u.shape ? `<i class="top poly">${shapeSvg(u, "glow")}${shapeSvg(u, "")}</i>` : `<i class="top"></i>`;
+      return `<div class="blk${u.shape ? " shaped" : ""}" role="button" tabindex="0" data-cut-unit="${u.id}" aria-label="${u.name}, приміщення ${u.id}" style="${style}"><i class="ws"></i><i class="wf"></i>${top}<span class="lbl"><span class="pin">${u.name}<small>${u.id}</small></span></span></div>`;
     }).join("");
     const zones = PLATE_ZONES.filter((zn) => zn.f === f).map((zn) =>
       `<div class="zone" role="button" tabindex="0" data-cut-unit="${zn.id}" aria-label="${zn.name}" style="--c:var(--gold);--i:9;left:${cells(zn.x)};top:${cells(zn.y)};width:${cells(zn.w)};height:${cells(zn.h)}"><span class="lbl"><span class="pin">${zn.name}<small>${zn.note}</small></span></span></div>`).join("");
-    return atrium + marks + zones + blocks;
+    return atrium + rooms + marks + zones + blocks;
   }
 
   function listHtml(f) {
@@ -1293,10 +1370,11 @@ footer a:hover{color:var(--gold-hi)}
     const stems = Array.from({length:Math.floor((PIN.max - PIN.min) / PIN.step) + 1}, (_, i) => PIN.min + i * PIN.step);
     const boxAt = (p, stem) => ({l:p.x - p.w / 2, r:p.x + p.w / 2, t:p.y - stem - p.h, b:p.y - stem});
     const overlaps = (a, b) => a.l < b.r + PIN.gap && b.l < a.r + PIN.gap && a.t < b.b + PIN.gap && b.t < a.b + PIN.gap;
-    const pins = [...plate.querySelectorAll("[data-cut-unit]")].map((el) => {
-      const pin = el.querySelector(".pin");
-      const cx = el.offsetLeft + el.offsetWidth / 2 - w / 2;
-      const cy = el.offsetTop + el.offsetHeight / 2 - h / 2;
+    const pins = [...plate.querySelectorAll(".lbl")].map((lbl) => {
+      const el = lbl.parentElement;
+      const pin = lbl.querySelector(".pin");
+      const cx = el.offsetLeft + lbl.offsetLeft - w / 2;
+      const cy = el.offsetTop + lbl.offsetTop - h / 2;
       const anchorX = cx * Math.cos(rz) + cy * Math.sin(rz);
       const pinW = pin.offsetWidth;
       const x = Math.max(pinW / 2 - half, Math.min(half - pinW / 2, anchorX));
@@ -1361,6 +1439,8 @@ footer a:hover{color:var(--gold-hi)}
     const wasClosed = cut.floor === null;
     cut = {...cut, floor:f, last:f, opener:wasClosed ? document.activeElement : cut.opener};
     plate.innerHTML = plateHtml(f);
+    plate.style.setProperty("--rows", FLOOR_GRID[f].rows);
+    plate.classList.toggle("is-deep", Boolean(FLOOR_GRID[f].hall));
     plate.style.setProperty("--ty", PLATE_ZONES.some((zn) => zn.f === f) ? "0%" : "8%");
     const strip = $("#cutList");
     strip.innerHTML = listHtml(f);
