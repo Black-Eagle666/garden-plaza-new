@@ -154,7 +154,8 @@ p{margin:0}
 .wm-gymmaxi svg{flex:none;width:15px;height:21px;fill:#FFE100}
 .wm-gymmaxi span{font:900 11px/1 var(--sans);letter-spacing:.03em;color:#fff}
 .wm-gymmaxi b{display:block;margin-top:1px;font-size:15px}
-.wm-beauty{font:italic 500 18px var(--serif);color:#E8A9C0}
+.wm-tiffany{font:600 14px/1 var(--serif);letter-spacing:.16em;color:#81D8D0;text-align:center}
+.wm-tiffany small{display:block;margin-top:4px;font:400 9px var(--sans);letter-spacing:.18em;color:#A9E3DE;text-transform:uppercase}
 .wm-img img{display:block;width:auto;height:15px;max-width:100%}
 .wm-hotel{font:500 12px var(--serif);color:var(--gold-hi);letter-spacing:.18em}
 
@@ -888,14 +889,15 @@ footer a:hover{color:var(--gold-hi)}
     {id:"3.01",f:3,x:0,y:0,w:4,h:3,cat:"food",name:"Garden Plaza",about:"Ресторан: кухня й бар, бронювання столу, доставка. Меню з цінами на gardenplaza.com.ua.",tags:"ресторан їжа обід доставка garden plaza бар"},
     {id:"3.02",f:3,x:4,y:0,w:4,h:3,cat:"fun",name:"GYM MAXI",about:"Спортзал GYM MAXI.",tags:"gym maxi джим максі спорт спортзал тренажерний зал фітнес бокс мма стретчинг тренер"},
     {id:"3.03",f:3,x:8,y:0,w:4,h:3,cat:"tech",name:"Mezey Shop",about:"Техніка Apple.",tags:"mezey shop мезей apple епл айфон iphone macbook ipad airpods техніка телефон ремонт"},
-    {id:"3.04",f:3,x:0,y:4,w:4,h:2,cat:"services",name:"Салон краси",about:"Перукарня і салон краси.",tags:"перукарня салон краси стрижка манікюр"},
+    {id:"3.04",f:3,x:0,y:4,w:4,h:2,cat:"services",name:"Tiffany Beauty Salon",about:"Салон краси Tiffany.",tags:"tiffany тіффані тифані салон краси перукарня стрижка фарбування зачіска макіяж манікюр педикюр брови вії косметологія масаж"},
     {id:"3.05",f:3,x:8,y:4,w:4,h:2,cat:"services",name:"MonoTaxi",about:"Служба таксі MonoTaxi.",tags:"monotaxi mono taxi монотаксі таксі офіс доставка тверезий водій"},
 
     {id:"4.01",f:4,x:0,y:0,w:12,h:3,cat:"home",name:"Готель",about:"Номери для гостей. Бронювання за телефоном (068) 535-00-99.",hours:"цілодобово",tags:"готель номер ночівля"}
   ];
   // опис, телефон і графік кожного закладу.
   // Справжні дані: 3.02 GYM MAXI (Instagram @gym_maxi_new; телефон із допису за жовтень 2024, перевірити),
-  // 3.03 Mezey Shop (Instagram @mezey_shop), 3.05 MonoTaxi (monotaxi.com.ua, 12.11.2026), телефон ресторану й готелю.
+  // 3.03 Mezey Shop (Instagram @mezey_shop), 3.04 Tiffany (Instagram @tiffany_beauty_salon_; телефону й графіка в профілі немає),
+  // 3.05 MonoTaxi (monotaxi.com.ua, 12.11.2026), телефон ресторану й готелю.
   // Решта — ПРИКЛАД: тексти й номери вигадані.
   const SHOP_INFO = {
     "1.01":{about:"Великий продуктовий магазин: свіжа випічка з власної пекарні, охолоджене м'ясо, сири, овочі та фрукти від місцевих господарств. Є відділ готових страв і кава з собою.", phone:"0680000101", hours:"8:00–22:00"},
@@ -918,7 +920,7 @@ footer a:hover{color:var(--gold-hi)}
     "3.01":{about:"Ресторан Garden Plaza: європейська й закарпатська кухня, власний бар, літня тераса з краєвидом на гори. Бронювання столів, банкети, доставка по Нересниці та селах поруч.", phone:"0685350099", hours:"10:00–23:00"},
     "3.02":{about:"Спортзал GYM MAXI: бігові доріжки, вільна вага й тренажери. Персональні заняття з тренером і групові з боксу, ММА, фітнесу та стретчингу. У святкові дні зал працює з 12:00 до 22:00.", phones:["0975350099"], hours:"Пн–Сб 8:00–22:00, Нд 13:00–20:00", logo:"shops/logo/3.02.webp", pics:["shops/3.02-1.webp"]},
     "3.03":{about:"Mezey Shop: нова та вживана техніка Apple — iPhone, iPad, MacBook, AirPods і фірмові аксесуари. Ремонт техніки будь-якої складності.", phones:["0968477627"], hours:"Пн–Сб 9:00–18:00, Нд вихідний", logo:"shops/logo/3.03.webp", pics:["shops/3.03-1.webp"]},
-    "3.04":{about:"Перукарня і салон краси: стрижки, складне фарбування, вечірні зачіски, макіяж, брови та вії. Збори нареченої — за попереднім записом.", phone:"0680000304", hours:"9:00–20:00"},
+    "3.04":{about:"Салон краси Tiffany: фарбування й догляд за волоссям, стрижки, зачіски та макіяж, манікюр і педикюр, брови й вії, косметологія та масаж. Майстра обираєте самі.", phones:[], hours:"уточнюйте в салоні", logo:"shops/logo/3.04.webp"},
     "3.05":{about:"Служба таксі MonoTaxi: поїздки Нересницею та за її межі, «тверезий водій», кур'єрська доставка й доставка продуктів. Виклик авто безкоштовний, тариф від 29 грн/км, мінімальне замовлення — 150 грн. Офіс на третьому поверсі центру.", phones:["0981873000", "0981874000"], hours:"7:00–01:00", logo:"shops/logo/3.05.webp"},
     "4.01":{about:"Готель на четвертому поверсі: затишні номери зі своєю ванною, Wi‑Fi і краєвидом на гори. Сніданок у ресторані Garden Plaza, безкоштовний паркінг для гостей.", phone:"0685350099", hours:"цілодобово"}
   };
@@ -934,6 +936,7 @@ footer a:hover{color:var(--gold-hi)}
     "1.04":[{href:"https://garden-street-food.pages.dev", label:"Меню й замовлення"}],
     "3.02":[{href:"https://www.instagram.com/gym_maxi_new/", label:"Instagram"}],
     "3.03":[{href:"https://www.instagram.com/mezey_shop/", label:"Instagram"}, {href:"https://t.me/mezeyshop", label:"Telegram"}],
+    "3.04":[{href:"https://www.instagram.com/tiffany_beauty_salon_/", label:"Написати в Instagram"}],
     "3.05":[{href:"https://monotaxi.com.ua/", label:"monotaxi.com.ua"}, {href:"https://www.instagram.com/mono.taxi/", label:"Instagram"}],
     "parking":[{href:"https://www.google.com/maps/search/?api=1&query=48.1196052,23.7721827", label:"Прокласти маршрут"}]
   };
@@ -1093,7 +1096,7 @@ footer a:hover{color:var(--gold-hi)}
       <dl><dt>Поверх</dt><dd>${u.f}</dd><dt>Приміщення</dt><dd>${u.id}</dd><dt>Графік</dt><dd>${s.hours}</dd></dl>
       <div class="acts">
         ${phonesHtml(s, "btn")}
-        ${linksHtml(s, "btn ghost")}
+        ${linksHtml(s, s.phones.length ? "btn ghost" : "btn")}
         <button class="btn ghost" type="button" data-show-floor="${u.f}" data-show="${u.id}">Показати на 3D-плані</button>
       </div>
       <button class="back" type="button" data-back>Назад до списку</button>`;
@@ -1187,7 +1190,7 @@ footer a:hover{color:var(--gold-hi)}
     {unit:"2.01", cls:"wm-gent", html:"ДЖЕНТЕЛЬМЕН"},
     {unit:"2.05", cls:"wm-credo", html:"КРЕДО<small>клініка</small>", label:"Кредо клініка"},
     {unit:"3.02", cls:"wm-gymmaxi", html:'<svg viewBox="0 0 20 28" aria-hidden="true"><rect x="3" width="14" height="4" rx="1"/><rect y="5" width="20" height="6" rx="1.5"/><rect x="7" y="11" width="6" height="6"/><rect y="17" width="20" height="6" rx="1.5"/><rect x="3" y="24" width="14" height="4" rx="1"/></svg><span>GYM<b>MAXI</b></span>', label:"GYM MAXI"},
-    {unit:"3.04", cls:"wm-beauty", html:"Салон краси"},
+    {unit:"3.04", cls:"wm-tiffany", html:"TIFFANY<small>Beauty Salon</small>", label:"Tiffany Beauty Salon"},
     {unit:"3.05", cls:"wm-img", html:'<img src="shops/logo/3.05-wide.webp" alt="" width="500" height="74" decoding="async">', label:"MonoTaxi"},
     {unit:"4.01", cls:"wm-hotel", html:"ГОТЕЛЬ"}
   ];
@@ -1268,7 +1271,7 @@ footer a:hover{color:var(--gold-hi)}
 
   function infoHtml(s) {
     const pics = s.pics.length ? `<div class="pics">${picsHtml(s)}</div>` : "";
-    return `${pics}<div class="who">${logoHtml(s)}<div><span class="tag" style="--c:${s.color}"><i></i>${s.tag}</span><h3>${s.name}</h3><div class="meta">${s.where}</div><div class="hrs">Графік: ${s.hours}</div></div></div><p>${s.about}</p><div class="acts">${phonesHtml(s, "call")}${linksHtml(s)}</div>`;
+    return `${pics}<div class="who">${logoHtml(s)}<div><span class="tag" style="--c:${s.color}"><i></i>${s.tag}</span><h3>${s.name}</h3><div class="meta">${s.where}</div><div class="hrs">Графік: ${s.hours}</div></div></div><p>${s.about}</p><div class="acts">${phonesHtml(s, "call")}${linksHtml(s, s.phones.length ? "" : "call")}</div>`;
   }
 
   // Розставляє підписи над блоками, щоб вони не перекривались і не виходили за край плану.
