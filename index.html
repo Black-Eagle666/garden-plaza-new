@@ -148,10 +148,12 @@ p{margin:0}
 .wm-gent{font:500 11px var(--serif);letter-spacing:.14em}
 .wm-credo{font:800 16px/1 var(--sans);color:#5FB3C9;letter-spacing:.06em;text-align:center}
 .wm-credo small{display:block;font:400 10px var(--sans);color:#9FCFDB;letter-spacing:.2em;margin-top:3px;text-transform:uppercase}
-.wm-gym{font:900 15px var(--sans);letter-spacing:.04em}
-.wm-gym b{color:var(--moss)}
+.wm-gymmaxi{display:flex;align-items:center;gap:7px;text-align:left}
+.wm-gymmaxi svg{flex:none;width:15px;height:21px;fill:#FFE100}
+.wm-gymmaxi span{font:900 11px/1 var(--sans);letter-spacing:.03em;color:#fff}
+.wm-gymmaxi b{display:block;margin-top:1px;font-size:15px}
 .wm-beauty{font:italic 500 18px var(--serif);color:#E8A9C0}
-.wm-taxi{font:900 16px var(--sans);color:#111;background:#F5C518;padding:4px 8px;border-radius:4px;letter-spacing:.08em}
+.wm-img img{display:block;width:auto;height:15px;max-width:100%}
 .wm-hotel{font:500 12px var(--serif);color:var(--gold-hi);letter-spacing:.18em}
 
 .quick{position:absolute;z-index:3;right:clamp(16px,1.4vw,26px);bottom:4.5%;width:clamp(152px,10.8vw,182px);display:flex;flex-direction:column;gap:8px}
@@ -236,6 +238,8 @@ p{margin:0}
 .cut-info[hidden]{display:none}
 .cut-info .pics{display:grid;grid-template-columns:auto auto;gap:8px}
 .cut-info .pics img{display:block;width:112px;height:84px;object-fit:cover;border-radius:8px;border:1px solid rgba(201,164,106,.3);background:#1A140F}
+.who{display:flex;align-items:center;gap:14px;min-width:0}
+.brand-logo{flex:none;width:56px;height:56px;border-radius:12px;object-fit:cover;border:1px solid rgba(201,164,106,.3);background:#0B0907}
 .cut-info .tag{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:4px}
 .cut-info .tag i{width:9px;height:9px;border-radius:3px;background:var(--c)}
 .cut-info h3{font:500 28px/1.05 var(--serif);color:#fff}
@@ -244,6 +248,7 @@ p{margin:0}
 .cut-info p{font-size:13.5px;line-height:1.5;color:#D9CDBB}
 .cut-info .acts{display:flex;flex-direction:column;gap:8px;align-items:stretch}
 .cut-info .acts a{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border-radius:99px;border:1px solid var(--gold);font:600 13px/1 var(--sans);text-decoration:none;white-space:nowrap;color:var(--gold-hi);transition:background .2s}
+.cut-info .acts:has(> :nth-child(3)){display:grid;grid-template-columns:auto auto}
 .cut-info .acts a:hover{background:rgba(201,164,106,.16)}
 .cut-info .acts a.call{background:linear-gradient(180deg,#EED39C,#C9A46A);color:var(--espresso);border-color:#EED39C}
 .cut-info .acts a.call:hover{filter:brightness(1.07)}
@@ -338,10 +343,13 @@ p{margin:0}
   .cut-info,.cut-info.no-pics{grid-template-columns:1fr;gap:14px;align-self:stretch;width:auto;margin:2px max(14px,var(--sar)) 0 max(14px,var(--sal));padding:16px}
   .cut-info .who{order:1}
   .cut-info .acts{order:2;flex-direction:row;flex-wrap:wrap}
+  .cut-info .acts:has(> :nth-child(3)){grid-template-columns:1fr 1fr}
   .cut-info .acts a{flex:1 1 140px;padding:13px 16px}
   .cut-info p{order:3;font-size:14.5px}
   .cut-info .pics{order:4;grid-template-columns:1fr 1fr}
   .cut-info .pics img{width:100%;height:auto;aspect-ratio:4/3}
+  .cut-info .pics:has(> img:only-child){grid-template-columns:minmax(0,240px)}
+  .cut-info .pics img:only-child{aspect-ratio:16/9}
   .cut-legend{padding:6px 14px 0}
   .cut-hint{margin:10px 22px 0}
 }
@@ -507,6 +515,8 @@ footer a:hover{color:var(--gold-hi)}
 .more{display:none}
 .card .pics{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .card .pics img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:6px;border:1px solid rgba(201,164,106,.28);background:var(--roast)}
+.card .pics:has(> img:only-child){grid-template-columns:1fr}
+.card .pics img:only-child{aspect-ratio:16/9}
 .card .acts{display:flex;flex-direction:column;gap:8px}
 .card .acts .btn{justify-content:center;padding:12px 16px;font-size:14px}
 .card .back{align-self:flex-start;padding:8px 0;border:0;background:none;color:var(--muted);font:400 14px var(--sans);text-decoration:underline;text-underline-offset:4px;cursor:pointer}
@@ -769,7 +779,7 @@ footer a:hover{color:var(--gold-hi)}
       </div>
       <div class="info-row">
         <svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="15" cy="11" r="4"/><path d="M7 26c0-5 3.6-8 8-8s8 3 8 8"/></svg>
-        <h3>Спортзал</h3><p>Тренажерний зал на третьому поверсі, поруч із рестораном.</p>
+        <h3>Спортзал GYM MAXI</h3><p>Третій поверх: тренажери, персональні заняття з тренером і групові з боксу, ММА, фітнесу та стретчингу.</p>
       </div>
     </div>
   </div>
@@ -874,14 +884,16 @@ footer a:hover{color:var(--gold-hi)}
     {id:"2.08",f:2,x:9,y:4,w:3,h:2,cat:"services",name:"Косметологія",about:"Кабінет косметології.",tags:"косметологія косметолог догляд шкіра"},
 
     {id:"3.01",f:3,x:0,y:0,w:4,h:3,cat:"food",name:"Garden Plaza",about:"Ресторан: кухня й бар, бронювання столу, доставка. Меню з цінами на gardenplaza.com.ua.",tags:"ресторан їжа обід доставка garden plaza бар"},
-    {id:"3.02",f:3,x:4,y:0,w:4,h:3,cat:"fun",name:"Спортзал",about:"Тренажерний зал.",tags:"спорт спортзал тренажерний зал фітнес"},
+    {id:"3.02",f:3,x:4,y:0,w:4,h:3,cat:"fun",name:"GYM MAXI",about:"Спортзал GYM MAXI.",tags:"gym maxi джим максі спорт спортзал тренажерний зал фітнес бокс мма стретчинг тренер"},
     {id:"3.03",f:3,x:8,y:0,w:4,h:3,cat:"tech",name:"Apple",about:"Магазин техніки Apple: iPhone, MacBook, iPad, аксесуари.",tags:"apple iphone macbook ipad техніка телефон"},
     {id:"3.04",f:3,x:0,y:4,w:4,h:2,cat:"services",name:"Салон краси",about:"Перукарня і салон краси.",tags:"перукарня салон краси стрижка манікюр"},
-    {id:"3.05",f:3,x:8,y:4,w:4,h:2,cat:"services",name:"Таксі",about:"Офіс служби таксі.",tags:"таксі офіс"},
+    {id:"3.05",f:3,x:8,y:4,w:4,h:2,cat:"services",name:"MonoTaxi",about:"Служба таксі MonoTaxi.",tags:"monotaxi mono taxi монотаксі таксі офіс доставка тверезий водій"},
 
     {id:"4.01",f:4,x:0,y:0,w:12,h:3,cat:"home",name:"Готель",about:"Номери для гостей. Бронювання за телефоном (068) 535-00-99.",hours:"цілодобово",tags:"готель номер ночівля"}
   ];
-  // опис, телефон і графік кожного закладу. ПРИКЛАД: тексти й номери вигадані, замінити на справжні
+  // опис, телефон і графік кожного закладу.
+  // Справжні дані: 3.02 GYM MAXI (Instagram @gym_maxi_new; телефон із допису за жовтень 2024, перевірити),
+  // 3.05 MonoTaxi (monotaxi.com.ua, 12.11.2026), телефон ресторану й готелю. Решта — ПРИКЛАД: тексти й номери вигадані.
   const SHOP_INFO = {
     "1.01":{about:"Великий продуктовий магазин: свіжа випічка з власної пекарні, охолоджене м'ясо, сири, овочі та фрукти від місцевих господарств. Є відділ готових страв і кава з собою.", phone:"0680000101", hours:"8:00–22:00"},
     "1.02":{about:"Ліки за рецептом і без, вітаміни, дитяче харчування, засоби догляду. Фармацевт підкаже заміну й перевірить наявність, рідкісні препарати привозять під замовлення за день.", phone:"0680000102", hours:"8:00–21:00"},
@@ -901,10 +913,10 @@ footer a:hover{color:var(--gold-hi)}
     "2.07":{about:"Килими й доріжки для дому: класичні, сучасні, дитячі, вовняні й синтетичні. Підрізаємо та оверлочимо під ваш розмір, доставляємо додому.", phone:"0680000207", hours:"10:00–19:00"},
     "2.08":{about:"Кабінет косметології: чистки, пілінги, апаратні процедури, догляд за шкірою обличчя й тіла. Перша консультація безкоштовна, працюємо за записом.", phone:"0680000208", hours:"9:00–20:00"},
     "3.01":{about:"Ресторан Garden Plaza: європейська й закарпатська кухня, власний бар, літня тераса з краєвидом на гори. Бронювання столів, банкети, доставка по Нересниці та селах поруч.", phone:"0685350099", hours:"10:00–23:00"},
-    "3.02":{about:"Тренажерний зал: кардіозона, вільна вага, тренажери для всіх груп м'язів. Працюють тренери, є разові відвідування, абонементи й роздягальні з душем.", phone:"0680000302", hours:"7:00–22:00"},
+    "3.02":{about:"Спортзал GYM MAXI: бігові доріжки, вільна вага й тренажери. Персональні заняття з тренером і групові з боксу, ММА, фітнесу та стретчингу. У святкові дні зал працює з 12:00 до 22:00.", phones:["0975350099"], hours:"Пн–Сб 8:00–22:00, Нд 13:00–20:00", logo:"shops/logo/3.02.webp", pics:["shops/3.02-1.webp"]},
     "3.03":{about:"Техніка Apple: iPhone, MacBook, iPad, Apple Watch, AirPods і фірмові аксесуари. Перенесемо дані зі старого телефона, наклеїмо скло, є оплата частинами.", phone:"0680000303", hours:"10:00–20:00"},
     "3.04":{about:"Перукарня і салон краси: стрижки, складне фарбування, вечірні зачіски, макіяж, брови та вії. Збори нареченої — за попереднім записом.", phone:"0680000304", hours:"9:00–20:00"},
-    "3.05":{about:"Офіс служби таксі: замовлення авто по Нересниці та району, поїздки в аеропорт і на вокзал, доставка. Тут же приймають водіїв на роботу.", phone:"0680000305", hours:"цілодобово"},
+    "3.05":{about:"Служба таксі MonoTaxi: поїздки Нересницею та за її межі, «тверезий водій», кур'єрська доставка й доставка продуктів. Виклик авто безкоштовний, тариф від 29 грн/км, мінімальне замовлення — 150 грн. Офіс на третьому поверсі центру.", phones:["0981873000", "0981874000"], hours:"7:00–01:00", logo:"shops/logo/3.05.webp"},
     "4.01":{about:"Готель на четвертому поверсі: затишні номери зі своєю ванною, Wi‑Fi і краєвидом на гори. Сніданок у ресторані Garden Plaza, безкоштовний паркінг для гостей.", phone:"0685350099", hours:"цілодобово"}
   };
   const UNITS = UNITS_BASE.map((u) => ({...u, ...SHOP_INFO[u.id]}));
@@ -917,6 +929,8 @@ footer a:hover{color:var(--gold-hi)}
   const SHOP_LINKS = {
     "3.01":[{href:"https://gardenplaza.com.ua", label:"Меню і доставка"}],
     "1.04":[{href:"https://garden-street-food.pages.dev", label:"Меню й замовлення"}],
+    "3.02":[{href:"https://www.instagram.com/gym_maxi_new/", label:"Instagram"}],
+    "3.05":[{href:"https://monotaxi.com.ua/", label:"monotaxi.com.ua"}, {href:"https://www.instagram.com/mono.taxi/", label:"Instagram"}],
     "parking":[{href:"https://www.google.com/maps/search/?api=1&query=48.1196052,23.7721827", label:"Прокласти маршрут"}]
   };
   // зони поза приміщеннями; координати в клітинках плану, y > 6.4 — перед фасадом
@@ -1052,28 +1066,29 @@ footer a:hover{color:var(--gold-hi)}
     const zone = PLATE_ZONES.find((zn) => zn.id === id);
     if (zone) {
       return {name:zone.name, tag:"Відвідувачам", color:"var(--gold)", where:`${zone.note}, перед входом`, hours:"цілодобово",
-        about:"Безкоштовний паркінг біля входу для відвідувачів центру, ресторану й готелю.", phone:MALL_PHONE, pics:[], links:SHOP_LINKS[id] || []};
+        about:"Безкоштовний паркінг біля входу для відвідувачів центру, ресторану й готелю.", phones:[MALL_PHONE], logo:null, pics:[], links:SHOP_LINKS[id] || []};
     }
     if (!unit) return null;
     return {name:unit.name, tag:CATS[unit.cat].name, color:cssVar(CATS[unit.cat].c), where:`${unit.f} поверх, приміщення ${unit.id}`,
-      hours:unit.hours || DEFAULT_HOURS, about:unit.about, phone:unit.phone || MALL_PHONE,
-      pics:[1, 2].map((n) => `shops/${unit.id}-${n}.webp`), links:SHOP_LINKS[id] || []};
+      hours:unit.hours || DEFAULT_HOURS, about:unit.about, phones:unit.phones || [unit.phone || MALL_PHONE], logo:unit.logo || null,
+      pics:unit.pics || [1, 2].map((n) => `shops/${unit.id}-${n}.webp`), links:SHOP_LINKS[id] || []};
   }
   const picsHtml = (s) => s.pics.map((src, i) =>
     `<img src="${src}" alt="${s.name}, фото ${i + 1}" loading="lazy" decoding="async" width="640" height="480">`).join("");
+  const logoHtml = (s) => (s.logo ? `<img class="brand-logo" src="${s.logo}" alt="Логотип ${s.name}" loading="lazy" decoding="async" width="160" height="160">` : "");
+  const phonesHtml = (s, cls) => s.phones.map((n) => `<a class="${cls}" href="${telHref(n)}">${telLabel(n)}</a>`).join("");
   const linksHtml = (s, cls) => s.links.map((l) =>
     `<a${cls ? ` class="${cls}"` : ""} href="${l.href}" target="_blank" rel="noopener">${l.label}</a>`).join("");
 
   function cardForUnit(u) {
     const s = shopFacts(u.id);
     return `
-      <span class="tag" style="--c:${s.color}"><i></i>${s.tag}</span>
-      <h3>${s.name}</h3>
+      <div class="who">${logoHtml(s)}<div><span class="tag" style="--c:${s.color}"><i></i>${s.tag}</span><h3>${s.name}</h3></div></div>
       <div class="pics">${picsHtml(s)}</div>
       <p>${s.about}</p>
       <dl><dt>Поверх</dt><dd>${u.f}</dd><dt>Приміщення</dt><dd>${u.id}</dd><dt>Графік</dt><dd>${s.hours}</dd></dl>
       <div class="acts">
-        <a class="btn" href="${telHref(s.phone)}">${telLabel(s.phone)}</a>
+        ${phonesHtml(s, "btn")}
         ${linksHtml(s, "btn ghost")}
         <button class="btn ghost" type="button" data-show-floor="${u.f}" data-show="${u.id}">Показати на 3D-плані</button>
       </div>
@@ -1167,9 +1182,9 @@ footer a:hover{color:var(--gold-hi)}
     {unit:"3.03", cls:"wm-apple", html:'<svg viewBox="0 0 24 28" aria-hidden="true"><use href="#i-apple"/></svg>', label:"Apple"},
     {unit:"2.01", cls:"wm-gent", html:"ДЖЕНТЕЛЬМЕН"},
     {unit:"2.05", cls:"wm-credo", html:"КРЕДО<small>клініка</small>", label:"Кредо клініка"},
-    {unit:"3.02", cls:"wm-gym", html:"SPORT<b>ZAL</b>", label:"Спортзал"},
+    {unit:"3.02", cls:"wm-gymmaxi", html:'<svg viewBox="0 0 20 28" aria-hidden="true"><rect x="3" width="14" height="4" rx="1"/><rect y="5" width="20" height="6" rx="1.5"/><rect x="7" y="11" width="6" height="6"/><rect y="17" width="20" height="6" rx="1.5"/><rect x="3" y="24" width="14" height="4" rx="1"/></svg><span>GYM<b>MAXI</b></span>', label:"GYM MAXI"},
     {unit:"3.04", cls:"wm-beauty", html:"Салон краси"},
-    {unit:"3.05", cls:"wm-taxi", html:"ТАКСІ"},
+    {unit:"3.05", cls:"wm-img", html:'<img src="shops/logo/3.05-wide.webp" alt="" width="500" height="74" decoding="async">', label:"MonoTaxi"},
     {unit:"4.01", cls:"wm-hotel", html:"ГОТЕЛЬ"}
   ];
   let hero = {floor:4, timer:null};
@@ -1249,7 +1264,7 @@ footer a:hover{color:var(--gold-hi)}
 
   function infoHtml(s) {
     const pics = s.pics.length ? `<div class="pics">${picsHtml(s)}</div>` : "";
-    return `${pics}<div class="who"><span class="tag" style="--c:${s.color}"><i></i>${s.tag}</span><h3>${s.name}</h3><div class="meta">${s.where}</div><div class="hrs">Графік: ${s.hours}</div></div><p>${s.about}</p><div class="acts"><a class="call" href="${telHref(s.phone)}">${telLabel(s.phone)}</a>${linksHtml(s)}</div>`;
+    return `${pics}<div class="who">${logoHtml(s)}<div><span class="tag" style="--c:${s.color}"><i></i>${s.tag}</span><h3>${s.name}</h3><div class="meta">${s.where}</div><div class="hrs">Графік: ${s.hours}</div></div></div><p>${s.about}</p><div class="acts">${phonesHtml(s, "call")}${linksHtml(s)}</div>`;
   }
 
   // Розставляє підписи над блоками, щоб вони не перекривались і не виходили за край плану.
