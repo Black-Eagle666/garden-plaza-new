@@ -212,6 +212,22 @@ p{margin:0}
 .cut-list button:hover{border-color:var(--gold)}
 .cut-list button[aria-pressed="true"]{border-color:#FFE7B0;background:rgba(201,164,106,.2);box-shadow:0 0 0 1px #F2D08A,0 0 16px rgba(255,214,130,.65)}
 
+.cut-info{align-self:center;width:min(100%,980px);display:grid;grid-template-columns:minmax(180px,auto) 1fr auto;gap:8px 28px;align-items:center;padding:14px 20px;margin-bottom:6px;animation:rise .45s cubic-bezier(.2,.7,.2,1) both}
+.cut-info[hidden]{display:none}
+.cutaway.has-info .cut-legend{display:none}
+.cut-info .tag{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:4px}
+.cut-info .tag i{width:9px;height:9px;border-radius:3px;background:var(--c)}
+.cut-info h3{font:500 28px/1.05 var(--serif);color:#fff}
+.cut-info .meta{font-size:12px;color:var(--muted);margin-top:6px}
+.cut-info p{font-size:14px;line-height:1.5;color:#D9CDBB}
+.cut-info p small{display:block;margin-top:6px;font-size:12px}
+.cut-info .acts{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.cut-info .acts a{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border-radius:99px;border:1px solid var(--gold);font:600 13px/1 var(--sans);text-decoration:none;white-space:nowrap;color:var(--gold-hi);transition:background .2s}
+.cut-info .acts a:hover{background:rgba(201,164,106,.16)}
+.cut-info .acts a.call{background:linear-gradient(180deg,#EED39C,#C9A46A);color:var(--espresso);border-color:#EED39C}
+.cut-info .acts a.call:hover{filter:brightness(1.07)}
+.cut-info .acts small{font-size:11px;color:var(--muted);text-align:center}
+
 .zone{position:absolute;transform-style:preserve-3d;cursor:pointer;border:1px dashed var(--gold-lo);background:repeating-linear-gradient(90deg,rgba(201,164,106,.16) 0 1px,transparent 1px calc(var(--u) * .5)),rgba(201,164,106,.05);animation:pinin .5s ease both;animation-delay:1.2s}
 .blk.hl .top,.zone.hl{border:1px solid #FFE7B0;animation:neon 1.5s ease-in-out infinite alternate}
 .blk.hl .top{background:color-mix(in srgb,var(--c) 42%,#4A3818)}
@@ -239,6 +255,8 @@ p{margin:0}
   .hero.is-open .cutaway{max-height:1200px;transition:max-height .7s cubic-bezier(.3,0,.2,1),visibility 0s}
   .cut-stage{flex:none;height:min(72vw,520px)}
   .cut-list button{padding:7px 11px;font-size:12px}
+  .cut-info{grid-template-columns:1fr;padding:14px 16px}
+  .cut-info .acts{flex-direction:row;flex-wrap:wrap}
   .cut-head{margin-top:10px;gap:10px;padding-left:16px}
   .cut-stage{transform-origin:50% 0}
   .pin{font-size:10px;padding:4px 8px}
@@ -452,6 +470,7 @@ footer a:hover{color:var(--gold-hi)}
     </div>
     <div class="cut-stage" id="cutStage"><div class="plate" id="plate"></div></div>
     <div class="cut-list" id="cutList" role="group" aria-label="Заклади на поверсі"></div>
+    <div class="cut-info glass" id="cutInfo" aria-live="polite" hidden></div>
     <div class="cut-legend" id="cutLegend"></div>
   </div>
 
@@ -925,7 +944,13 @@ footer a:hover{color:var(--gold-hi)}
       el.addEventListener("click", go);
       el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
     });
-    document.querySelectorAll("[data-unit]").forEach((b) => b.addEventListener("click", () => { stopTour(); openUnit(b.dataset.unit); }));
+    document.querySelectorAll("[data-unit]").forEach((b) => b.addEventListener("click", () => {
+      const unit = UNITS.find((u) => u.id === b.dataset.unit);
+      if (!unit) return;
+      stopTour();
+      setHeroFloor(unit.f);
+      openCut(unit.f, unit.id);
+    }));
     document.querySelectorAll(".arrow").forEach((b) => b.addEventListener("click", () => {
       const track = $("#track");
       track.scrollBy({left: Number(b.dataset.dir) * track.clientWidth * .6});
@@ -938,8 +963,7 @@ footer a:hover{color:var(--gold-hi)}
       if (!blk) return;
       if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return;
       e.preventDefault();
-      if (UNITS.some((u) => u.id === blk.dataset.cutUnit)) openUnit(blk.dataset.cutUnit);
-      else setHighlight(blk.dataset.cutUnit);
+      setHighlight(cut.hl === blk.dataset.cutUnit ? null : blk.dataset.cutUnit);
     };
     $("#cutList").addEventListener("click", (e) => {
       const b = e.target.closest("[data-hl]");
@@ -992,6 +1016,14 @@ footer a:hover{color:var(--gold-hi)}
   const heroEl = $("#top"), cutaway = $("#cutaway"), cutStage = $("#cutStage"), plate = $("#plate");
   // зони поза приміщеннями; координати в клітинках плану, y > 6.4 — перед фасадом
   const PLATE_ZONES = [{id:"parking", f:1, x:0, y:6.75, w:7, h:1.5, name:"Паркінг", note:"1000 місць"}];
+  // контакти закладів; де немає запису — показуємо довідку ТЦ і мітку ЗАПОВНИТИ
+  const MALL_PHONE = {tel:"+380685350099", label:"(068) 535-00-99"};
+  const CONTACTS = {
+    "3.01":{phone:MALL_PHONE, links:[{href:"https://gardenplaza.com.ua", label:"Меню і доставка"}]},
+    "4.01":{phone:MALL_PHONE, links:[]},
+    "1.04":{phone:null, links:[{href:"https://garden-street-food.pages.dev", label:"Меню й замовлення"}]},
+    "parking":{phone:MALL_PHONE, links:[{href:"https://www.google.com/maps/search/?api=1&query=48.1196052,23.7721827", label:"Прокласти маршрут"}]}
+  };
   const cut = {floor:null, timer:null, hl:null};
   const cells = (n) => `calc(var(--u) * ${n})`;
 
@@ -1020,8 +1052,33 @@ footer a:hover{color:var(--gold-hi)}
     return [...units, ...zones].join("");
   }
 
+  function infoHtml(id) {
+    const unit = UNITS.find((u) => u.id === id);
+    const zone = PLATE_ZONES.find((zn) => zn.id === id);
+    if (!unit && !zone) return "";
+    const contact = CONTACTS[id];
+    const color = unit ? cssVar(CATS[unit.cat].c) : "var(--gold)";
+    const tag = unit ? CATS[unit.cat].name : "Відвідувачам";
+    const name = unit ? unit.name : zone.name;
+    const meta = unit ? `${unit.f} поверх · приміщення ${unit.id} · ${unit.hours || DEFAULT_HOURS}` : `${zone.note} · перед входом`;
+    const about = unit ? unit.about : "Безкоштовний паркінг біля входу для відвідувачів центру, ресторану й готелю.";
+    const phone = contact && contact.phone;
+    const links = contact ? contact.links : [];
+    const acts = [
+      phone ? `<a class="call" href="tel:${phone.tel}">${phone.label}</a>` : "",
+      ...links.map((l) => `<a href="${l.href}" target="_blank" rel="noopener">${l.label}</a>`),
+      contact ? "" : `<a class="call" href="tel:${MALL_PHONE.tel}">${MALL_PHONE.label}</a><small>довідка ТЦ</small>`
+    ].join("");
+    const todo = contact ? "" : `<small><span class="fill">ЗАПОВНИТИ: телефон і посилання закладу</span></small>`;
+    return `<div><span class="tag" style="--c:${color}"><i></i>${tag}</span><h3>${name}</h3><div class="meta">${meta}</div></div><p>${about}${todo}</p><div class="acts">${acts}</div>`;
+  }
+
   function setHighlight(id) {
     cut.hl = id;
+    const info = $("#cutInfo");
+    info.innerHTML = id ? infoHtml(id) : "";
+    info.hidden = !info.innerHTML;
+    cutaway.classList.toggle("has-info", !info.hidden);
     plate.querySelectorAll("[data-cut-unit]").forEach((el) => el.classList.toggle("hl", el.dataset.cutUnit === id));
     document.querySelectorAll("#cutList [data-hl]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.hl === id)));
   }
