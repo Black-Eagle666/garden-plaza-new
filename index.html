@@ -9,7 +9,9 @@
 <meta property="og:description" content="Магазини, ресторан і готель в одному місці на вулиці Грушевського.">
 <meta property="og:image" content="og.jpg">
 <meta name="theme-color" content="#07080C">
-<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preload" as="image" href="mall.webp" imagesrcset="mall-m.webp 1200w, mall.webp 2400w" imagesizes="(max-width:1100px) 100vw, 177svh">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -79,7 +81,7 @@ p{margin:0}
 
 .hhead{position:absolute;top:0;left:0;right:0;z-index:10;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;padding:20px clamp(20px,2.8vw,44px)}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;justify-self:start}
-.brand svg{width:48px;height:38px;color:var(--gold)}
+.brand img{display:block;width:46px;height:46px}
 .brand span{font:600 17px/1.05 var(--sans);letter-spacing:.1em}
 .pillnav{display:flex;gap:2px;padding:5px;border-radius:99px}
 .pillnav a{display:flex;align-items:center;gap:8px;padding:9px 20px;border-radius:99px;border:1px solid transparent;text-decoration:none;font-size:14px;color:#E8DFD1;white-space:nowrap;transition:color .2s,background .2s}
@@ -294,7 +296,7 @@ p{margin:0}
 
   .hhead{grid-template-columns:1fr auto;gap:12px;padding:calc(12px + env(safe-area-inset-top)) max(16px,var(--sar)) 0 max(16px,var(--sal))}
   .brand{gap:10px}
-  .brand svg{width:40px;height:32px}
+  .brand img{width:40px;height:40px}
   .brand span{font-size:15px}
   .hright{gap:10px}
   .status{display:flex;align-items:center;gap:9px;height:40px;padding:0 14px 0 12px;border-radius:99px;border:1px solid rgba(201,164,106,.3);background:rgba(14,11,8,.55);text-decoration:none;white-space:nowrap}
@@ -647,7 +649,7 @@ footer a:hover{color:var(--gold-hi)}
   </div>
 
   <header class="hhead">
-    <a class="brand" href="#top" aria-label="Garden Plaza, на початок"><svg aria-hidden="true"><use href="#i-lotus"/></svg><span>GARDEN<br>PLAZA</span></a>
+    <a class="brand" href="#top" aria-label="Garden Plaza, на початок"><img src="gp-mark.svg" alt="" width="46" height="46"><span>GARDEN<br>PLAZA</span></a>
     <nav class="pillnav glass" aria-label="Розділи">
       <a class="is-on" href="#top" aria-current="page"><svg aria-hidden="true"><use href="#i-cube"/></svg>3D Тур</a>
       <a href="#map">Магазини</a>
