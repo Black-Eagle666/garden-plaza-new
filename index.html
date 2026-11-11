@@ -274,7 +274,8 @@ p{margin:0}
   .hhead{position:relative;grid-template-columns:1fr auto;padding:16px 20px}
   .pillnav{grid-column:1 / -1;grid-row:2;overflow-x:auto;scrollbar-width:none;justify-self:stretch}
   .pillnav::-webkit-scrollbar{display:none}
-  .hcopy{position:relative;left:auto;top:auto;max-width:none;padding:8px 20px 22px;order:1}
+  .hcopy{position:absolute;left:0;top:0;width:1px;height:1px;max-width:none;padding:0;overflow:hidden;clip-path:inset(50%)}
+  .hcopy p,.hcopy .tour-btn{display:none}
   .scene{position:relative;top:auto;left:auto;width:100%;transform:none;order:2;overflow:hidden}
   .shade{background:linear-gradient(180deg,rgba(6,5,4,.0) 70%,rgba(7,8,12,1) 100%)}
   .floorsel{position:relative;order:3;right:auto;top:auto;width:auto;display:grid;grid-template-columns:repeat(4,1fr);margin:14px 20px 0}
