@@ -159,6 +159,8 @@ p{margin:0}
 .wm-tiffany{font:600 14px/1 var(--serif);letter-spacing:.16em;color:#81D8D0;text-align:center}
 .wm-tiffany small{display:block;margin-top:4px;font:400 9px var(--sans);letter-spacing:.18em;color:#A9E3DE;text-transform:uppercase}
 .wm-img img{display:block;width:auto;height:15px;max-width:100%}
+.wm-mid img{height:20px}
+.wm-tall img{height:30px}
 .wm-hotel{font:500 12px var(--serif);color:var(--gold-hi);letter-spacing:.18em}
 
 .quick{position:absolute;z-index:3;right:clamp(16px,1.4vw,26px);bottom:4.5%;width:clamp(152px,10.8vw,182px);display:flex;flex-direction:column;gap:8px}
@@ -232,6 +234,7 @@ p{margin:0}
 .pin::after{content:"";position:absolute;left:calc(50% - var(--dx,0px));top:100%;width:1px;height:var(--stem,14px);background:var(--c)}
 .pin small{font-weight:400;font-size:.85em;opacity:.6;margin-left:7px}
 .blk:hover .pin,.blk:focus-visible .pin{background:var(--c);color:var(--espresso)}
+@container (max-height:430px){.pin{font-size:10.5px;padding:4px 8px}.pin small{display:none}}
 @keyframes pinin{from{opacity:0;translate:0 8px}to{opacity:1}}
 
 /* вибраний заклад: золотий неон. Пульсує лише прозорість шару ::after, тінь не перемальовується */
@@ -302,6 +305,18 @@ p{margin:0}
   .hcopy{transition:opacity .4s ease,visibility 0s}
   .hero.is-open .hcopy{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .4s ease,visibility 0s .4s}
   .cutaway{background:radial-gradient(55% 45% at 50% 58%,rgba(201,164,106,.10),transparent 70%)}
+  /* картка закладу стоїть збоку від плану, а не під ним: план не стискається і підписи не збиваються в купу */
+  .cutaway.has-info .cut-stage{margin-right:340px}
+  .cut-info,.cut-info.no-pics{position:absolute;right:0;top:66px;width:324px;max-height:calc(100% - 170px);overflow-y:auto;scrollbar-width:thin;grid-template-columns:1fr;gap:12px;align-self:auto;margin:0;padding:16px}
+  .cut-info .who{order:1}
+  .cut-info .acts{order:2;flex-direction:row;flex-wrap:wrap}
+  .cut-info .acts:has(> :nth-child(3)){grid-template-columns:1fr 1fr}
+  .cut-info .acts a{flex:1 1 120px}
+  .cut-info p{order:3}
+  .cut-info .pics{order:4;grid-template-columns:1fr 1fr}
+  .cut-info .pics img{width:100%;height:auto;aspect-ratio:4/3}
+  .cut-info .pics:has(> img:only-child){grid-template-columns:1fr}
+  .cut-info .pics img:only-child{aspect-ratio:16/9}
 }
 @media (max-height:760px) and (min-width:1100.02px){.tagline{display:none}.hcopy{top:14%}}
 @media (max-width:1280px){.pillnav a{padding:9px 14px}.hours-chip{display:none}}
@@ -941,18 +956,18 @@ footer a:hover{color:var(--gold-hi)}
   // 1 поверх: назви з малюнка Миколи, описи загальні, телефонів і фото немає (дзвінок іде адміністрації центру);
   // що продають «Алма» і «Фурт сервіс», невідомо. 2 поверх, 3.06, 3.07 — ПРИКЛАД: тексти й номери вигадані.
   const SHOP_INFO = {
-    "1.01":{about:"Магазин мережі «Копійочка»: товари для дому, побутова хімія, посуд і дрібниці на щодень.", pics:[]},
+    "1.01":{about:"Магазин мережі «Копійочка»: товари для дому, побутова хімія, посуд і дрібниці на щодень.", logo:"shops/logo/1.01.webp", pics:[]},
     "1.02":{about:"Ліки за рецептом і без, вітаміни, дитяче харчування, засоби догляду."},
     "1.03":{about:"Пункт обміну валют: купівля й продаж долара, євро та інших валют. Курс уточнюйте на місці.", pics:[]},
     "1.04":{about:"Магазин косметики: декоративна косметика, парфумерія, засоби догляду за шкірою та волоссям.", pics:[]},
     "1.05":{about:"Свіжі квіти й букети на будь-який привід, кімнатні рослини."},
     "1.06":{about:"Магазин одягу на першому поверсі, праворуч у дальньому кутку.", pics:[]},
     "1.07":{about:"Килими й доріжки для дому.", pics:[]},
-    "1.08":{about:"Ювелірний магазин «Золотий вік»: каблучки, обручки, сережки й ланцюжки із золота та срібла. У холі біля входу є ще острівець магазину.", pics:[]},
+    "1.08":{about:"Ювелірний магазин «Золотий вік»: каблучки, обручки, сережки й ланцюжки із золота та срібла. У холі біля входу є ще острівець магазину.", logo:"shops/logo/zolotyi-vik-sq.svg", pics:[]},
     "1.09":{about:"Магазин «Алма» на першому поверсі, ліворуч від входу.", pics:[]},
     "1.10":{about:"Острівець «Фурт сервіс» у холі біля ескалаторів. Ще одна точка — праворуч від входу.", pics:[]},
     "1.11":{about:"Вільний острівець у холі біля ескалаторів. Здається в оренду: телефонуйте адміністрації центру.", pics:[]},
-    "1.12":{about:"Острівець ювелірного магазину «Золотий вік» у холі біля входу. Основний магазин — ліворуч, уздовж стіни.", pics:[]},
+    "1.12":{about:"Острівець ювелірного магазину «Золотий вік» у холі біля входу. Основний магазин — ліворуч, уздовж стіни.", logo:"shops/logo/zolotyi-vik-sq.svg", pics:[]},
     "1.13":{about:"Острівець у холі: сушені фрукти на вагу.", pics:[]},
     "1.14":{about:"«Фурт сервіс» праворуч від входу. Ще один острівець — у холі біля ескалаторів.", pics:[]},
     "2.01":{about:"Магазин чоловічого одягу: класичні костюми, сорочки, пальта, трикотаж і аксесуари. Допоможемо зібрати образ на весілля, випускний чи ділову зустріч, підгін по фігурі на місці.", phone:"0680000201", hours:"10:00–20:00"},
@@ -985,6 +1000,9 @@ footer a:hover{color:var(--gold-hi)}
     "3.03":[{href:"https://www.instagram.com/mezey_shop/", label:"Instagram"}, {href:"https://t.me/mezeyshop", label:"Telegram"}],
     "3.04":[{href:"https://www.instagram.com/tiffany_beauty_salon_/", label:"Написати в Instagram"}],
     "3.05":[{href:"https://monotaxi.com.ua/", label:"monotaxi.com.ua"}, {href:"https://www.instagram.com/mono.taxi/", label:"Instagram"}],
+    "1.01":[{href:"https://www.kopiyochka.ua/", label:"kopiyochka.ua"}],
+    "1.08":[{href:"https://zolotiyvik.ua/", label:"zolotiyvik.ua"}],
+    "1.12":[{href:"https://zolotiyvik.ua/", label:"zolotiyvik.ua"}],
     "parking":[{href:"https://www.google.com/maps/search/?api=1&query=48.1196052,23.7721827", label:"Прокласти маршрут"}]
   };
   // зони поза приміщеннями; координати в клітинках плану, y більший за висоту поверху — перед фасадом
@@ -1178,7 +1196,9 @@ footer a:hover{color:var(--gold-hi)}
   const hasPics = (u) => !u.pics || u.pics.length > 0;
   const thumbHtml = (u) => (hasPics(u)
     ? `<img src="shops/t/${u.id}.webp" alt="" loading="lazy" decoding="async" width="120" height="120">`
-    : `<span class="ph" aria-hidden="true">${u.name[0]}</span>`);
+    : u.logo
+      ? `<img src="${u.logo}" alt="" loading="lazy" decoding="async" width="120" height="120">`
+      : `<span class="ph" aria-hidden="true">${u.name[0]}</span>`);
   const picsHtml = (s) => s.pics.map((src, i) =>
     `<img src="${src}" alt="${s.name}, фото ${i + 1}" loading="lazy" decoding="async" width="640" height="480">`).join("");
   const logoHtml = (s) => (s.logo ? `<img class="brand-logo" src="${s.logo}" alt="Логотип ${s.name}" loading="lazy" decoding="async" width="160" height="160">` : "");
@@ -1291,7 +1311,9 @@ footer a:hover{color:var(--gold-hi)}
     {unit:"3.02", cls:"wm-gymmaxi", html:'<svg viewBox="0 0 20 28" aria-hidden="true"><rect x="3" width="14" height="4" rx="1"/><rect y="5" width="20" height="6" rx="1.5"/><rect x="7" y="11" width="6" height="6"/><rect y="17" width="20" height="6" rx="1.5"/><rect x="3" y="24" width="14" height="4" rx="1"/></svg><span>GYM<b>MAXI</b></span>', label:"GYM MAXI"},
     {unit:"3.04", cls:"wm-tiffany", html:"TIFFANY<small>Beauty Salon</small>", label:"Tiffany Beauty Salon"},
     {unit:"3.05", cls:"wm-img", html:'<img src="shops/logo/3.05-wide.webp" alt="" width="500" height="74" decoding="async">', label:"MonoTaxi"},
-    {unit:"4.01", cls:"wm-hotel", html:"ГОТЕЛЬ"}
+    {unit:"4.01", cls:"wm-hotel", html:"ГОТЕЛЬ"},
+    {unit:"1.01", cls:"wm-img wm-mid", html:'<img src="shops/logo/1.01-wide.webp" alt="" width="544" height="120" decoding="async">', label:"Копійочка"},
+    {unit:"1.08", also:["1.12"], cls:"wm-img wm-tall", html:'<img src="shops/logo/zolotyi-vik.svg" alt="" width="100" height="40" decoding="async">', label:"Золотий вік"}
   ];
   let hero = {floor:4, timer:null};
 
@@ -1367,7 +1389,7 @@ footer a:hover{color:var(--gold-hi)}
   function listHtml(f) {
     const tile = (id, label, mark, note) => `<button class="tile" type="button" data-hl="${id}" aria-pressed="false" aria-label="${label}">${mark}<small>${note}</small></button>`;
     const markFor = (u) => {
-      const logo = POPULAR.find((x) => x.unit === u.id);
+      const logo = POPULAR.find((x) => x.unit === u.id || (x.also || []).includes(u.id));
       return logo ? `<span class="wm ${logo.cls}">${logo.html}</span>` : `<span class="wm wm-plain">${u.name}</span>`;
     };
     const units = UNITS.filter((u) => u.f === f).map((u) => tile(u.id, u.name, markFor(u), `${u.f} поверх · ${u.id}`));
@@ -1643,6 +1665,9 @@ footer a:hover{color:var(--gold-hi)}
   bindEvents();
   watchSections();
   render();
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(() => { if (cut.floor !== null) requestAnimationFrame(layoutPins); }).observe(cutStage);
+  }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (cut.floor !== null) layoutPins(); });
 })();
 </script>
