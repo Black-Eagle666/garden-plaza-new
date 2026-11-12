@@ -56,7 +56,6 @@ p{margin:0}
 .hero{position:relative;height:100vh;height:100svh;min-height:680px;overflow:hidden;background:#07080C;isolation:isolate}
 .scene{position:absolute;top:50%;left:50%;width:max(100%, calc(100svh * 1.7684));aspect-ratio:2688/1520;transform:translate(-50%,-50%);z-index:0}
 .zoom{position:absolute;inset:0;transform-origin:var(--zx,60%) var(--zy,45%);transition:transform 1.8s cubic-bezier(.45,0,.2,1)}
-.zoom.on{transform:scale(1.16)}
 .zoom img{width:100%;height:100%;display:block}
 .shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:
   linear-gradient(90deg,rgba(6,5,4,.95) 0%,rgba(6,5,4,.78) 20%,rgba(6,5,4,.25) 38%,transparent 52%),
@@ -103,11 +102,6 @@ p{margin:0}
 .hcopy{position:absolute;z-index:3;left:clamp(20px,2.8vw,44px);top:17%;max-width:min(38vw,560px)}
 .hcopy h1{font:700 clamp(40px,4.5vw,72px)/1.04 var(--sans);letter-spacing:-.025em;color:#fff}
 .hcopy h1 em{display:block;font-style:normal;background:linear-gradient(180deg,#F6DEA8 0%,#D7B475 55%,#A9844F 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hcopy p{margin:16px 0 26px;font-size:clamp(16px,1.25vw,19px);line-height:1.45;color:#D9CDBB;max-width:30ch}
-.tour-btn{display:inline-flex;align-items:center;gap:12px;padding:8px 26px 8px 8px;border-radius:99px;border:0;cursor:pointer;font:600 16px var(--sans);color:var(--espresso);background:linear-gradient(180deg,#EED39C,#C9A46A);box-shadow:0 10px 30px rgba(201,164,106,.28);transition:filter .2s}
-.tour-btn:hover{filter:brightness(1.07)}
-.tour-btn i{width:38px;height:38px;border-radius:50%;background:var(--espresso);color:var(--gold-hi);display:grid;place-items:center}
-.tour-btn svg{width:14px;height:14px}
 
 .plan{width:clamp(230px,18vw,290px);margin-top:clamp(20px,4vh,40px);padding:14px 16px}
 .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;color:#E8DFD1;margin-bottom:6px}
@@ -328,7 +322,6 @@ p{margin:0}
   .hero.is-open{z-index:60}
   .shade,.plan,.tagline,.pillnav,.arrow,.hright .pill-btn:not(.call-btn){display:none}
   .hcopy{position:absolute;left:0;top:0;width:1px;height:1px;max-width:none;padding:0;overflow:hidden;clip-path:inset(50%)}
-  .hcopy p,.hcopy .tour-btn{display:none}
   .hero .reveal{animation-delay:calc(var(--d,0s) * .3)}
 
   .hhead{grid-template-columns:1fr auto;gap:12px;padding:calc(12px + env(safe-area-inset-top)) max(16px,var(--sar)) 0 max(16px,var(--sal))}
@@ -695,8 +688,6 @@ footer a:hover{color:var(--gold-hi)}
 
   <div class="hcopy">
     <h1 class="sr-only">Віртуальна екскурсія по Garden Plaza</h1>
-    <p class="reveal" style="--d:.65s">Відкрийте для себе наш торговий центр у 3D форматі</p>
-    <button class="tour-btn reveal" style="--d:.8s" type="button" id="tourBtn" aria-pressed="false"><i><svg aria-hidden="true"><use href="#i-play"/></svg></i><span>Почати тур</span></button>
     <div class="plan glass reveal" style="--d:1s">
     <div class="panel-head"><span><svg aria-hidden="true"><use href="#i-pin"/></svg>План ТЦ</span><a href="#map" aria-label="Відкрити мапу поверхів"><svg aria-hidden="true" width="16" height="16"><use href="#i-expand"/></svg></a></div>
     <svg class="iso" id="iso" viewBox="0 0 240 132" role="group" aria-label="Поверхи"></svg>
@@ -987,7 +978,7 @@ footer a:hover{color:var(--gold-hi)}
   const byName = (a, b) => a.name.localeCompare(b.name, "uk");
   const icon = (id) => `<svg aria-hidden="true"><use href="#${id}"/></svg>`;
 
-  const heroEl = $("#top"), zoom = $("#zoom"), tip = $("#tip"), tourBtn = $("#tourBtn"), tabbar = $("#tabbar");
+  const heroEl = $("#top"), zoom = $("#zoom"), tip = $("#tip"), tabbar = $("#tabbar");
   const cutaway = $("#cutaway"), cutStage = $("#cutStage"), plate = $("#plate");
 
   // ——— каталог: пошук, категорії, 2D-план ———
@@ -1250,7 +1241,7 @@ footer a:hover{color:var(--gold-hi)}
     $("#map").scrollIntoView({behavior:scrollMode()});
   }
 
-  // ——— перший екран: поверхи на будівлі, тур ———
+  // ——— перший екран: поверхи на будівлі ———
   // x, y — точка на картинці mall.webp у відсотках; unit — приміщення на мапі нижче
   const HERO_FLOORS = {
     4:{label:"Готель", icon:"i-bed", x:66, y:28, title:"Готель", unit:"4.01"},
@@ -1260,7 +1251,6 @@ footer a:hover{color:var(--gold-hi)}
   };
   const HERO_ORDER = [4, 3, 2, 1];
   const TIP_FLIP_X = 72;
-  const TOUR_STEP_MS = 3400;
   const POPULAR = [
     {unit:"3.01", cls:"wm-gp", html:"Garden<br>Plaza", label:"Ресторан Garden Plaza"},
     {unit:"3.03", cls:"wm-mezey", html:'<svg viewBox="0 0 24 28" aria-hidden="true"><use href="#i-apple"/></svg><span>Mezey Shop</span>', label:"Mezey Shop"},
@@ -1273,7 +1263,7 @@ footer a:hover{color:var(--gold-hi)}
     {unit:"1.01", cls:"wm-img wm-mid", html:'<img src="shops/logo/1.01-wide.webp" alt="" width="544" height="120" decoding="async">', label:"Копійочка"},
     {unit:"1.08", also:["1.12"], cls:"wm-img wm-tall", html:'<img src="shops/logo/zolotyi-vik.svg" alt="" width="100" height="40" decoding="async">', label:"Золотий вік"}
   ];
-  let hero = {floor:4, timer:null};
+  let hero = {floor:4};
 
   function buildHero() {
     $("#floorsel").innerHTML = HERO_ORDER.map((f) =>
@@ -1487,33 +1477,7 @@ footer a:hover{color:var(--gold-hi)}
     if (opener && opener.isConnected && typeof opener.focus === "function") opener.focus({preventScroll:true});
   }
 
-  function startTour() {
-    const steps = [...HERO_ORDER].reverse();
-    let i = 0;
-    const step = () => {
-      if (i >= steps.length) { stopTour(); return; }
-      setHeroFloor(steps[i]);
-      i += 1;
-    };
-    zoom.classList.add("on");
-    tourBtn.setAttribute("aria-pressed", "true");
-    tourBtn.querySelector("use").setAttribute("href", "#i-pause");
-    tourBtn.querySelector("span").textContent = "Зупинити тур";
-    step();
-    hero = {...hero, timer:setInterval(step, TOUR_STEP_MS)};
-  }
-
-  function stopTour() {
-    if (!hero.timer) return;
-    clearInterval(hero.timer);
-    hero = {...hero, timer:null};
-    zoom.classList.remove("on");
-    tourBtn.setAttribute("aria-pressed", "false");
-    tourBtn.querySelector("use").setAttribute("href", "#i-play");
-    tourBtn.querySelector("span").textContent = "Почати тур";
-  }
-
-  const showFloor = (f, highlight = null) => { stopTour(); setHeroFloor(f); openCut(f, highlight); };
+  const showFloor = (f, highlight = null) => { setHeroFloor(f); openCut(f, highlight); };
   const showShop = (id) => {
     const unit = UNITS.find((u) => u.id === id);
     if (unit) showFloor(unit.f, unit.id);
@@ -1552,10 +1516,9 @@ footer a:hover{color:var(--gold-hi)}
       const track = $("#track");
       track.scrollBy({left:Number(b.dataset.dir) * track.clientWidth * .6});
     }));
-    tourBtn.addEventListener("click", () => { closeCut(); if (hero.timer) stopTour(); else startTour(); });
     tip.addEventListener("click", (e) => {
       const a = e.target.closest("a[data-go]");
-      if (a) { e.preventDefault(); stopTour(); openUnit(a.dataset.go); }
+      if (a) { e.preventDefault(); openUnit(a.dataset.go); }
     });
 
     const card = $("#card");
