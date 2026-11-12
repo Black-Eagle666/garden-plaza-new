@@ -503,16 +503,6 @@ section{padding:110px 0}
 /* ═══════════ ДЕ ПОЇСТИ ═══════════ */
 .food{background:linear-gradient(180deg,var(--espresso) 0%,var(--espresso-2) 100%)}
 
-/* ═══════════ ПОДІЇ ═══════════ */
-.events{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:1px;background:var(--seam);border:1px solid var(--seam)}
-.event{background:var(--espresso);padding:30px;display:flex;flex-direction:column;gap:12px}
-.event time{font:500 18px/1 var(--serif);font-style:italic;color:var(--gold);display:flex;gap:12px;align-items:baseline}
-.event time b{font:500 64px/.8 var(--serif);font-style:normal;color:var(--cream)}
-.event h3{font:500 26px/1.12 var(--serif)}
-.event p{color:var(--muted);font-size:15px}
-.event.feature{background:radial-gradient(120% 120% at 0% 0%, rgba(201,164,106,.22), transparent 60%),var(--espresso-2)}
-@media (max-width:860px){.events{grid-template-columns:1fr}}
-
 /* ═══════════ ВІДВІДУВАЧАМ ═══════════ */
 .info{display:grid;grid-template-columns:repeat(3,1fr);gap:0 40px}
 .info-row{padding:26px 0;border-top:1px solid var(--seam)}
@@ -596,9 +586,6 @@ footer a:hover{color:var(--gold-hi)}
   .tabbar button:active i{transform:scale(.94)}
 }
 @media (max-width:860px){
-  .events{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 var(--gut);scrollbar-width:none;margin:0 calc(var(--gut) * -1);padding:0 var(--gut);background:none;border:0}
-  .events::-webkit-scrollbar{display:none}
-  .event{flex:0 0 min(80%,340px);scroll-snap-align:start;border:1px solid var(--seam);padding:24px}
   .map,.map iframe{min-height:300px}
 }
 @media (max-width:820px){
@@ -623,9 +610,6 @@ footer a:hover{color:var(--gold-hi)}
   .results.is-short .extra{display:none}
   .more{display:block;width:100%;margin-top:8px;padding:14px;border:1px solid rgba(201,164,106,.4);border-radius:var(--r);background:none;color:var(--gold-hi);font:500 15px var(--sans);cursor:pointer}
   .eat h3{font-size:26px;margin-top:16px}
-  .event{padding:22px}
-  .event time b{font-size:54px}
-  .event h3{font-size:23px}
   .info-row{display:grid;grid-template-columns:30px 1fr;gap:2px 16px;padding:18px 0}
   .info-row svg{grid-row:1 / span 2;width:28px;height:28px;margin:3px 0 0}
   .info-row h3{font-size:22px;margin:0}
@@ -698,7 +682,6 @@ footer a:hover{color:var(--gold-hi)}
       <a class="is-on" href="#top" aria-current="page"><svg aria-hidden="true"><use href="#i-cube"/></svg>3D Тур</a>
       <a href="#map">Магазини</a>
       <a href="#food">Ресторани</a>
-      <a href="#events">Розваги</a>
       <a href="#guests">Про ТЦ</a>
       <a href="#visit">Контакти</a>
     </nav>
@@ -711,7 +694,7 @@ footer a:hover{color:var(--gold-hi)}
   </header>
 
   <div class="hcopy">
-    <h1 class="reveal" style="--d:.5s">Віртуальна екскурсія по <em>Garden Plaza</em></h1>
+    <h1 class="sr-only">Віртуальна екскурсія по Garden Plaza</h1>
     <p class="reveal" style="--d:.65s">Відкрийте для себе наш торговий центр у 3D форматі</p>
     <button class="tour-btn reveal" style="--d:.8s" type="button" id="tourBtn" aria-pressed="false"><i><svg aria-hidden="true"><use href="#i-play"/></svg></i><span>Почати тур</span></button>
     <div class="plan glass reveal" style="--d:1s">
@@ -775,31 +758,6 @@ footer a:hover{color:var(--gold-hi)}
   </div>
 </section>
 
-<section id="events" aria-labelledby="events-title">
-  <div class="wrap">
-    <div class="sec-head">
-      <h2 id="events-title">Цього місяця</h2>
-      <p><span class="fill">ЗАПОВНИТИ: справжні події</span></p>
-    </div>
-    <div class="events">
-      <article class="event feature">
-        <time datetime="2026-11-01"><b>1</b>листопада</time>
-        <h3>Ярмарок місцевих виробників</h3>
-        <p>Сир, мед, вино й кераміка з Тячівщини. Субота, з 10:00 до 18:00, біля головного входу.</p>
-      </article>
-      <article class="event">
-        <time datetime="2026-11-08"><b>8</b>листопада</time>
-        <h3>Майстер-клас з ліплення для дітей</h3>
-        <p>Для дітей 5–10 років. Безкоштовно, запис у адміністратора.</p>
-      </article>
-      <article class="event">
-        <time datetime="2026-11-28"><b>28</b>листопада</time>
-        <h3>Чорна п'ятниця</h3>
-        <p>Знижки в магазинах центру. Учасники з'являться на мапі за тиждень.</p>
-      </article>
-    </div>
-  </div>
-</section>
 
 <section id="guests" aria-labelledby="guests-title" style="padding-top:0">
   <div class="wrap">
@@ -1658,7 +1616,7 @@ footer a:hover{color:var(--gold-hi)}
       if (!hit) return;
       tabs.forEach((a) => a.setAttribute("aria-current", String(a.dataset.tab === hit.target.id)));
     }, {rootMargin:"-45% 0px -54% 0px"});
-    ["top", "map", "food", "events", "guests", "visit", "lease"].forEach((id) => spy.observe(document.getElementById(id)));
+    ["top", "map", "food", "guests", "visit", "lease"].forEach((id) => spy.observe(document.getElementById(id)));
   }
 
   buildHero();
