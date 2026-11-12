@@ -114,7 +114,7 @@ p{margin:0}
 .floorsel button[aria-pressed="true"] svg,.floorsel button[aria-pressed="true"] b,.floorsel button[aria-pressed="true"] small{color:var(--espresso)}
 }
 
-.shops{position:absolute;z-index:3;left:22%;right:calc(clamp(16px,1.4vw,26px) + clamp(152px,10.8vw,182px) + 14px);bottom:4.5%;padding:12px 14px 14px}
+.shops{position:absolute;z-index:3;left:clamp(16px,1.4vw,26px);right:calc(clamp(16px,1.4vw,26px) + clamp(152px,10.8vw,182px) + 14px);bottom:4.5%;padding:12px 14px 14px}
 .shops .panel-head a{display:flex;align-items:center;gap:6px;font-size:13px;text-decoration:none;white-space:nowrap}
 .shop-row{display:grid;grid-template-columns:28px 1fr 28px;gap:8px;align-items:center}
 .arrow{width:28px;height:28px;border-radius:50%;border:1px solid rgba(201,164,106,.4);background:transparent;color:var(--gold-hi);display:grid;place-items:center;cursor:pointer;padding:0}
@@ -150,7 +150,7 @@ p{margin:0}
 .quick i{flex:none;width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:rgba(201,164,106,.16);color:var(--gold-hi)}
 .quick svg{width:18px;height:18px}
 
-.tagline{position:absolute;z-index:2;left:clamp(14px,1.6vw,30px);bottom:3%;display:flex;align-items:flex-end;pointer-events:none}
+.tagline{position:absolute;z-index:2;left:clamp(14px,1.6vw,30px);bottom:calc(4.5% + 232px);display:flex;align-items:flex-end;pointer-events:none}
 .tagline svg{width:clamp(80px,7vw,110px);height:auto;color:rgba(201,164,106,.22);margin-right:-34px}
 .tagline span{font:400 clamp(20px,1.8vw,30px)/1 'Marck Script',cursive;background:linear-gradient(180deg,#F6DEA8,#C9A46A);-webkit-background-clip:text;background-clip:text;color:transparent;transform:rotate(-4deg);padding-bottom:12px;white-space:nowrap}
 
