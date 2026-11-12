@@ -250,6 +250,8 @@ p{margin:0}
 .cut-info .pics img{display:block;width:112px;height:84px;object-fit:cover;border-radius:8px;border:1px solid rgba(201,164,106,.3);background:#1A140F}
 .who{display:flex;align-items:center;gap:14px;min-width:0}
 .brand-logo{flex:none;width:56px;height:56px;border-radius:12px;object-fit:cover;border:1px solid rgba(201,164,106,.3);background:#0B0907}
+/* заклад без файлу логотипа: у картці той самий знак, що на плитках */
+.brand-wm{width:auto;min-width:56px;max-width:190px;padding:0 12px;display:grid;place-items:center;overflow:hidden}
 .cut-info .tag{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:4px}
 .cut-info .tag i{width:9px;height:9px;border-radius:3px;background:var(--c)}
 .cut-info h3{font:500 28px/1.05 var(--serif);color:#fff}
@@ -443,17 +445,23 @@ section{padding:110px 0}
 .board-note{margin-top:14px;font-size:13px}
 
 #plan{width:100%;height:auto;display:block}
-#plan .unit :is(rect,polygon){fill:var(--c);fill-opacity:.10;stroke:var(--c);stroke-opacity:.75;stroke-width:1.5;transition:fill-opacity .2s}
+#plan .unit > :is(rect,polygon){fill:var(--c);fill-opacity:.10;stroke:var(--c);stroke-opacity:.75;stroke-width:1.5;transition:fill-opacity .2s}
 #plan .unit{cursor:pointer;outline:none}
-#plan .unit:hover :is(rect,polygon),#plan .unit:focus-visible :is(rect,polygon){fill-opacity:.24}
-#plan .unit:focus-visible :is(rect,polygon){stroke:var(--gold-hi);stroke-width:3;stroke-opacity:1}
-#plan .unit.dim :is(rect,polygon){fill-opacity:.02;stroke-opacity:.18}
+#plan .unit:hover > :is(rect,polygon),#plan .unit:focus-visible > :is(rect,polygon){fill-opacity:.24}
+#plan .unit:focus-visible > :is(rect,polygon){stroke:var(--gold-hi);stroke-width:3;stroke-opacity:1}
+#plan .unit.dim > :is(rect,polygon){fill-opacity:.02;stroke-opacity:.18}
 #plan .unit.dim text{opacity:.25}
-#plan .unit.on :is(rect,polygon){fill-opacity:.85}
+#plan .unit.on > :is(rect,polygon){fill-opacity:.85}
 #plan .unit.on text{fill:var(--espresso)}
 #plan .unit text{font-family:var(--sans);fill:var(--cream);pointer-events:none}
 #plan .u-no{font-size:14px;opacity:.55;dominant-baseline:hanging}
 #plan .u-name{font:500 24px var(--serif)}
+/* логотип закладу на 2D-плані: той самий знак, що на плитках, збільшений до масштабу плану */
+#plan .u-logo{pointer-events:none;overflow:visible}
+#plan .plan-logo{width:100%;height:100%;display:grid;place-items:center;zoom:2.2;transition:opacity .2s}
+#plan .plan-logo img{object-fit:contain}
+#plan .unit.dim .plan-logo{opacity:.25}
+#plan .unit.on .plan-logo .wm{padding:5px 8px;border-radius:6px;background:rgba(14,11,8,.88)}
 #plan .corridor{fill:#231C15}
 #plan .void{fill:none;stroke:var(--gold-lo);stroke-dasharray:5 7;stroke-width:1.2}
 #plan .room{fill:rgba(201,164,106,.06);stroke:var(--gold-lo);stroke-width:1.2}
@@ -840,15 +848,15 @@ footer a:hover{color:var(--gold-hi)}
     {id:"1.01",f:1,x:0,y:0,w:4.45,h:1.35,cat:"home",name:"Копійочка",about:"Товари для дому й побутова хімія.",tags:"копійочка kopiyochka товари для дому побутова хімія посуд господарські"},
     {id:"1.02",f:1,x:9.95,y:5.4,w:2.05,h:1.9,cat:"services",name:"Аптека",about:"Ліки, вітаміни, засоби гігієни.",tags:"аптека ліки вітаміни"},
     {id:"1.03",f:1,x:0,y:1.85,w:1.8,h:1.6,cat:"services",name:"Обмін валют",about:"Пункт обміну валют.",tags:"обмін валют валюта долар євро крони гроші курс"},
-    {id:"1.04",f:1,x:4.45,y:0,w:4,h:1.35,cat:"beauty",name:"Косметика",about:"Магазин косметики.",tags:"косметика парфумерія парфуми догляд крем помада"},
+    {id:"1.04",f:1,x:4.45,y:0,w:4,h:1.35,cat:"beauty",name:"PROSTOR",about:"Магазин косметики PROSTOR.",tags:"prostor простор косметика парфумерія парфуми догляд крем помада побутова хімія"},
     {id:"1.05",f:1,x:9.95,y:3.25,w:2.05,h:2.15,cat:"home",name:"Квіти",about:"Букети й кімнатні рослини.",tags:"квіти букет рослини"},
     {id:"1.06",f:1,x:8.45,y:0,w:3.55,h:1.35,cat:"fashion",name:"Одяг",about:"Магазин одягу.",tags:"одяг"},
     {id:"1.07",f:1,x:9.95,y:1.35,w:2.05,h:1.9,cat:"home",name:"Килими",about:"Килими й доріжки для дому.",tags:"килими ковер доріжка"},
-    {id:"1.08",f:1,x:0,y:3.45,w:1.8,h:2.65,cat:"beauty",name:"Золотий вік",about:"Ювелірний магазин.",tags:"золотий вік ювелірний золото срібло каблучка обручка сережки прикраси"},
-    {id:"1.09",f:1,x:0,y:6.1,w:1.8,h:3.05,cat:"shop",name:"Алма",about:"Магазин «Алма».",tags:"алма alma"},
+    {id:"1.08",f:1,x:0,y:3.45,w:1.8,h:2.65,cat:"shop",name:"Версаль",about:"Магазин «Версаль».",tags:"версаль versal versailles"},
+    {id:"1.09",f:1,x:0,y:6.1,w:1.8,h:3.05,cat:"shop",name:"ALMA",about:"Магазин ALMA.",tags:"alma алма"},
     {id:"1.10",f:1,x:3.4,y:3.65,w:1.2,h:1.85,cat:"services",name:"Фурт сервіс",about:"Острівець «Фурт сервіс».",tags:"фурт сервіс furt service"},
     {id:"1.11",f:1,vacant:true,x:7.25,y:3.65,w:1.2,h:1.85,cat:"services",name:"Оренда",about:"Вільний острівець під оренду.",tags:"оренда вільне місце острівець орендувати"},
-    {id:"1.12",f:1,x:3.4,y:6.85,w:1.3,h:1.95,cat:"beauty",name:"Золотий вік",about:"Острівець ювелірного магазину.",tags:"золотий вік ювелірний золото срібло прикраси острівець"},
+    {id:"1.12",f:1,x:3.4,y:6.85,w:1.3,h:1.95,cat:"beauty",name:"Золотий вік",about:"Ювелірний острівець.",tags:"золотий вік ювелірний золото срібло прикраси острівець"},
     {id:"1.13",f:1,x:7.25,y:6.85,w:1.3,h:1.6,cat:"grocery",name:"Сушені фрукти",about:"Сушені фрукти на вагу.",tags:"сушені засушені фрукти сухофрукти горіхи"},
     {id:"1.14",f:1,x:9.05,y:8.5,w:2.25,h:1.1,cat:"services",name:"Фурт сервіс",about:"«Фурт сервіс» біля входу.",tags:"фурт сервіс furt service"},
 
@@ -876,20 +884,20 @@ footer a:hover{color:var(--gold-hi)}
   // 3.03 Mezey Shop (Instagram @mezey_shop), 3.04 Tiffany (Instagram @tiffany_beauty_salon_; телефону й графіка в профілі немає),
   // 3.05 MonoTaxi (monotaxi.com.ua, 12.11.2026), телефон ресторану й готелю.
   // 1 поверх: назви з малюнка Миколи, описи загальні, телефонів і фото немає (дзвінок іде адміністрації центру);
-  // що продають «Алма» і «Фурт сервіс», невідомо. 2 поверх, 3.06, 3.07 — ПРИКЛАД: тексти й номери вигадані.
+  // що продають ALMA, «Версаль» і «Фурт сервіс», невідомо. 2 поверх, 3.06, 3.07 — ПРИКЛАД: тексти й номери вигадані.
   const SHOP_INFO = {
     "1.01":{about:"Магазин мережі «Копійочка»: товари для дому, побутова хімія, посуд і дрібниці на щодень.", logo:"shops/logo/1.01.webp", pics:[]},
     "1.02":{about:"Ліки за рецептом і без, вітаміни, дитяче харчування, засоби догляду."},
     "1.03":{about:"Пункт обміну валют: купівля й продаж долара, євро та інших валют. Курс уточнюйте на місці.", pics:[]},
-    "1.04":{about:"Магазин косметики: декоративна косметика, парфумерія, засоби догляду за шкірою та волоссям.", pics:[]},
+    "1.04":{about:"Магазин мережі PROSTOR: декоративна косметика, парфумерія, засоби догляду за шкірою й волоссям, побутова хімія.", logo:"shops/logo/prostor-sq.svg", pics:[]},
     "1.05":{about:"Свіжі квіти й букети на будь-який привід, кімнатні рослини."},
     "1.06":{about:"Магазин одягу на першому поверсі, праворуч у дальньому кутку.", pics:[]},
     "1.07":{about:"Килими й доріжки для дому.", pics:[]},
-    "1.08":{about:"Ювелірний магазин «Золотий вік»: каблучки, обручки, сережки й ланцюжки із золота та срібла. У холі біля входу є ще острівець магазину.", logo:"shops/logo/zolotyi-vik-sq.svg", pics:[]},
-    "1.09":{about:"Магазин «Алма» на першому поверсі, ліворуч від входу.", pics:[]},
+    "1.08":{about:"Магазин «Версаль» на першому поверсі, ліворуч уздовж стіни.", pics:[]},
+    "1.09":{about:"Магазин ALMA на першому поверсі, ліворуч від входу.", pics:[]},
     "1.10":{about:"Острівець «Фурт сервіс» у холі біля ескалаторів. Ще одна точка — праворуч від входу.", pics:[]},
     "1.11":{about:"Вільний острівець у холі біля ескалаторів. Здається в оренду: телефонуйте адміністрації центру.", pics:[]},
-    "1.12":{about:"Острівець ювелірного магазину «Золотий вік» у холі біля входу. Основний магазин — ліворуч, уздовж стіни.", logo:"shops/logo/zolotyi-vik-sq.svg", pics:[]},
+    "1.12":{about:"Ювелірний острівець «Золотий вік» у холі біля входу: каблучки, обручки, сережки й ланцюжки із золота та срібла.", logo:"shops/logo/zolotyi-vik-sq.svg", pics:[]},
     "1.13":{about:"Острівець у холі: сушені фрукти на вагу.", pics:[]},
     "1.14":{about:"«Фурт сервіс» праворуч від входу. Ще один острівець — у холі біля ескалаторів.", pics:[]},
     "2.01":{about:"Магазин чоловічого одягу: класичні костюми, сорочки, пальта, трикотаж і аксесуари. Допоможемо зібрати образ на весілля, випускний чи ділову зустріч, підгін по фігурі на місці.", phone:"0680000201", hours:"10:00–20:00"},
@@ -923,7 +931,7 @@ footer a:hover{color:var(--gold-hi)}
     "3.04":[{href:"https://www.instagram.com/tiffany_beauty_salon_/", label:"Написати в Instagram"}],
     "3.05":[{href:"https://monotaxi.com.ua/", label:"monotaxi.com.ua"}, {href:"https://www.instagram.com/mono.taxi/", label:"Instagram"}],
     "1.01":[{href:"https://www.kopiyochka.ua/", label:"kopiyochka.ua"}],
-    "1.08":[{href:"https://zolotiyvik.ua/", label:"zolotiyvik.ua"}],
+    "1.04":[{href:"https://prostor.ua/", label:"prostor.ua"}],
     "1.12":[{href:"https://zolotiyvik.ua/", label:"zolotiyvik.ua"}],
     "parking":[{href:"https://www.google.com/maps/search/?api=1&query=48.1196052,23.7721827", label:"Прокласти маршрут"}]
   };
@@ -1051,6 +1059,20 @@ footer a:hover{color:var(--gold-hi)}
     if (state.floor === 1) svg.append(svgEl("circle", {class:"you", cx:YOU_ARE_HERE.x*CELL, cy:YOU_ARE_HERE.y*CELL, r:11}));
   }
 
+  // логотип на 2D-плані: у рамці приміщення під номером; для складної форми — навколо точки підпису
+  const PLAN_LOGO = {pad:16, top:34, shapedW:320, shapedH:130};
+  function planLogo(u, mark) {
+    const box = u.label
+      ? {x:u.label[0]*CELL - PLAN_LOGO.shapedW / 2, y:u.label[1]*CELL - PLAN_LOGO.shapedH / 2, width:PLAN_LOGO.shapedW, height:PLAN_LOGO.shapedH}
+      : {x:u.x*CELL + PLAN_LOGO.pad, y:u.y*CELL + PLAN_LOGO.top, width:u.w*CELL - 2 * PLAN_LOGO.pad, height:u.h*CELL - PLAN_LOGO.top - PLAN_LOGO.pad};
+    const fo = svgEl("foreignObject", {class:"u-logo", ...box});
+    const div = document.createElement("div");
+    div.className = "plan-logo";
+    div.innerHTML = mark;
+    fo.append(div);
+    return fo;
+  }
+
   function unitNode(u) {
     const x = u.x*CELL, y = u.y*CELL, w = u.w*CELL, h = u.h*CELL;
     const g = svgEl("g", {class:"unit", tabindex:0, role:"button", "aria-label":`${u.name}, ${u.id}`, style:`--c:${cssVar(CATS[u.cat].c)}`});
@@ -1068,7 +1090,8 @@ footer a:hover{color:var(--gold-hi)}
       row.textContent = line;
       nm.append(row);
     });
-    g.append(outline, no, nm);
+    const mark = brandMark(u.id);
+    g.append(outline, no, mark ? planLogo(u, mark) : nm);
     const pick = () => setState({selected:u.id});
     g.addEventListener("click", pick);
     g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
@@ -1111,7 +1134,7 @@ footer a:hover{color:var(--gold-hi)}
         about:"Безкоштовний паркінг біля входу для відвідувачів центру, ресторану й готелю.", phones:[MALL_PHONE], logo:null, pics:[], links:SHOP_LINKS[id] || []};
     }
     if (!unit) return null;
-    return {name:unit.name, tag:CATS[unit.cat].name, color:cssVar(CATS[unit.cat].c), where:`${unit.f} поверх, приміщення ${unit.id}`,
+    return {id:unit.id, name:unit.name, tag:CATS[unit.cat].name, color:cssVar(CATS[unit.cat].c), where:`${unit.f} поверх, приміщення ${unit.id}`,
       hours:unit.hours || DEFAULT_HOURS, about:unit.about, phones:unit.phones || [unit.phone || MALL_PHONE], logo:unit.logo || null,
       pics:unit.pics || [1, 2].map((n) => `shops/${unit.id}-${n}.webp`), links:SHOP_LINKS[id] || []};
   }
@@ -1123,7 +1146,11 @@ footer a:hover{color:var(--gold-hi)}
       : `<span class="ph" aria-hidden="true">${u.name[0]}</span>`);
   const picsHtml = (s) => s.pics.map((src, i) =>
     `<img src="${src}" alt="${s.name}, фото ${i + 1}" loading="lazy" decoding="async" width="640" height="480">`).join("");
-  const logoHtml = (s) => (s.logo ? `<img class="brand-logo" src="${s.logo}" alt="Логотип ${s.name}" loading="lazy" decoding="async" width="160" height="160">` : "");
+  const logoHtml = (s) => {
+    if (s.logo) return `<img class="brand-logo" src="${s.logo}" alt="Логотип ${s.name}" loading="lazy" decoding="async" width="160" height="160">`;
+    const mark = s.id ? brandMark(s.id) : null;
+    return mark ? `<span class="brand-logo brand-wm" role="img" aria-label="Логотип ${s.name}">${mark}</span>` : "";
+  };
   const phonesHtml = (s, cls) => s.phones.map((n) => `<a class="${cls}" href="${telHref(n)}">${telLabel(n)}</a>`).join("");
   const linksHtml = (s, cls) => s.links.map((l) =>
     `<a${cls ? ` class="${cls}"` : ""} href="${l.href}" target="_blank" rel="noopener">${l.label}</a>`).join("");
@@ -1234,7 +1261,8 @@ footer a:hover{color:var(--gold-hi)}
     {unit:"3.05", cls:"wm-img", html:'<img src="shops/logo/3.05-wide.webp" alt="" width="500" height="74" decoding="async">', label:"MonoTaxi"},
     {unit:"4.01", cls:"wm-hotel", html:"ГОТЕЛЬ"},
     {unit:"1.01", cls:"wm-img wm-mid", html:'<img src="shops/logo/1.01-wide.webp" alt="" width="544" height="120" decoding="async">', label:"Копійочка"},
-    {unit:"1.08", also:["1.12"], cls:"wm-img wm-tall", html:'<img src="shops/logo/zolotyi-vik.svg" alt="" width="100" height="40" decoding="async">', label:"Золотий вік"}
+    {unit:"1.12", cls:"wm-img wm-tall", html:'<img src="shops/logo/zolotyi-vik.svg" alt="" width="100" height="40" decoding="async">', label:"Золотий вік"},
+    {unit:"1.04", cls:"wm-img wm-mid", html:'<img src="shops/logo/prostor.svg" alt="" width="195" height="32" decoding="async">', label:"PROSTOR"}
   ];
   let hero = {floor:4};
 
@@ -1296,14 +1324,18 @@ footer a:hover{color:var(--gold-hi)}
     return atrium + rooms + marks + zones + blocks;
   }
 
-  // знак закладу на плитці: логотип із POPULAR або назва
+  // знак закладу з POPULAR (логотип або фірмовий напис); null, якщо знака немає
+  function brandMark(id) {
+    const logo = POPULAR.find((x) => x.unit === id || (x.also || []).includes(id));
+    return logo ? `<span class="wm ${logo.cls}">${logo.html}</span>` : null;
+  }
+  // знак закладу на плитці: логотип або назва
   function tileMark(u) {
-    const logo = POPULAR.find((x) => x.unit === u.id || (x.also || []).includes(u.id));
-    return logo ? `<span class="wm ${logo.cls}">${logo.html}</span>` : `<span class="wm wm-plain">${u.name}</span>`;
+    return brandMark(u.id) || `<span class="wm wm-plain">${u.name}</span>`;
   }
 
   // усі заклади для стрічки на першому екрані: спершу ті, що з логотипами, далі решта по поверхах.
-  // Кілька точок одного закладу на поверсі (Фурт сервіс, Золотий вік) показуємо однією плиткою
+  // Кілька точок одного закладу на поверсі (Фурт сервіс) показуємо однією плиткою
   function shopStrip() {
     const popular = POPULAR.map((p) => UNITS.find((u) => u.id === p.unit));
     const covered = new Set(POPULAR.flatMap((p) => [p.unit, ...(p.also || [])]));
