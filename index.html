@@ -182,7 +182,6 @@ p{margin:0}
 .plate .mk{position:absolute;font:italic 500 calc(var(--u) * .3)/1 var(--serif);color:var(--muted);transform:translate(-50%,-50%) translateZ(1px);white-space:nowrap}
 .plate .mk.esc{font:400 calc(var(--u) * .7)/1 var(--sans);color:var(--gold-hi)}
 .plate .mk.door{font-size:calc(var(--u) * .42);color:var(--gold-hi)}
-.plate .atrium{position:absolute;border:1px dashed var(--gold-lo);border-radius:6px}
 /* службове приміщення (туалет): є на плані, але не натискається */
 .plate .room{--c:rgba(201,164,106,.5);position:absolute;transform-style:preserve-3d;border:1px solid var(--c);background:rgba(201,164,106,.06)}
 .plate .room .pin{padding:4px 9px;background:rgba(14,11,8,.82);font-weight:500;font-size:11px;color:var(--muted);pointer-events:none}
@@ -463,7 +462,6 @@ section{padding:110px 0}
 #plan .unit.dim .plan-logo{opacity:.25}
 #plan .unit.on .plan-logo .wm{padding:5px 8px;border-radius:6px;background:rgba(14,11,8,.88)}
 #plan .corridor{fill:#231C15}
-#plan .void{fill:none;stroke:var(--gold-lo);stroke-dasharray:5 7;stroke-width:1.2}
 #plan .room{fill:rgba(201,164,106,.06);stroke:var(--gold-lo);stroke-width:1.2}
 #plan .mark{font:italic 400 18px var(--serif);fill:var(--muted)}
 #plan .mark.big{font:400 46px var(--sans);fill:var(--gold-hi)}
@@ -703,7 +701,7 @@ footer a:hover{color:var(--gold-hi)}
       <h2 id="map-title">Що де знаходиться</h2>
       <label class="search">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-        <input id="q" type="search" placeholder="Наприклад, взуття або аптека" autocomplete="off" aria-label="Пошук магазину">
+        <input id="q" type="search" placeholder="Наприклад, одяг або аптека" autocomplete="off" aria-label="Пошук магазину">
         <button type="button" id="clear" hidden>Очистити</button>
       </label>
     </div>
@@ -839,7 +837,7 @@ footer a:hover{color:var(--gold-hi)}
     food:{name:"Їжа",c:"--c-food"}, fun:{name:"Спорт",c:"--c-fun"},
     beauty:{name:"Краса і прикраси",c:"--c-beauty"}, shop:{name:"Магазини",c:"--c-shop"}
   };
-  const FLOOR_NOTES = {1:"Магазини й послуги", 2:"Одяг, взуття, дім", 3:"Ресторан, спорт, діти, краса", 4:"Готель"};
+  const FLOOR_NOTES = {1:"Магазини й послуги", 2:"Одяг, клініка, штори", 3:"Ресторан, спорт, діти, краса", 4:"Готель"};
 
   // x, y, w, h — рамка приміщення в клітинках плану свого поверху (сітка поверхів — FLOOR_GRID).
   // shape — контур для приміщення складної форми (вершини за годинниковою стрілкою), label — де стоїть його підпис.
@@ -860,22 +858,24 @@ footer a:hover{color:var(--gold-hi)}
     {id:"1.13",f:1,x:7.25,y:6.85,w:1.3,h:1.6,cat:"grocery",name:"Сушені фрукти",about:"Сушені фрукти на вагу.",tags:"сушені засушені фрукти сухофрукти горіхи"},
     {id:"1.14",f:1,x:9.05,y:8.5,w:2.25,h:1.1,cat:"services",name:"Фурт сервіс",about:"«Фурт сервіс» біля входу.",tags:"фурт сервіс furt service"},
 
-    {id:"2.01",f:2,x:0,y:0,w:3,h:3,cat:"fashion",name:"Джентельмен",about:"Чоловічий одяг: костюми, сорочки, верхній одяг.",tags:"джентельмен gentleman одяг чоловічий костюм сорочка"},
-    {id:"2.02",f:2,x:3,y:0,w:2,h:3,cat:"fashion",name:"Взуття",about:"Взуттєвий магазин.",tags:"взуття черевики кросівки туфлі"},
-    {id:"2.03",f:2,x:5,y:0,w:2,h:3,cat:"fashion",name:"Одяг",about:"Магазин одягу.",tags:"одяг"},
-    {id:"2.04",f:2,x:7,y:0,w:2,h:3,cat:"fashion",name:"Сумки",about:"Сумки на будь-який випадок.",tags:"сумки рюкзаки гаманці аксесуари"},
-    {id:"2.05",f:2,x:9,y:0,w:3,h:3,cat:"services",name:"Кредо клініка",about:"Медична клініка «Кредо».",tags:"кредо клініка лікар медицина"},
-    {id:"2.06",f:2,x:0,y:4.4,w:2,h:2,cat:"home",name:"Штори",about:"Штори, тюль, карнизи.",tags:"штори занавіски тюль карниз"},
-    {id:"2.07",f:2,x:2,y:4.4,w:2,h:2,cat:"home",name:"Килими",about:"Килими й доріжки для дому.",tags:"килими ковер доріжка"},
-    {id:"2.08",f:2,x:9,y:4.4,w:3,h:2,cat:"services",name:"Косметологія",about:"Кабінет косметології.",tags:"косметологія косметолог догляд шкіра"},
+    {id:"2.01",f:2,x:10.09,y:1.42,w:1.91,h:6.93,cat:"fashion",name:"Джентельмен",about:"Чоловічий одяг: костюми, сорочки, верхній одяг.",tags:"джентельмен gentleman gentelman одяг чоловічий костюм сорочка"},
+    {id:"2.02",f:2,x:0,y:0,w:2.04,h:3.4,cat:"shop",name:"Зима-Літо",about:"Магазин «Зима-Літо».",tags:"зима-літо зима літо"},
+    {id:"2.03",f:2,x:0,y:3.4,w:2.04,h:2.56,cat:"shop",name:"Файна пані",about:"Магазин «Файна пані».",tags:"файна пані"},
+    {id:"2.04",f:2,x:0,y:5.96,w:2.04,h:2.36,cat:"shop",name:"Brand",about:"Магазин Brand.",tags:"brand бренд"},
+    {id:"2.05",f:2,x:2.08,y:0,w:9.92,h:1.42,cat:"services",name:"Кредо клініка",about:"Медична клініка «Кредо».",tags:"кредо credo клініка лікар медицина"},
+    {id:"2.06",f:2,x:8.6,y:10.93,w:3.4,h:2.47,cat:"home",name:"Штори",about:"Штори, тюль, карнизи.",tags:"штори занавіски тюль карниз"},
+    {id:"2.07",f:2,x:0,y:8.32,w:2.04,h:2.6,cat:"shop",name:"Шарм",about:"Магазин «Шарм».",tags:"шарм sharm charm"},
+    {id:"2.08",f:2,x:10.09,y:8.35,w:1.91,h:2.58,cat:"shop",name:"Astel",about:"Магазин Astel.",tags:"astel астел"},
+    {id:"2.09",f:2,x:4.46,y:8.4,w:4.14,h:5,cat:"fashion",name:"La Butik",about:"Бутик La Butik.",tags:"la butik ла бутік бутик одяг"},
 
     {id:"3.01",f:3,x:3.6,y:0,w:5,h:3,cat:"food",name:"Garden Plaza",about:"Ресторан: кухня й бар, бронювання столу, доставка. Меню з цінами на gardenplaza.com.ua.",tags:"ресторан їжа обід доставка garden plaza бар"},
     {id:"3.02",f:3,x:0,y:6,w:9.75,h:4.9,shape:[[0,6],[3.55,6],[3.55,9],[9.75,9],[9.75,10.9],[0,10.9]],label:[3.2,9.95],cat:"fun",name:"GYM MAXI",about:"Спортзал GYM MAXI.",tags:"gym maxi джим максі спорт спортзал тренажерний зал фітнес бокс мма стретчинг тренер"},
-    {id:"3.03",f:3,x:9.75,y:2.75,w:2.25,h:2.5,cat:"tech",name:"Mezey Shop",about:"Техніка Apple.",tags:"mezey shop мезей apple епл айфон iphone macbook ipad airpods техніка телефон ремонт"},
+    {id:"3.03",f:3,x:9.75,y:4.45,w:2.25,h:1.7,cat:"tech",name:"Mezey Shop",about:"Техніка Apple.",tags:"mezey shop мезей apple епл айфон iphone macbook ipad airpods техніка телефон ремонт"},
     {id:"3.04",f:3,x:9.75,y:7.75,w:2.25,h:3.15,cat:"services",name:"Tiffany Beauty Salon",about:"Салон краси Tiffany.",tags:"tiffany тіффані тифані салон краси перукарня стрижка фарбування зачіска макіяж манікюр педикюр брови вії косметологія масаж"},
     {id:"3.05",f:3,x:9.75,y:1.25,w:2.25,h:1.5,cat:"services",name:"MonoTaxi",about:"Служба таксі MonoTaxi.",tags:"monotaxi mono taxi монотаксі таксі офіс доставка тверезий водій"},
     {id:"3.06",f:3,x:0,y:0,w:3.55,h:4.65,cat:"kids",name:"Дитяча кімната",about:"Дитяча ігрова кімната.",tags:"діти дитяча ігрова кімната зала розваги малеча"},
-    {id:"3.07",f:3,x:9.75,y:5.25,w:2.25,h:2.5,cat:"fashion",name:"Одяг",about:"Магазин одягу.",tags:"одяг"},
+    {id:"3.07",f:3,x:9.75,y:6.15,w:2.25,h:1.6,cat:"fashion",name:"Одяг",about:"Магазин одягу.",tags:"одяг"},
+    {id:"3.08",f:3,x:9.75,y:2.75,w:2.25,h:1.7,cat:"food",name:"Банкетний зал",about:"Зал для банкетів ресторану Garden Plaza.",tags:"банкетний зал банкет весілля хрестини ювілей корпоратив свято garden plaza"},
 
     {id:"4.01",f:4,x:0,y:0,w:12,h:3,cat:"home",name:"Готель",about:"Номери для гостей. Бронювання за телефоном (068) 535-00-99.",hours:"цілодобово",tags:"готель номер ночівля"}
   ];
@@ -884,7 +884,9 @@ footer a:hover{color:var(--gold-hi)}
   // 3.03 Mezey Shop (Instagram @mezey_shop), 3.04 Tiffany (Instagram @tiffany_beauty_salon_; телефону й графіка в профілі немає),
   // 3.05 MonoTaxi (monotaxi.com.ua, 12.11.2026), телефон ресторану й готелю.
   // 1 поверх: назви з малюнка Миколи, описи загальні, телефонів і фото немає (дзвінок іде адміністрації центру);
-  // що продають ALMA, «Версаль» і «Фурт сервіс», невідомо. 2 поверх, 3.06, 3.07 — ПРИКЛАД: тексти й номери вигадані.
+  // що продають ALMA, «Версаль» і «Фурт сервіс», невідомо.
+  // 2 поверх: розкладка й назви з малюнка Миколи від 12.11.2026; описи Джентельмена, Кредо й Штор і їхні телефони вигадані,
+  // що продають Зима-Літо, Файна пані, Brand, Шарм, Astel, невідомо. 3.06, 3.07 — ПРИКЛАД: тексти й номери вигадані.
   const SHOP_INFO = {
     "1.01":{about:"Магазин мережі «Копійочка»: товари для дому, побутова хімія, посуд і дрібниці на щодень.", logo:"shops/logo/1.01.webp", pics:[]},
     "1.02":{about:"Ліки за рецептом і без, вітаміни, дитяче харчування, засоби догляду."},
@@ -901,13 +903,14 @@ footer a:hover{color:var(--gold-hi)}
     "1.13":{about:"Острівець у холі: сушені фрукти на вагу.", pics:[]},
     "1.14":{about:"«Фурт сервіс» праворуч від входу. Ще один острівець — у холі біля ескалаторів.", pics:[]},
     "2.01":{about:"Магазин чоловічого одягу: класичні костюми, сорочки, пальта, трикотаж і аксесуари. Допоможемо зібрати образ на весілля, випускний чи ділову зустріч, підгін по фігурі на місці.", phone:"0680000201", hours:"10:00–20:00"},
-    "2.02":{about:"Взуття для всієї родини: шкіряні туфлі й черевики, кросівки, дитячі моделі. Щосезону нові колекції, є засоби для догляду та устілки.", phone:"0680000202", hours:"10:00–20:00"},
-    "2.03":{about:"Жіночий і чоловічий одяг на щодень: сукні, джинси, светри, верхній одяг. Зручні примірочні, нові надходження щотижня.", phone:"0680000203", hours:"10:00–20:00"},
-    "2.04":{about:"Сумки на будь-який випадок: шкіряні жіночі, рюкзаки, дорожні валізи, гаманці та ремені. Допоможемо підібрати подарунок і запакуємо.", phone:"0680000204", hours:"10:00–20:00"},
+    "2.02":{about:"Магазин «Зима-Літо» на другому поверсі, ліворуч у дальньому кутку.", pics:[]},
+    "2.03":{about:"Магазин «Файна пані» на другому поверсі, ліворуч уздовж стіни.", pics:[]},
+    "2.04":{about:"Магазин Brand на другому поверсі, ліворуч уздовж стіни.", pics:[]},
     "2.05":{about:"Медична клініка «Кредо»: прийом терапевта, педіатра й вузьких спеціалістів, УЗД, аналізи. Запис на зручний час телефоном, результати аналізів надсилаємо на пошту.", phone:"0680000205", hours:"Пн–Сб 8:00–19:00"},
     "2.06":{about:"Штори, тюль, римські й рулонні штори, карнизи. Понад 300 тканин у наявності, пошиття за вашими розмірами, виїзд на замір і монтаж.", phone:"0680000206", hours:"10:00–19:00"},
-    "2.07":{about:"Килими й доріжки для дому: класичні, сучасні, дитячі, вовняні й синтетичні. Підрізаємо та оверлочимо під ваш розмір, доставляємо додому.", phone:"0680000207", hours:"10:00–19:00"},
-    "2.08":{about:"Кабінет косметології: чистки, пілінги, апаратні процедури, догляд за шкірою обличчя й тіла. Перша консультація безкоштовна, працюємо за записом.", phone:"0680000208", hours:"9:00–20:00"},
+    "2.07":{about:"Магазин «Шарм» на другому поверсі, ліворуч уздовж стіни.", pics:[]},
+    "2.08":{about:"Магазин Astel на другому поверсі, праворуч між «Джентельменом» і «Шторами».", pics:[]},
+    "2.09":{about:"Бутик La Butik на другому поверсі, навпроти ескалаторів.", pics:[]},
     "3.01":{about:"Ресторан Garden Plaza: європейська й закарпатська кухня, власний бар, літня тераса з краєвидом на гори. Бронювання столів, банкети, доставка по Нересниці та селах поруч.", phone:"0685350099", hours:"10:00–23:00"},
     "3.02":{about:"Спортзал GYM MAXI: бігові доріжки, вільна вага й тренажери. Персональні заняття з тренером і групові з боксу, ММА, фітнесу та стретчингу. У святкові дні зал працює з 12:00 до 22:00.", phones:["0975350099"], hours:"Пн–Сб 8:00–22:00, Нд 13:00–20:00", logo:"shops/logo/3.02.webp", pics:["shops/3.02-1.webp"]},
     "3.03":{about:"Mezey Shop: нова та вживана техніка Apple — iPhone, iPad, MacBook, AirPods і фірмові аксесуари. Ремонт техніки будь-якої складності.", phones:["0968477627"], hours:"Пн–Сб 9:00–18:00, Нд вихідний", logo:"shops/logo/3.03.webp", pics:["shops/3.03-1.webp"]},
@@ -915,6 +918,7 @@ footer a:hover{color:var(--gold-hi)}
     "3.05":{about:"Служба таксі MonoTaxi: поїздки Нересницею та за її межі, «тверезий водій», кур'єрська доставка й доставка продуктів. Виклик авто безкоштовний, тариф від 29 грн/км, мінімальне замовлення — 150 грн. Офіс на третьому поверсі центру.", phones:["0981873000", "0981874000"], hours:"7:00–01:00", logo:"shops/logo/3.05.webp"},
     "3.06":{about:"Ігрова кімната для дітей: гірки, сухий басейн, лабіринт і куточок для найменших. Малеча грається під наглядом, поки батьки в ресторані чи на покупках.", phone:"0680000306", hours:"10:00–21:00"},
     "3.07":{about:"Магазин одягу на третьому поверсі: повсякденні речі, верхній одяг та аксесуари. Нові надходження щотижня.", phone:"0680000307", hours:"10:00–20:00"},
+    "3.08":{about:"Банкетний зал на третьому поверсі для весіль, хрестин, ювілеїв і корпоративів. Подробиці й бронювання — у ресторані Garden Plaza.", phone:"0685350099", hours:"за домовленістю", pics:[]},
     "4.01":{about:"Готель на четвертому поверсі: затишні номери зі своєю ванною, Wi‑Fi і краєвидом на гори. Сніданок у ресторані Garden Plaza, безкоштовний паркінг для гостей.", phone:"0685350099", hours:"цілодобово"}
   };
   const UNITS = UNITS_BASE.map((u) => ({...u, ...SHOP_INFO[u.id]}));
@@ -926,6 +930,7 @@ footer a:hover{color:var(--gold-hi)}
   // посилання закладів, у яких є свій сайт
   const SHOP_LINKS = {
     "3.01":[{href:"https://gardenplaza.com.ua", label:"Меню і доставка"}],
+    "3.08":[{href:"https://gardenplaza.com.ua", label:"Ресторан Garden Plaza"}],
     "3.02":[{href:"https://www.instagram.com/gym_maxi_new/", label:"Instagram"}],
     "3.03":[{href:"https://www.instagram.com/mezey_shop/", label:"Instagram"}, {href:"https://t.me/mezeyshop", label:"Telegram"}],
     "3.04":[{href:"https://www.instagram.com/tiffany_beauty_salon_/", label:"Написати в Instagram"}],
@@ -1002,13 +1007,16 @@ footer a:hover{color:var(--gold-hi)}
   }
 
   // сітка кожного поверху в клітинках; hall: вільний простір між приміщеннями — це хол, а не коридор-смуга
-  const FLOOR_GRID = {1:{cols:12, rows:9.6, hall:true}, 2:{cols:12, rows:6.4}, 3:{cols:12, rows:10.9, hall:true}, 4:{cols:12, rows:6.4}};
+  const FLOOR_GRID = {1:{cols:12, rows:9.6, hall:true}, 2:{cols:12, rows:13.4, hall:true}, 3:{cols:12, rows:10.9, hall:true}, 4:{cols:12, rows:6.4}};
   // службові приміщення: їх видно на плані, але в каталозі закладів їх немає.
   // mark — короткий підпис для 2D-плану; flat — на 3D-плані без підпису над блоком (напис лежить на підлозі, див. PLATE_MARKS)
   const PLAN_ROOMS = [
-    {f:1, x:5.15, y:3.6, w:.8, h:3.45, name:"Ескалатор униз", mark:"↓", flat:true},
-    {f:1, x:5.95, y:3.6, w:.8, h:3.45, name:"Ескалатор угору", mark:"↑", flat:true},
+    {f:1, x:5.15, y:3.6, w:.8, h:3.45, name:"Ескалатор угору", mark:"↑", flat:true},
+    {f:1, x:5.95, y:3.6, w:.8, h:3.45, name:"Ескалатор униз", mark:"↓", flat:true},
     {f:1, x:5.1, y:8.8, w:2.2, h:.8, name:"Вхід / вихід", flat:true},
+    {f:2, x:4.32, y:2.6, w:1.89, h:4.61, name:"Ескалатор угору", mark:"↑", flat:true},
+    {f:2, x:6.21, y:2.6, w:2.24, h:4.61, name:"Ескалатор униз", mark:"↓", flat:true},
+    {f:2, x:.05, y:11.93, w:2.05, h:1.44, name:"Туалет"},
     {f:3, x:9.85, y:0, w:2.15, h:.75, name:"Туалет"}
   ];
   // точка «ви тут» на 2D-плані 1 поверху: одразу за входом
@@ -1016,7 +1024,7 @@ footer a:hover{color:var(--gold-hi)}
   // підписи на 2D-плані: x, y у клітинках
   const PLAN_MARKS = {
     1:[[5.95, 7.4, "Ескалатори"]],
-    2:[[5.5, 5.6, "Атріум"], [11.3, 4, "Сходи"]],
+    2:[[6.3, 7.75, "Ескалатори"]],
     3:[[6.6, 6, "Хол"]],
     4:[[6, 5.6, "Тераса"], [11.3, 4, "Сходи"]]
   };
@@ -1044,7 +1052,6 @@ footer a:hover{color:var(--gold-hi)}
     const grid = FLOOR_GRID[state.floor];
     const walkway = grid.hall ? {x:0, y:0, width:grid.cols*CELL, height:grid.rows*CELL} : {x:0, y:3*CELL, width:grid.cols*CELL, height:1.4*CELL};
     svg.append(svgEl("rect", {class:"corridor", ...walkway}));
-    if (state.floor === 2) svg.append(svgEl("rect", {class:"void", x:4*CELL+12, y:4*CELL+52, width:3*CELL-24, height:2*CELL-64, rx:10}));
     PLAN_ROOMS.filter((r) => r.f === state.floor).forEach((r) => {
       svg.append(svgEl("rect", {class:"room", x:r.x*CELL+PLAN_GAP, y:r.y*CELL+PLAN_GAP, width:r.w*CELL-2*PLAN_GAP, height:r.h*CELL-2*PLAN_GAP, rx:3}));
       const label = svgEl("text", {class:r.mark ? "mark big" : "mark", x:(r.x + r.w / 2)*CELL, y:(r.y + r.h / 2)*CELL + (r.mark ? 16 : 6), "text-anchor":"middle"});
@@ -1060,7 +1067,8 @@ footer a:hover{color:var(--gold-hi)}
   }
 
   // логотип на 2D-плані: у рамці приміщення під номером; для складної форми — навколо точки підпису
-  const PLAN_LOGO = {pad:16, top:34, shapedW:320, shapedH:130};
+  // maxZoom — у скільки разів знак більший, ніж на плитці; fill — яку частку рамки він може зайняти
+  const PLAN_LOGO = {pad:16, top:34, shapedW:320, shapedH:130, maxZoom:2.2, fill:.9};
   function planLogo(u, mark) {
     const box = u.label
       ? {x:u.label[0]*CELL - PLAN_LOGO.shapedW / 2, y:u.label[1]*CELL - PLAN_LOGO.shapedH / 2, width:PLAN_LOGO.shapedW, height:PLAN_LOGO.shapedH}
@@ -1098,6 +1106,18 @@ footer a:hover{color:var(--gold-hi)}
     return g;
   }
 
+  // знак не має вилазити за рамку приміщення: міряємо його в натуральному розмірі й збільшуємо, скільки вміщається.
+  // Коли план схований (телефон), розміри нульові — лишається збільшення з CSS
+  function fitPlanLogos() {
+    $$("#plan .plan-logo").forEach((el) => {
+      el.style.zoom = "1";
+      const box = el.parentElement.getBoundingClientRect();
+      const mark = el.firstElementChild.getBoundingClientRect();
+      if (!box.width || !mark.width) { el.style.zoom = ""; return; }
+      el.style.zoom = String(Math.min(PLAN_LOGO.maxZoom, box.width * PLAN_LOGO.fill / mark.width, box.height * PLAN_LOGO.fill / mark.height));
+    });
+  }
+
   function renderPlan() {
     const svg = $("#plan");
     const grid = FLOOR_GRID[state.floor];
@@ -1106,6 +1126,7 @@ footer a:hover{color:var(--gold-hi)}
     svg.setAttribute("aria-label", `План ${state.floor} поверху`);
     renderPlanStatic(svg);
     UNITS.filter((u) => u.f === state.floor).forEach((u) => svg.append(unitNode(u)));
+    fitPlanLogos();
   }
 
   function renderCats() {
@@ -1246,7 +1267,7 @@ footer a:hover{color:var(--gold-hi)}
   const HERO_FLOORS = {
     4:{label:"Готель", icon:"i-bed", x:66, y:28, title:"Готель", unit:"4.01"},
     3:{label:"Ресторан, спорт, діти, краса", icon:"i-food", x:58, y:41, title:"Ресторан Garden Plaza", unit:"3.01"},
-    2:{label:"Одяг, взуття, дім", icon:"i-hanger", x:84, y:54, title:"Джентельмен", unit:"2.01"},
+    2:{label:"Одяг, клініка, штори", icon:"i-hanger", x:84, y:54, title:"Джентельмен", unit:"2.01"},
     1:{label:"Магазини й послуги", icon:"i-bag", x:44, y:68, title:"Копійочка", unit:"1.01"}
   };
   const HERO_ORDER = [4, 3, 2, 1];
@@ -1294,8 +1315,8 @@ footer a:hover{color:var(--gold-hi)}
   // скільки пікселів картки закладу показуємо на телефоні одразу після вибору
   const CARD_PEEK = 190;
   const PLATE_MARKS = {
-    1:[[5.55, 5.3, "↓", "esc"], [6.35, 5.3, "↑", "esc"], [5.95, 7.4, "Ескалатори"], [6.2, 9.2, "Вхід / вихід", "door"]],
-    2:[[5.5, 5.4, "Атріум"], [11.2, 3.2, "Сходи"]],
+    1:[[5.55, 5.3, "↑", "esc"], [6.35, 5.3, "↓", "esc"], [5.95, 7.4, "Ескалатори"], [6.2, 9.2, "Вхід / вихід", "door"]],
+    2:[[5.26, 4.9, "↑", "esc"], [7.33, 4.9, "↓", "esc"], [6.3, 7.6, "Ескалатори"]],
     3:[[6.6, 5.9, "Хол"]],
     4:[[6, 5.2, "Тераса"], [11.2, 3.2, "Сходи"]]
   };
@@ -1311,7 +1332,6 @@ footer a:hover{color:var(--gold-hi)}
 
   function plateHtml(f) {
     const marks = PLATE_MARKS[f].map(([x, y, t, kind]) => `<span class="mk${kind ? ` ${kind}` : ""}" style="left:${cells(x)};top:${cells(y)}">${t}</span>`).join("");
-    const atrium = f === 2 ? `<span class="atrium" style="left:${cells(4.15)};top:${cells(4.55)};width:${cells(2.7)};height:${cells(1.7)}"></span>` : "";
     const rooms = PLAN_ROOMS.filter((r) => r.f === f).map((r) =>
       `<span class="room" style="--i:8;left:${cells(r.x)};top:${cells(r.y)};width:${cells(r.w)};height:${cells(r.h)}">${r.flat ? "" : `<span class="lbl"><span class="pin">${r.name}</span></span>`}</span>`).join("");
     const blocks = UNITS.filter((u) => u.f === f).map((u, i) => {
@@ -1321,7 +1341,7 @@ footer a:hover{color:var(--gold-hi)}
     }).join("");
     const zones = PLATE_ZONES.filter((zn) => zn.f === f).map((zn) =>
       `<div class="zone" role="button" tabindex="0" data-cut-unit="${zn.id}" aria-label="${zn.name}" style="--c:var(--gold);--i:9;left:${cells(zn.x)};top:${cells(zn.y)};width:${cells(zn.w)};height:${cells(zn.h)}"><span class="lbl"><span class="pin">${zn.name}<small>${zn.note}</small></span></span></div>`).join("");
-    return atrium + rooms + marks + zones + blocks;
+    return rooms + marks + zones + blocks;
   }
 
   // знак закладу з POPULAR (логотип або фірмовий напис); null, якщо знака немає
