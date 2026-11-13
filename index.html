@@ -556,6 +556,7 @@ section{padding:110px 0}
 #plan .unit text{font-family:var(--sans);fill:var(--cream);pointer-events:none}
 #plan .u-no{font-size:14px;opacity:.55;dominant-baseline:hanging}
 #plan .u-name{font:500 24px var(--serif)}
+#plan .u-name.sm{font-size:16px}
 /* логотип закладу на 2D-плані: той самий знак, що на плитках, збільшений до масштабу плану */
 #plan .u-logo{pointer-events:none;overflow:visible}
 #plan .plan-logo{width:100%;height:100%;display:grid;place-items:center;zoom:2.2;transition:opacity .2s}
@@ -563,6 +564,7 @@ section{padding:110px 0}
 #plan .unit.dim .plan-logo{opacity:.25}
 #plan .unit.on .plan-logo .wm{padding:5px 8px;border-radius:6px;background:rgba(14,11,8,.88)}
 #plan .corridor{fill:#231C15}
+#plan .lot{fill:rgba(201,164,106,.04);stroke:var(--gold-lo);stroke-width:1.5;stroke-dasharray:10 8}
 #plan .room{fill:rgba(201,164,106,.06);stroke:var(--gold-lo);stroke-width:1.2}
 #plan .mark{font:italic 400 18px var(--serif);fill:var(--muted)}
 #plan .room.esc{fill:color-mix(in srgb,var(--lane) 12%,transparent);stroke:var(--lane)}
@@ -983,20 +985,20 @@ footer a:hover{color:var(--gold-hi)}
   // shape — контур для приміщення складної форми (вершини за годинниковою стрілкою), label — де стоїть його підпис.
   // 1 і 3 поверхи розкладено за малюнками Миколи від 12.11.2026 (1 клітинка 1 поверху = 52 px малюнка)
   const UNITS_BASE = [
-    {id:"1.01",slug:"kopiyochka",f:1,x:0,y:0,w:4.45,h:1.35,cat:"home",name:"Копійочка",about:"Товари для дому й побутова хімія.",tags:"копійочка kopiyochka товари для дому побутова хімія посуд господарські"},
-    {id:"1.02",slug:"apteka",f:1,x:9.95,y:5.4,w:2.05,h:1.9,cat:"services",name:"Аптека",about:"Ліки, вітаміни, засоби гігієни.",tags:"аптека ліки вітаміни"},
-    {id:"1.03",slug:"obmin-valyut",f:1,x:0,y:1.85,w:1.8,h:1.6,cat:"services",name:"Обмін валют",about:"Пункт обміну валют.",tags:"обмін валют валюта долар євро крони гроші курс"},
-    {id:"1.04",slug:"prostor",f:1,x:4.45,y:0,w:4,h:1.35,cat:"beauty",name:"PROSTOR",about:"Магазин косметики PROSTOR.",tags:"prostor простор косметика парфумерія парфуми догляд крем помада побутова хімія"},
-    {id:"1.05",slug:"kvity",f:1,x:9.95,y:3.25,w:2.05,h:2.15,cat:"home",name:"Квіти",about:"Букети й кімнатні рослини.",tags:"квіти букет рослини"},
-    {id:"1.06",slug:"odyag",f:1,x:8.45,y:0,w:3.55,h:1.35,cat:"fashion",name:"Одяг",about:"Магазин одягу.",tags:"одяг"},
-    {id:"1.07",slug:"kylymy",f:1,x:9.95,y:1.35,w:2.05,h:1.9,cat:"home",name:"Килими",about:"Килими й доріжки для дому.",tags:"килими ковер доріжка"},
-    {id:"1.08",slug:"versal",f:1,x:0,y:3.45,w:1.8,h:2.65,cat:"shop",name:"Версаль",about:"Магазин «Версаль».",tags:"версаль versal versailles"},
-    {id:"1.09",slug:"alma",f:1,x:0,y:6.1,w:1.8,h:3.05,cat:"grocery",name:"ALMA",about:"Супермаркет ALMA.",tags:"alma алма супермаркет продукти хліб пекарня м'ясо випічка"},
-    {id:"1.10",slug:"furt-servis",f:1,x:3.4,y:3.65,w:1.2,h:1.85,cat:"services",name:"Фурт сервіс",about:"Острівець «Фурт сервіс».",tags:"фурт сервіс furt service"},
-    {id:"1.11",f:1,vacant:true,x:7.25,y:3.65,w:1.2,h:1.85,cat:"services",name:"Оренда",about:"Вільний острівець під оренду.",tags:"оренда вільне місце острівець орендувати"},
-    {id:"1.12",slug:"zolotyi-vik",f:1,x:3.4,y:6.85,w:1.3,h:1.95,cat:"beauty",name:"Золотий вік",about:"Ювелірний острівець.",tags:"золотий вік ювелірний золото срібло прикраси острівець"},
-    {id:"1.13",slug:"susheni-frukty",f:1,x:7.25,y:6.85,w:1.3,h:1.6,cat:"grocery",name:"Сушені фрукти",about:"Сушені фрукти на вагу.",tags:"сушені засушені фрукти сухофрукти горіхи"},
-    {id:"1.14",slug:"furt-servis",f:1,x:9.05,y:8.5,w:2.25,h:1.1,cat:"services",name:"Фурт сервіс",about:"«Фурт сервіс» біля входу.",tags:"фурт сервіс furt service"},
+    {id:"1.01",slug:"kopiyochka",f:1,x:0,y:0,w:4.2,h:1.23,cat:"home",name:"Копійочка",about:"Товари для дому й побутова хімія.",tags:"копійочка kopiyochka товари для дому побутова хімія посуд господарські"},
+    {id:"1.02",slug:"apteka",f:1,x:10.52,y:3.57,w:1.48,h:1.21,cat:"services",name:"Аптека",about:"Ліки, вітаміни, засоби гігієни.",tags:"аптека ліки вітаміни"},
+    {id:"1.03",slug:"obmin-valyut",f:1,x:0,y:1.84,w:1.99,h:0.77,cat:"services",name:"Обмін валют",about:"Пункт обміну валют.",tags:"обмін валют валюта долар євро крони гроші курс"},
+    {id:"1.04",slug:"prostor",f:1,x:4.2,y:0,w:3.73,h:1.23,cat:"beauty",name:"PROSTOR",about:"Магазин косметики PROSTOR.",tags:"prostor простор косметика парфумерія парфуми догляд крем помада побутова хімія"},
+    {id:"1.05",slug:"kvity",f:1,x:10.52,y:2.41,w:1.48,h:1.16,cat:"home",name:"Квіти",about:"Букети й кімнатні рослини.",tags:"квіти букет рослини"},
+    {id:"1.06",slug:"odyag",f:1,x:7.93,y:0,w:4.07,h:1.23,cat:"fashion",name:"Одяг",about:"Магазин одягу.",tags:"одяг"},
+    {id:"1.07",slug:"kylymy",f:1,x:10.52,y:1.23,w:1.48,h:1.18,cat:"home",name:"Килими",about:"Килими й доріжки для дому.",tags:"килими ковер доріжка"},
+    {id:"1.08",slug:"versal",f:1,x:0,y:2.61,w:1.99,h:2.17,cat:"shop",name:"Версаль",about:"Магазин «Версаль».",tags:"версаль versal versailles"},
+    {id:"1.09",slug:"alma",f:1,x:0,y:4.78,w:1.99,h:4.38,cat:"grocery",name:"ALMA",about:"Супермаркет ALMA.",tags:"alma алма супермаркет продукти хліб пекарня м'ясо випічка"},
+    {id:"1.10",slug:"furt-servis",f:1,x:3.17,y:1.9,w:0.86,h:0.95,cat:"services",name:"Фурт сервіс",about:"Острівець «Фурт сервіс».",tags:"фурт сервіс furt service"},
+    {id:"1.11",f:1,vacant:true,x:7.88,y:1.94,w:0.82,h:0.93,cat:"services",name:"Оренда",about:"Вільний острівець під оренду.",tags:"оренда вільне місце острівець орендувати"},
+    {id:"1.12",slug:"zolotyi-vik",f:1,x:3.22,y:3.43,w:0.83,h:0.95,cat:"beauty",name:"Золотий вік",about:"Ювелірний острівець.",tags:"золотий вік ювелірний золото срібло прикраси острівець"},
+    {id:"1.13",slug:"susheni-frukty",f:1,x:7.89,y:3.41,w:0.83,h:0.96,cat:"grocery",name:"Сушені фрукти",about:"Сушені фрукти на вагу.",tags:"сушені засушені фрукти сухофрукти горіхи"},
+    {id:"1.14",slug:"furt-servis",f:1,x:9.09,y:4.24,w:1.04,h:0.54,cat:"services",name:"Фурт сервіс",about:"«Фурт сервіс» біля входу.",tags:"фурт сервіс furt service"},
 
     {id:"2.01",slug:"dzhentelmen",f:2,x:10.09,y:1.42,w:1.91,h:6.93,cat:"fashion",name:"Джентельмен",about:"Чоловічий одяг: костюми, сорочки, верхній одяг.",tags:"джентельмен gentleman gentelman одяг чоловічий костюм сорочка"},
     {id:"2.02",slug:"zyma-lito",f:2,x:0,y:0,w:2.04,h:3.4,cat:"shop",name:"Зима-Літо",about:"Магазин «Зима-Літо».",tags:"зима-літо зима літо"},
@@ -1136,7 +1138,7 @@ footer a:hover{color:var(--gold-hi)}
     }
   }
   // зони поза приміщеннями; координати в клітинках плану, y більший за висоту поверху — перед фасадом
-  const PLATE_ZONES = [{id:"parking", f:1, x:0, y:9.95, w:7, h:1.5, name:"Паркінг", note:"1000 місць"}];
+  const PLATE_ZONES = [{id:"parking", f:1, x:2.4, y:5.85, w:9.6, h:3.3, name:"Паркінг", note:"1000 місць"}];
   // скільки закладів видно в каталозі на телефоні до кнопки «Показати всі»
   const LIST_PREVIEW = 6;
 
@@ -1202,23 +1204,23 @@ footer a:hover{color:var(--gold-hi)}
   }
 
   // сітка кожного поверху в клітинках; hall: вільний простір між приміщеннями — це хол, а не коридор-смуга
-  const FLOOR_GRID = {1:{cols:12, rows:9.6, hall:true}, 2:{cols:12, rows:13.4, hall:true}, 3:{cols:12, rows:10.9, hall:true}, 4:{cols:12, rows:6.4}};
+  const FLOOR_GRID = {1:{cols:12, rows:9.2, hall:true, hallH:4.78, wing:{x:0, w:1.99}}, 2:{cols:12, rows:13.4, hall:true}, 3:{cols:12, rows:10.9, hall:true}, 4:{cols:12, rows:6.4}};
   // службові приміщення: їх видно на плані, але в каталозі закладів їх немає.
   // mark — короткий підпис для 2D-плану; flat — на 3D-плані без підпису над блоком (напис лежить на підлозі, див. PLATE_MARKS)
   const PLAN_ROOMS = [
-    {f:1, x:5.15, y:3.6, w:.8, h:3.45, name:"Ескалатор угору", esc:"up", flat:true},
-    {f:1, x:5.95, y:3.6, w:.8, h:3.45, name:"Ескалатор униз", esc:"down", flat:true},
-    {f:1, x:5.1, y:8.8, w:2.2, h:.8, name:"Вхід / вихід", flat:true},
+    {f:1, x:5.25, y:1.84, w:.74, h:2.09, name:"Ескалатор угору", esc:"up", flat:true},
+    {f:1, x:5.99, y:1.84, w:.75, h:2.09, name:"Ескалатор униз", esc:"down", flat:true},
+    {f:1, x:5.73, y:4.78, w:.95, h:.64, name:"Вхід", flat:true},
     {f:2, x:4.32, y:2.6, w:2.065, h:4.61, name:"Ескалатор угору", esc:"up", flat:true},
     {f:2, x:6.385, y:2.6, w:2.065, h:4.61, name:"Ескалатор униз", esc:"down", flat:true},
     {f:2, x:.05, y:11.93, w:2.05, h:1.44, name:"Туалет"},
     {f:3, x:9.85, y:0, w:2.15, h:.75, name:"Туалет"}
   ];
   // точка «ви тут» на 2D-плані 1 поверху: одразу за входом
-  const YOU_ARE_HERE = {x:6.2, y:8.45};
+  const YOU_ARE_HERE = {x:6.2, y:4.5};
   // підписи на 2D-плані: x, y у клітинках
   const PLAN_MARKS = {
-    1:[[5.95, 7.4, "Ескалатори"]],
+    1:[[5.99, 4.25, "Ескалатори"]],
     2:[[6.385, 7.75, "Ескалатори"]],
     3:[[6.6, 6, "Хол"]],
     4:[[6, 5.6, "Тераса"], [11.3, 4, "Сходи"]]
@@ -1235,6 +1237,8 @@ footer a:hover{color:var(--gold-hi)}
 
   // назва приміщення на 2D-плані (в одиницях плану): відступ від краю, висота рядка, середня ширина літери
   const PLAN_NAME = {inset:18, bottom:24, line:28, charWidth:13};
+  // вузькі острівці в холі (ширина менша за narrowW): дрібніший шрифт і менший відступ, щоб назва вміщалась
+  const PLAN_NAME_SM = {inset:9, bottom:14, line:19, charWidth:9, narrowW:115};
   // ділить назву щонайбільше на два рядки по пробілу; те, що не вмістилось, обрізає
   const nameLines = (name, maxChars) => {
     if (name.length <= maxChars) return [name];
@@ -1266,8 +1270,16 @@ footer a:hover{color:var(--gold-hi)}
 
   function renderPlanStatic(svg) {
     const grid = FLOOR_GRID[state.floor];
-    const walkway = grid.hall ? {x:0, y:0, width:grid.cols*CELL, height:grid.rows*CELL} : {x:0, y:3*CELL, width:grid.cols*CELL, height:1.4*CELL};
+    const walkway = grid.hall ? {x:0, y:0, width:grid.cols*CELL, height:(grid.hallH || grid.rows)*CELL} : {x:0, y:3*CELL, width:grid.cols*CELL, height:1.4*CELL};
     svg.append(svgEl("rect", {class:"corridor", ...walkway}));
+    // крило будівлі, що виходить за фасад (на 1 поверсі — ALMA)
+    if (grid.wing) svg.append(svgEl("rect", {class:"corridor", x:grid.wing.x*CELL, y:walkway.height, width:grid.wing.w*CELL, height:grid.rows*CELL - walkway.height}));
+    PLATE_ZONES.filter((zn) => zn.f === state.floor).forEach((zn) => {
+      svg.append(svgEl("rect", {class:"lot", x:zn.x*CELL, y:zn.y*CELL, width:zn.w*CELL, height:zn.h*CELL, rx:6}));
+      const t = svgEl("text", {class:"mark", x:(zn.x + zn.w / 2)*CELL, y:(zn.y + zn.h / 2)*CELL + 6, "text-anchor":"middle"});
+      t.textContent = `${zn.name} · ${zn.note}`;
+      svg.append(t);
+    });
     PLAN_ROOMS.filter((r) => r.f === state.floor).forEach((r) => {
       svg.append(svgEl("rect", {class:r.esc ? `room esc ${r.esc}` : "room", x:r.x*CELL+PLAN_GAP, y:r.y*CELL+PLAN_GAP, width:r.w*CELL-2*PLAN_GAP, height:r.h*CELL-2*PLAN_GAP, rx:3}));
       if (r.esc) { svg.append(escLane(r)); return; }
@@ -1308,10 +1320,12 @@ footer a:hover{color:var(--gold-hi)}
       : svgEl("rect", {x:x+PLAN_GAP, y:y+PLAN_GAP, width:w-2*PLAN_GAP, height:h-2*PLAN_GAP, rx:3});
     const no = svgEl("text", {class:"u-no", x:x+18, y:y+18});
     no.textContent = u.id;
-    const lines = nameLines(u.name, Math.max(1, Math.floor((w - 2 * PLAN_NAME.inset) / PLAN_NAME.charWidth)));
-    const nm = svgEl("text", {class:"u-name", x:x+PLAN_NAME.inset, y:y+h-PLAN_NAME.bottom});
+    const small = w < PLAN_NAME_SM.narrowW;
+    const nf = small ? PLAN_NAME_SM : PLAN_NAME;
+    const lines = nameLines(u.name, Math.max(1, Math.floor((w - 2 * nf.inset) / nf.charWidth)));
+    const nm = svgEl("text", {class:small ? "u-name sm" : "u-name", x:x+nf.inset, y:y+h-nf.bottom});
     lines.forEach((line, i) => {
-      const row = svgEl("tspan", {x:x+PLAN_NAME.inset, dy:i === 0 ? -(lines.length - 1) * PLAN_NAME.line : PLAN_NAME.line});
+      const row = svgEl("tspan", {x:x+nf.inset, dy:i === 0 ? -(lines.length - 1) * nf.line : nf.line});
       row.textContent = line;
       nm.append(row);
     });
@@ -1533,7 +1547,7 @@ footer a:hover{color:var(--gold-hi)}
   // скільки пікселів картки закладу показуємо на телефоні одразу після вибору
   const CARD_PEEK = 190;
   const PLATE_MARKS = {
-    1:[[5.95, 7.4, "Ескалатори"], [6.2, 9.2, "Вхід / вихід", "door"]],
+    1:[[5.99, 4.2, "Ескалатори"], [6.2, 5.62, "Вхід / вихід", "door"]],
     2:[[6.385, 7.6, "Ескалатори"]],
     3:[[6.6, 5.9, "Хол"]],
     4:[[6, 5.2, "Тераса"], [11.2, 3.2, "Сходи"]]
