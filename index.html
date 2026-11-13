@@ -250,6 +250,15 @@ p{margin:0}
 .hl .pin::after{background:#FFE7B0}
 @keyframes neon{to{opacity:1}}
 
+
+/* вікно плану: на телефоні обгортки панелей не мають власної рамки, лишається один стовпчик */
+.cut-side,.cut-main,.cut-foot,.cut-go{display:contents}
+.cut-cap,.cut-bar,.cut-meta,.cut-go-head,.cut-pct,.info-cap,.info-foot,.cut-floors em,.cut-floors .fl-d,.cut-floors .fl-go,.tile .chip{display:none}
+.cut-head{order:0}.cut-floors{order:1}.cut-stage{order:2}.cut-list{order:3}.cut-info{order:4}.cut-legend{order:5}.cut-hint{order:6}
+.cutaway.no-names .plate .lbl{display:none}
+.cut-hint .h-d{display:none}
+.info-empty{display:none}
+
 /* заклади поверху одним рядком; коли не вміщаються, рядок гортається */
 .cut-list{position:relative;flex:none;align-self:stretch;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:4px 2px 8px;opacity:0;transition:opacity .4s}
 .cut-list::-webkit-scrollbar{display:none}
@@ -304,10 +313,82 @@ p{margin:0}
   .hero.is-open .scene{opacity:0}
   .hcopy{transition:opacity .4s ease,visibility 0s}
   .hero.is-open .hcopy{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .4s ease,visibility 0s .4s}
-  .cutaway{background:radial-gradient(55% 45% at 50% 58%,rgba(201,164,106,.10),transparent 70%)}
-  /* картка закладу стоїть збоку від плану, а не під ним: план не стискається і підписи не збиваються в купу */
-  .cutaway.has-info .cut-stage{margin-right:340px}
-  .cut-info,.cut-info.no-pics{position:absolute;right:0;top:66px;width:324px;max-height:calc(100% - 170px);overflow-y:auto;scrollbar-width:thin;grid-template-columns:1fr;gap:12px;align-self:auto;margin:0;padding:16px}
+
+  /* план поверху — три панелі за зразком: поверхи й позначення, план, заклад; знизу — заклади поверху */
+  .hero.is-open .floorsel,.hero.is-open .quick{opacity:0;visibility:hidden;pointer-events:none}
+  .floorsel,.quick{transition:opacity .4s,visibility 0s .4s}
+  .cutaway{left:clamp(16px,1.4vw,26px);right:clamp(16px,1.4vw,26px);top:max(96px,11%);bottom:3%;display:grid;grid-template-columns:minmax(196px,232px) minmax(0,1fr) minmax(250px,300px);grid-template-rows:minmax(0,1fr) auto;gap:16px 18px;background:none}
+  .cut-head{display:none}
+  .cut-head,.cut-floors,.cut-stage,.cut-list,.cut-info,.cut-legend,.cut-hint{order:0}
+  .cut-side{grid-area:1 / 1}
+  .cut-main{grid-area:1 / 2}
+  .cutaway .cut-info{grid-area:1 / 3}
+  .cut-go{grid-area:2 / 1 / 3 / 4}
+  .cut-side,.cut-main,.cut-info,.cut-info.no-pics{border:1px solid rgba(201,164,106,.24);border-radius:18px;background:linear-gradient(180deg,rgba(28,22,16,.94),rgba(11,9,7,.94));box-shadow:0 20px 50px rgba(0,0,0,.35)}
+  .cut-side,.cut-main,.cut-go{opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s}
+  .hero.is-open .cut-side,.hero.is-open .cut-main,.hero.is-open .cut-go{opacity:1;transform:none;transition:opacity .5s ease .3s,transform .6s cubic-bezier(.2,.8,.2,1) .3s}
+  .cut-cap{display:block;font:600 10.5px/1.3 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+  .cut-side{display:flex;flex-direction:column;gap:14px;min-height:0;overflow-y:auto;scrollbar-width:none;padding:22px 18px}
+  .cut-floors{display:flex;flex-direction:column-reverse;gap:8px}
+  .cut-floors button{display:grid;grid-template-columns:auto 1fr auto;gap:2px 12px;align-items:center;text-align:left;padding:12px;border-radius:12px;border:1px solid transparent;background:none;color:#E8DFD1;font:inherit;transition:border-color .2s,background .2s}
+  .cut-floors button:hover{border-color:rgba(201,164,106,.35)}
+  .cut-floors button[aria-pressed="true"]{background:linear-gradient(180deg,rgba(201,164,106,.30),rgba(201,164,106,.12));border-color:var(--gold);color:#fff}
+  .cut-floors .fl-m{display:none}
+  .cut-floors em{display:block;grid-row:span 2;font:400 26px/1 var(--serif);font-style:normal;color:var(--gold-hi)}
+  .cut-floors .fl-d{display:contents}
+  .cut-floors .fl-d b{font:600 13.5px/1.25 var(--sans);color:#fff}
+  .cut-floors .fl-d small{grid-column:2;font-size:11.5px;line-height:1.3;color:var(--muted)}
+  .cut-floors .fl-go{display:block;grid-row:1 / span 2;grid-column:3;width:15px;height:15px;color:var(--gold)}
+  .cut-cap-legend{margin-top:auto;padding-top:16px;border-top:1px solid rgba(201,164,106,.18)}
+  .cut-legend{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:10px;padding:0;font-size:12.5px;align-self:stretch}
+  .cutaway.has-info .cut-legend{display:flex}
+  .cut-main{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;padding:0}
+  .cut-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 22px 16px;border-bottom:1px solid rgba(201,164,106,.16)}
+  .cut-eyebrow{font:600 10.5px/1.3 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+  .cut-name{margin-top:6px;font:500 clamp(22px,1.9vw,30px)/1.1 var(--serif);color:#fff}
+  .cut-tools{display:flex;align-items:center;gap:8px}
+  .cut-tools button:not(.cut-close){display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:99px;border:1px solid rgba(201,164,106,.4);background:rgba(14,11,8,.6);color:#E8DFD1;font:500 12px/1 var(--sans);cursor:pointer;white-space:nowrap}
+  .cut-tools button:not(.cut-close):hover{border-color:var(--gold);color:#fff}
+  .cut-tools button[aria-pressed="true"]{background:rgba(201,164,106,.18);border-color:var(--gold)}
+  .cut-tools svg{width:13px;height:13px}
+  .cut-stage{transform-origin:50% 50%;background:linear-gradient(rgba(201,164,106,.05) 1px,transparent 1px) 0 0/48px 48px,linear-gradient(90deg,rgba(201,164,106,.05) 1px,transparent 1px) 0 0/48px 48px,radial-gradient(60% 55% at 50% 55%,rgba(201,164,106,.10),transparent 70%)}
+  .cutaway.has-info .cut-stage{margin-right:0}
+  .cut-main .plate{--pw:min(76cqw,120cqh)}
+  .cut-main .plate.is-deep{--pw:min(64cqw,92cqh)}
+  .cut-zoom{right:16px;bottom:16px;align-items:center;gap:4px;padding:6px;border-radius:99px;border:1px solid rgba(201,164,106,.3);background:rgba(14,11,8,.8)}
+  .cut-zoom button{width:34px;height:34px}
+  .cut-zoom [data-zoom="reset"]{display:none}
+  .cut-pct{display:block;font:500 10.5px/1 var(--sans);color:var(--muted);padding:3px 0}
+  .cut-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 22px;border-top:1px solid rgba(201,164,106,.16)}
+  .cut-hint,.cutaway.has-info .cut-hint{display:block;max-width:none;margin:0;font:500 10.5px/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;text-align:left;color:var(--muted)}
+  .cut-hint .h-m{display:none}
+  .cut-hint .h-d{display:inline}
+  .cut-meta{display:flex;gap:22px;flex:none;font:600 10.5px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#E8DFD1}
+  .cut-meta > span{display:flex;align-items:center;gap:8px}
+  .cut-meta i{width:7px;height:7px;border-radius:50%;background:var(--moss);box-shadow:0 0 0 3px rgba(141,178,85,.2)}
+  .cutaway .cut-info,.cutaway .cut-info.no-pics,.cutaway .cut-info[hidden]{position:static;width:auto;max-height:none;min-height:0;display:flex;flex-direction:column;align-items:stretch;align-self:stretch;text-align:left;gap:14px;margin:0;padding:22px 20px 18px;overflow-y:auto;scrollbar-width:thin;animation:none;opacity:0;transition:opacity .4s}
+  .hero.is-open .cut-info{opacity:1;transition-delay:.45s}
+  .info-cap{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font:600 10.5px/1.3 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+  .info-cap b{font:500 20px/1 var(--serif);letter-spacing:0;color:var(--gold-hi)}
+  .cut-info .who{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+  .cut-info h3{font-size:clamp(26px,2.2vw,34px)}
+  .cut-info .pics{order:5}
+  .info-empty{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:6px}
+  .info-empty .ic{width:46px;height:46px;border-radius:12px;border:1px solid var(--gold);display:grid;place-items:center;color:var(--gold-hi);font-size:20px}
+  .info-empty h3{font:500 30px/1.05 var(--serif);color:#fff}
+  .info-empty p{font-size:13.5px;line-height:1.55;color:var(--muted)}
+  .info-foot{display:flex;justify-content:space-between;margin-top:auto;padding-top:14px;border-top:1px solid rgba(201,164,106,.16);font:600 9.5px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--gold-lo);order:9}
+  .cut-go{grid-column:1 / -1;display:flex;align-items:center;gap:clamp(20px,3vw,48px);min-width:0}
+  .cut-go-head{display:block;flex:none}
+  .cut-go-head h3{margin-top:6px;font:500 24px/1.1 var(--serif);color:#fff;white-space:nowrap}
+  .cut-go .cut-list{flex:1;min-width:0;padding:4px 2px}
+  .cut-go .cut-list > :first-child{margin-left:0}
+  .cut-go .tile{flex:0 0 auto;max-width:none;height:auto;min-width:118px;padding:10px 16px;align-items:flex-start;justify-content:center;gap:5px;border-radius:10px}
+  .cut-go .tile > .wm,.cut-go .tile > small{display:none}
+  .cut-go .tile .chip{display:block;text-align:left}
+  .cut-go .tile .chip b{display:block;font:500 16px/1.15 var(--serif);color:#fff;white-space:nowrap}
+  .cut-go .tile .chip small{display:block;margin-top:5px;font:600 9.5px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .cut-go .tile[aria-pressed="true"]{background:linear-gradient(180deg,rgba(201,164,106,.30),rgba(201,164,106,.10))}
   .cut-info .who{order:1}
   .cut-info .acts{order:2;flex-direction:row;flex-wrap:wrap}
   .cut-info .acts:has(> :nth-child(3)){grid-template-columns:1fr 1fr}
@@ -675,18 +756,39 @@ footer a:hover{color:var(--gold-hi)}
       <a href="#map">Детальна мапа</a>
       <button class="cut-close" type="button" id="cutClose" aria-label="Закрити план поверху"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <div class="cut-floors" id="cutFloors" role="group" aria-label="Поверх"><button type="button" data-floor="1">1 поверх</button><button type="button" data-floor="2">2 поверх</button><button type="button" data-floor="3">3 поверх</button><button type="button" data-floor="4">4 поверх</button></div>
-    <div class="cut-stage" id="cutStage"><div class="plate" id="plate"></div>
+    <aside class="cut-side">
+      <p class="cut-cap">Оберіть поверх</p>
+      <div class="cut-floors" id="cutFloors" role="group" aria-label="Поверх"></div>
+      <p class="cut-cap cut-cap-legend">Позначення</p>
+      <div class="cut-legend" id="cutLegend"></div>
+    </aside>
+    <section class="cut-main" aria-label="План поверху">
+      <div class="cut-bar">
+        <div><p class="cut-eyebrow" id="cutEyebrow"></p><h2 class="cut-name" id="cutName"></h2></div>
+        <div class="cut-tools">
+          <button type="button" id="cutNames" aria-pressed="false">Приховати назви</button>
+          <button type="button" id="cutReset"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4"/></svg>Скинути</button>
+          <button class="cut-close" type="button" id="cutClose2" aria-label="Закрити план поверху"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg></button>
+        </div>
+      </div>
+      <div class="cut-stage" id="cutStage"><div class="plate" id="plate"></div>
       <div class="cut-zoom" role="group" aria-label="Масштаб плану">
         <button type="button" data-zoom="in" aria-label="Збільшити план"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 5v14M5 12h14"/></svg></button>
+        <span class="cut-pct" id="cutPct" aria-hidden="true">100%</span>
         <button type="button" data-zoom="out" aria-label="Зменшити план"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M5 12h14"/></svg></button>
         <button type="button" data-zoom="reset" aria-label="Повернути план як було"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4"/></svg></button>
       </div>
-    </div>
-    <div class="cut-list" id="cutList" role="group" aria-label="Заклади на поверсі"></div>
+      </div>
+      <div class="cut-foot">
+    <p class="cut-hint"><span class="h-m">Потягніть план убік, щоб покрутити його; двома пальцями, коліщатком або кнопками «+» і «−» — збільшити чи зменшити. Оберіть заклад на плані або в списку: покажемо опис, графік і телефон.</span><span class="h-d">Тягніть, щоб покрутити · коліщатко — масштаб · натисніть на заклад</span></p>
+        <div class="cut-meta"><span><i></i><span id="cutScheme"></span></span><span id="cutCount"></span></div>
+      </div>
+    </section>
     <div class="cut-info glass" id="cutInfo" aria-live="polite" hidden></div>
-    <div class="cut-legend" id="cutLegend"></div>
-    <p class="cut-hint">Потягніть план убік, щоб покрутити його; двома пальцями, коліщатком або кнопками «+» і «−» — збільшити чи зменшити. Оберіть заклад на плані або в списку: покажемо опис, графік і телефон.</p>
+    <div class="cut-go">
+      <div class="cut-go-head"><p class="cut-cap">Перейти до закладу</p><h3>Заклади поверху</h3></div>
+      <div class="cut-list" id="cutList" role="group" aria-label="Заклади на поверсі"></div>
+    </div>
   </div>
 
   <header class="hhead">
@@ -1489,17 +1591,24 @@ footer a:hover{color:var(--gold-hi)}
 
   function listHtml(f) {
     const tile = (id, label, mark, note) => `<button class="tile" type="button" data-hl="${id}" aria-pressed="false" aria-label="${label}">${mark}<small>${note}</small></button>`;
-    const units = UNITS.filter((u) => u.f === f).map((u) => tile(u.id, u.name, tileMark(u), `${u.f} поверх · ${u.id}`));
-    const zones = PLATE_ZONES.filter((zn) => zn.f === f).map((zn) => tile(zn.id, zn.name, `<span class="wm wm-plain">${zn.name}</span>`, zn.note));
+    // .chip — текстовий варіант для великого екрана: назва і номер приміщення
+    const chip = (name, note) => `<span class="chip"><b>${name}</b><small>${note}</small></span>`;
+    const units = UNITS.filter((u) => u.f === f).map((u) => tile(u.id, u.name, tileMark(u) + chip(u.name, `приміщення ${u.id}`), `${u.f} поверх · ${u.id}`));
+    const zones = PLATE_ZONES.filter((zn) => zn.f === f).map((zn) => tile(zn.id, zn.name, `<span class="wm wm-plain">${zn.name}</span>` + chip(zn.name, zn.note), zn.note));
     return [...units, ...zones].join("");
   }
 
   // посилання на окрему сторінку закладу (zaklady/<slug>/, їх збирає build_zaklady.py у службовій теці)
   const pageLink = (s) => (s.slug ? ` <a class="page-link" href="zaklady/${s.slug}/">Сторінка закладу&nbsp;→</a>` : "");
 
+  // шапка й підвал картки закладу (їх видно лише на великому екрані)
+  const INFO_FOOT = `<div class="info-foot"><span>Garden Plaza</span><span>Нересниця</span></div>`;
+  const infoCap = (id) => `<div class="info-cap"><span>Інформація про заклад</span>${id ? `<b>${id}</b>` : ""}</div>`;
+  const emptyInfoHtml = () => `${infoCap("")}<div class="info-empty"><span class="ic" aria-hidden="true">✳</span><h3>Оберіть заклад</h3><p>Натисніть на заклад на плані або в списку внизу: покажемо опис, графік роботи й телефон.</p></div>${INFO_FOOT}`;
+
   function infoHtml(s) {
     const pics = s.pics.length ? `<div class="pics">${picsHtml(s)}</div>` : "";
-    return `${pics}<div class="who">${logoHtml(s)}<div><span class="tag" style="--c:${s.color}"><i></i>${s.tag}</span><h3>${s.name}</h3><div class="meta">${s.where}</div><div class="hrs">Графік: ${s.hours}</div></div></div><p>${s.about}${pageLink(s)}</p><div class="acts">${phonesHtml(s, "call")}${linksHtml(s, s.phones.length ? "" : "call")}</div>`;
+    return `${infoCap(s.id || "")}${pics}<div class="who">${logoHtml(s)}<div><span class="tag" style="--c:${s.color}"><i></i>${s.tag}</span><h3>${s.name}</h3><div class="meta">${s.where}</div><div class="hrs">Графік: ${s.hours}</div></div></div><p>${s.about}${pageLink(s)}</p><div class="acts">${phonesHtml(s, "call")}${linksHtml(s, s.phones.length ? "" : "call")}</div>${INFO_FOOT}`;
   }
 
   // Розставляє підписи над блоками, щоб вони не перекривались і не виходили за край плану.
@@ -1547,7 +1656,7 @@ footer a:hover{color:var(--gold-hi)}
     const facts = id ? shopFacts(id) : null;
     cut = {...cut, hl:facts ? id : null};
     const info = $("#cutInfo");
-    info.innerHTML = facts ? infoHtml(facts) : "";
+    info.innerHTML = facts ? infoHtml(facts) : emptyInfoHtml();
     info.hidden = !facts;
     info.classList.toggle("no-pics", Boolean(facts) && !facts.pics.length);
     cutaway.classList.toggle("has-info", Boolean(facts));
@@ -1598,6 +1707,14 @@ footer a:hover{color:var(--gold-hi)}
     return 2 * Math.max(...corners.map(([x, y]) => Math.hypot(x - cols / 2, y - rows / 2)));
   }
 
+  // ліва панель плану: на телефоні «N поверх», на великому екрані номер, назва, кількість закладів і стрілка
+  const CUT_FLOORS = [1, 2, 3, 4];
+  const placesLabel = (n) => {
+    const tail = n % 10 === 1 && n % 100 !== 11 ? "заклад" : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? "заклади" : "закладів";
+    return `${n} ${tail}`;
+  };
+  const floorBtnHtml = (n) => `<button type="button" data-floor="${n}" aria-pressed="${n === cut.floor}"><em>${String(n).padStart(2, "0")}</em><span class="fl-m">${n} поверх</span><span class="fl-d"><b>${HERO_FLOORS[n].label}</b><small>${n} поверх · ${placesLabel(UNITS.filter((u) => u.f === n).length)}</small></span><svg class="fl-go" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M7 17 17 7M9 7h8v8"/></svg></button>`;
+
   function openCut(f, highlight = null) {
     const wasClosed = cut.floor === null;
     cut = {...cut, floor:f, last:f, opener:wasClosed ? document.activeElement : cut.opener};
@@ -1613,6 +1730,13 @@ footer a:hover{color:var(--gold-hi)}
     strip.innerHTML = listHtml(f);
     strip.scrollLeft = 0;
     $("#cutTitle").textContent = `${f} поверх`;
+    const count = UNITS.filter((u) => u.f === f).length;
+    const pad = String(f).padStart(2, "0");
+    $("#cutFloors").innerHTML = CUT_FLOORS.map((n) => floorBtnHtml(n)).join("");
+    $("#cutEyebrow").textContent = `Garden Plaza / поверх ${pad}`;
+    $("#cutName").textContent = HERO_FLOORS[f].label;
+    $("#cutScheme").textContent = `Схема поверху ${pad}`;
+    $("#cutCount").textContent = placesLabel(count);
     $("#cutNote").textContent = `${HERO_FLOORS[f].label} · закладів: ${UNITS.filter((u) => u.f === f).length}`;
     const floorCats = [...new Set(UNITS.filter((u) => u.f === f).map((u) => u.cat))];
     $("#cutLegend").innerHTML = floorCats.map((key) => `<span style="--c:${cssVar(CATS[key].c)}"><i></i>${CATS[key].name}</span>`).join("");
@@ -1786,6 +1910,7 @@ footer a:hover{color:var(--gold-hi)}
     const limX = cutStage.clientWidth / 2 * zoom, limY = cutStage.clientHeight / 2 * zoom;
     view = {zoom, px:Math.max(-limX, Math.min(limX, next.px)), py:Math.max(-limY, Math.min(limY, next.py))};
     plate.style.setProperty("--zoom", String(view.zoom));
+    $("#cutPct").textContent = `${Math.round(view.zoom * 100)}%`;
     plate.style.setProperty("--px", `${view.px}px`);
     plate.style.setProperty("--py", `${view.py}px`);
   }
@@ -1800,6 +1925,7 @@ footer a:hover{color:var(--gold-hi)}
   // початковий ракурс: без збільшення, зсуву й обертання
   function resetView() {
     view = {zoom:1, px:0, py:0};
+    $("#cutPct").textContent = "100%";
     ["--zoom", "--px", "--py", "--rx", "--rz"].forEach((name) => plate.style.removeProperty(name));
   }
 
@@ -1858,6 +1984,15 @@ footer a:hover{color:var(--gold-hi)}
       if (b) toggleHighlight(b.dataset.hl);
     });
     $("#cutClose").addEventListener("click", () => closeCut());
+    $("#cutClose2").addEventListener("click", () => closeCut());
+    $("#cutReset").addEventListener("click", () => { if (cut.floor === null) return; resetView(); queuePins(); });
+    $("#cutNames").addEventListener("click", (e) => {
+      const hide = !cutaway.classList.contains("no-names");
+      cutaway.classList.toggle("no-names", hide);
+      e.currentTarget.setAttribute("aria-pressed", String(hide));
+      e.currentTarget.textContent = hide ? "Показати назви" : "Приховати назви";
+      if (!hide) queuePins();
+    });
     $("#tabPlan").addEventListener("click", () => showFloor(cut.last));
     $$(".shop-row .arrow").forEach((b) => b.addEventListener("click", () => {
       const track = $("#track");
