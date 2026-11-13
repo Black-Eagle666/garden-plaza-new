@@ -572,6 +572,12 @@ footer a:hover{color:var(--gold-hi)}
 .eat-links{display:flex;flex-wrap:wrap;gap:0 22px;margin-top:auto;padding-top:8px}
 .eat-links a,.eat-links button{padding:10px 0;border:0;background:none;color:var(--gold);font:500 14px/1.4 var(--sans);text-decoration:underline;text-decoration-color:rgba(201,164,106,.4);text-underline-offset:4px;cursor:pointer}
 .eat-links a:hover,.eat-links button:hover{color:var(--gold-hi)}
+/* один заклад: фото ліворуч, текст праворуч на всю ширину секції */
+.eat:only-child{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);grid-template-rows:1fr auto auto auto 1fr;column-gap:48px}
+.eat:only-child img{grid-row:1/6}
+.eat:only-child h3{grid-column:2;grid-row:2;font-size:40px;margin-top:0}
+.eat:only-child p{grid-column:2;grid-row:3}
+.eat:only-child .eat-links{grid-column:2;grid-row:4;margin-top:12px}
 
 /* ═══════════ НИЖНЯ ПАНЕЛЬ І РОЗДІЛИ НА ПЛАНШЕТІ Й ТЕЛЕФОНІ ═══════════ */
 .tabbar{display:none}
@@ -594,6 +600,8 @@ footer a:hover{color:var(--gold-hi)}
   .menu{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 var(--gut);scrollbar-width:none;margin:0 calc(var(--gut) * -1);padding:0 var(--gut)}
   .menu::-webkit-scrollbar{display:none}
   .eat{flex:0 0 min(80%,340px);scroll-snap-align:start}
+  .eat:only-child{flex:1 1 100%;display:flex}
+  .eat:only-child h3{font-size:26px;margin-top:16px}
 }
 @media (max-width:640px){
   :root{--gut:20px}
@@ -751,7 +759,7 @@ footer a:hover{color:var(--gold-hi)}
   <div class="wrap">
     <div class="sec-head">
       <h2 id="food-title">Де поїсти</h2>
-      <p>Ресторан із доставкою по Нересниці та селах поруч і вулична їжа на швидку руку. Меню з цінами на їхніх сайтах.</p>
+      <p>Ресторан на 3 поверсі з доставкою по Нересниці та селах поруч. Меню з цінами на сайті ресторану.</p>
     </div>
     <div class="menu" id="menu"></div>
   </div>
@@ -842,7 +850,7 @@ footer a:hover{color:var(--gold-hi)}
   <div class="wrap">
     <div><strong>Garden Plaza New</strong><br>вул. Грушевського, 30, с. Нересниця</div>
     <div>Адміністрація: <a href="tel:+380685350099">(068) 535-00-99</a><br><a href="https://www.instagram.com/garden_plaza_new/" target="_blank" rel="noopener">Instagram @garden_plaza_new</a></div>
-    <div>Ресторан: <a href="https://gardenplaza.com.ua">gardenplaza.com.ua</a><br>Вулична їжа: <a href="https://garden-street-food.pages.dev">Garden Street Food</a></div>
+    <div>Ресторан: <a href="https://gardenplaza.com.ua">gardenplaza.com.ua</a></div>
   </div>
 </footer>
 
@@ -1327,8 +1335,7 @@ footer a:hover{color:var(--gold-hi)}
 
   // ——— де поїсти ———
   const EAT = [
-    {name:"Ресторан Garden Plaza", about:"Кухня й власний бар, бронювання столу, доставка по Нересниці та селах поруч.", unit:"3.01", img:"shops/3.01-1.webp", link:{href:"https://gardenplaza.com.ua", label:"Меню на gardenplaza.com.ua"}},
-    {name:"Garden Street Food", about:"Бургери, шаурма, хот-доги й напої на швидку руку, з доставкою.", unit:null, img:"shops/street-food.webp", link:{href:"https://garden-street-food.pages.dev", label:"Меню й замовлення онлайн"}}
+    {name:"Ресторан Garden Plaza", about:"Кухня й власний бар, бронювання столу, доставка по Нересниці та селах поруч.", unit:"3.01", img:"shops/3.01-1.webp", link:{href:"https://gardenplaza.com.ua", label:"Меню на gardenplaza.com.ua"}}
   ];
   $("#menu").innerHTML = EAT.map((e) => {
     const unit = UNITS.find((u) => u.id === e.unit);
