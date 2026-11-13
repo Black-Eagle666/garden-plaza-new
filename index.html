@@ -189,6 +189,10 @@ p{margin:0}
 .plate{--pw:min(84cqw,142cqh);--u:calc(var(--pw) * var(--zoom, 1) / 12);--h:calc(var(--u) * .28);--rx:56deg;--rz:30deg;position:relative;width:calc(var(--pw) * var(--zoom, 1));height:calc(var(--u) * var(--rows,6.4));transform:translate(var(--px,0px),var(--py,0px)) translateY(var(--ty,8%)) rotateX(var(--rx)) rotateZ(calc(var(--rz) * -1));transform-style:preserve-3d;background:linear-gradient(135deg,#241B13,#15100B);border:1px solid rgba(232,204,148,.7);box-shadow:0 0 0 calc(var(--u) * .12) rgba(201,164,106,.12),0 0 calc(var(--u) * 1.2) rgba(232,204,148,.28)}
 /* майже квадратний поверх: план глибший, тож вужчий */
 .plate.is-deep{--pw:min(70cqw,calc(132cqh - 120px))}
+/* поверх із крилом за фасадом (1 поверх): плита — лише контур будівлі (Г-подібний), довкола неї земля з паркінгом */
+.plate.has-yard{background:none;border:0;box-shadow:none}
+.plate .slab{position:absolute;inset:0;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 calc(var(--u) * .5) rgba(232,204,148,.28))}
+.plate .slab polygon{fill:url(#slabFill);stroke:rgba(232,204,148,.7);stroke-width:1.2;vector-effect:non-scaling-stroke}
 .hero.is-open .plate{animation:unfold 1.3s cubic-bezier(.2,.8,.2,1) .3s both}
 @keyframes unfold{from{transform:translateY(var(--ty,8%)) rotateX(84deg) rotateZ(-80deg) scale(.55)}}
 .plate .mk{position:absolute;font:italic 500 calc(var(--u) * .3)/1 var(--serif);color:var(--muted);transform:translate(-50%,-50%) translateZ(1px);white-space:nowrap}
@@ -1210,7 +1214,6 @@ footer a:hover{color:var(--gold-hi)}
   const PLAN_ROOMS = [
     {f:1, x:5.25, y:1.84, w:.74, h:2.09, name:"Ескалатор угору", esc:"up", flat:true},
     {f:1, x:5.99, y:1.84, w:.75, h:2.09, name:"Ескалатор униз", esc:"down", flat:true},
-    {f:1, x:5.73, y:4.78, w:.95, h:.64, name:"Вхід", flat:true},
     {f:2, x:4.32, y:2.6, w:2.065, h:4.61, name:"Ескалатор угору", esc:"up", flat:true},
     {f:2, x:6.385, y:2.6, w:2.065, h:4.61, name:"Ескалатор униз", esc:"down", flat:true},
     {f:2, x:.05, y:11.93, w:2.05, h:1.44, name:"Туалет"},
@@ -1220,7 +1223,7 @@ footer a:hover{color:var(--gold-hi)}
   const YOU_ARE_HERE = {x:6.2, y:4.5};
   // підписи на 2D-плані: x, y у клітинках
   const PLAN_MARKS = {
-    1:[[5.99, 4.25, "Ескалатори"]],
+    1:[[5.99, 4.25, "Ескалатори"], [6.2, 5.3, "Вхід / вихід"]],
     2:[[6.385, 7.75, "Ескалатори"]],
     3:[[6.6, 6, "Хол"]],
     4:[[6, 5.6, "Тераса"], [11.3, 4, "Сходи"]]
@@ -1547,7 +1550,7 @@ footer a:hover{color:var(--gold-hi)}
   // скільки пікселів картки закладу показуємо на телефоні одразу після вибору
   const CARD_PEEK = 190;
   const PLATE_MARKS = {
-    1:[[5.99, 4.2, "Ескалатори"], [6.2, 5.62, "Вхід / вихід", "door"]],
+    1:[[5.99, 4.2, "Ескалатори"], [6.2, 5.25, "Вхід / вихід", "door"]],
     2:[[6.385, 7.6, "Ескалатори"]],
     3:[[6.6, 5.9, "Хол"]],
     4:[[6, 5.2, "Тераса"], [11.2, 3.2, "Сходи"]]
@@ -1573,7 +1576,15 @@ footer a:hover{color:var(--gold-hi)}
     }).join("");
     const zones = PLATE_ZONES.filter((zn) => zn.f === f).map((zn) =>
       `<div class="zone" role="button" tabindex="0" data-cut-unit="${zn.id}" aria-label="${zn.name}" style="--c:var(--gold);--i:9;left:${cells(zn.x)};top:${cells(zn.y)};width:${cells(zn.w)};height:${cells(zn.h)}"><span class="lbl"><span class="pin">${zn.name}<small>${zn.note}</small></span></span></div>`).join("");
-    return rooms + marks + zones + blocks;
+    return slabHtml(f) + rooms + marks + zones + blocks;
+  }
+
+  // контур будівлі для поверху з крилом: хол на всю ширину до фасаду (hallH) і крило донизу
+  function slabHtml(f) {
+    const {cols, rows, hallH, wing} = FLOOR_GRID[f];
+    if (!wing) return "";
+    const pts = [[0, 0], [cols, 0], [cols, hallH], [wing.x + wing.w, hallH], [wing.x + wing.w, rows], [wing.x, rows]];
+    return `<svg class="slab" viewBox="0 0 ${cols} ${rows}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="slabFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#241B13"/><stop offset="1" stop-color="#15100B"/></linearGradient></defs><polygon points="${pts.map((pt) => pt.join(",")).join(" ")}"/></svg>`;
   }
 
   // знак закладу: широкий логотип із кабінету або вбудований знак із POPULAR (лише поки в приміщенні той самий заклад,
@@ -1735,6 +1746,7 @@ footer a:hover{color:var(--gold-hi)}
     plate.innerHTML = plateHtml(f);
     plate.style.setProperty("--rows", FLOOR_GRID[f].rows);
     plate.classList.toggle("is-deep", Boolean(FLOOR_GRID[f].hall));
+    plate.classList.toggle("has-yard", Boolean(FLOOR_GRID[f].wing));
     plate.style.setProperty("--span", plateSpan(f).toFixed(2));
     cutStage.classList.toggle("is-deep", Boolean(FLOOR_GRID[f].hall));
     plate.style.setProperty("--ty", PLATE_ZONES.some((zn) => zn.f === f) ? "0%" : "8%");
