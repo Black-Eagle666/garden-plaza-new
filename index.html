@@ -26,7 +26,7 @@
 :root{
   --espresso:#100C08; --espresso-2:#1A140F; --roast:#2B241D; --seam:#3A3027;
   --gold:#C9A46A; --gold-hi:#E8CC94; --gold-lo:#8A6E44;
-  --cream:#F4EADC; --muted:#B5A998; --moss:#8DB255;
+  --cream:#F4EADC; --muted:#B5A998; --moss:#8DB255; --coral:#E08A5F;
   --c-grocery:#8DB255; --c-fashion:#B48AD6; --c-kids:#E58FB0; --c-tech:#6FA0E6;
   --c-home:#C9A46A; --c-services:#9AA3AD; --c-food:#E0A35A; --c-fun:#E06A5A; --c-beauty:#E9B8A2; --c-shop:#8FC3BC;
   --serif:'Cormorant Garamond',Georgia,serif; --sans:'Geist',system-ui,sans-serif;
@@ -192,7 +192,10 @@ p{margin:0}
 .hero.is-open .plate{animation:unfold 1.3s cubic-bezier(.2,.8,.2,1) .3s both}
 @keyframes unfold{from{transform:translateY(var(--ty,8%)) rotateX(84deg) rotateZ(-80deg) scale(.55)}}
 .plate .mk{position:absolute;font:italic 500 calc(var(--u) * .3)/1 var(--serif);color:var(--muted);transform:translate(-50%,-50%) translateZ(1px);white-space:nowrap}
-.plate .mk.esc{font:400 calc(var(--u) * .7)/1 var(--sans);color:var(--gold-hi)}
+.plate .room.esc{background:repeating-linear-gradient(0deg,transparent 0 calc(var(--u) * .2),color-mix(in srgb,var(--lane) 45%,transparent) calc(var(--u) * .2) calc(var(--u) * .22)),color-mix(in srgb,var(--lane) 10%,transparent);border-color:var(--lane)}
+.plate .room.esc.up,#plan .esc.up{--lane:var(--moss)}
+.plate .room.esc.down,#plan .esc.down{--lane:var(--coral)}
+.plate .room .lane{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) translateZ(1px) rotate(180deg);writing-mode:vertical-rl;padding:calc(var(--u) * var(--lf) * .55) calc(var(--u) * var(--lf) * .25);border-radius:99px;background:var(--lane);color:#14100b;font:700 calc(var(--u) * var(--lf))/1 var(--sans);letter-spacing:.12em;white-space:nowrap}
 .plate .mk.door{font-size:calc(var(--u) * .42);color:var(--gold-hi)}
 /* службове приміщення (туалет): є на плані, але не натискається */
 .plate .room{--c:rgba(201,164,106,.5);position:absolute;transform-style:preserve-3d;border:1px solid var(--c);background:rgba(201,164,106,.06)}
@@ -481,7 +484,10 @@ section{padding:110px 0}
 #plan .corridor{fill:#231C15}
 #plan .room{fill:rgba(201,164,106,.06);stroke:var(--gold-lo);stroke-width:1.2}
 #plan .mark{font:italic 400 18px var(--serif);fill:var(--muted)}
-#plan .mark.big{font:400 46px var(--sans);fill:var(--gold-hi)}
+#plan .room.esc{fill:color-mix(in srgb,var(--lane) 12%,transparent);stroke:var(--lane)}
+#plan .step{stroke:var(--lane);stroke-width:2;opacity:.45}
+#plan .lane-bg{fill:var(--lane)}
+#plan .lane-t{font:700 30px var(--sans);letter-spacing:.12em;fill:#14100b}
 #plan .you{fill:var(--gold);stroke:var(--espresso);stroke-width:3}
 @media (max-width:640px){#plan .u-name{display:none}#plan .u-no{font-size:44px;opacity:.85}#plan .mark{font-size:34px}}
 
@@ -1090,11 +1096,11 @@ footer a:hover{color:var(--gold-hi)}
   // службові приміщення: їх видно на плані, але в каталозі закладів їх немає.
   // mark — короткий підпис для 2D-плану; flat — на 3D-плані без підпису над блоком (напис лежить на підлозі, див. PLATE_MARKS)
   const PLAN_ROOMS = [
-    {f:1, x:5.15, y:3.6, w:.8, h:3.45, name:"Ескалатор угору", mark:"↑", flat:true},
-    {f:1, x:5.95, y:3.6, w:.8, h:3.45, name:"Ескалатор униз", mark:"↓", flat:true},
+    {f:1, x:5.15, y:3.6, w:.8, h:3.45, name:"Ескалатор угору", esc:"up", flat:true},
+    {f:1, x:5.95, y:3.6, w:.8, h:3.45, name:"Ескалатор униз", esc:"down", flat:true},
     {f:1, x:5.1, y:8.8, w:2.2, h:.8, name:"Вхід / вихід", flat:true},
-    {f:2, x:4.32, y:2.6, w:1.89, h:4.61, name:"Ескалатор угору", mark:"↑", flat:true},
-    {f:2, x:6.21, y:2.6, w:2.24, h:4.61, name:"Ескалатор униз", mark:"↓", flat:true},
+    {f:2, x:4.32, y:2.6, w:2.065, h:4.61, name:"Ескалатор угору", esc:"up", flat:true},
+    {f:2, x:6.385, y:2.6, w:2.065, h:4.61, name:"Ескалатор униз", esc:"down", flat:true},
     {f:2, x:.05, y:11.93, w:2.05, h:1.44, name:"Туалет"},
     {f:3, x:9.85, y:0, w:2.15, h:.75, name:"Туалет"}
   ];
@@ -1103,7 +1109,7 @@ footer a:hover{color:var(--gold-hi)}
   // підписи на 2D-плані: x, y у клітинках
   const PLAN_MARKS = {
     1:[[5.95, 7.4, "Ескалатори"]],
-    2:[[6.3, 7.75, "Ескалатори"]],
+    2:[[6.385, 7.75, "Ескалатори"]],
     3:[[6.6, 6, "Хол"]],
     4:[[6, 5.6, "Тераса"], [11.3, 4, "Сходи"]]
   };
@@ -1127,14 +1133,36 @@ footer a:hover{color:var(--gold-hi)}
     return cut > 0 ? [name.slice(0, cut), clip(name.slice(cut + 1))] : [clip(name)];
   };
 
+  // ескалатор на 2D-плані: смуги-сходинки і вертикальна плашка «ВГОРУ» / «ВНИЗ» замість стрілок
+  const ESC_LABEL = {up:"ВГОРУ", down:"ВНИЗ"};
+  const ESC_STEP = .2;
+  // розмір напису на 3D-плані (у клітинках): пропорційно ширині смуги, але не більше max
+  const ESC_PLATE_FONT = {perCell:.45, max:.5};
+  const ESC_PILL = {w:46, pad:26, char:25};
+  function escLane(r) {
+    const g = svgEl("g", {class:`esc ${r.esc}`});
+    const x0 = r.x*CELL + PLAN_GAP, x1 = (r.x + r.w)*CELL - PLAN_GAP;
+    for (let y = r.y + ESC_STEP; y < r.y + r.h - ESC_STEP / 2; y += ESC_STEP) {
+      g.append(svgEl("line", {class:"step", x1:x0, x2:x1, y1:y*CELL, y2:y*CELL}));
+    }
+    const cx = (r.x + r.w / 2)*CELL, cy = (r.y + r.h / 2)*CELL, text = ESC_LABEL[r.esc];
+    const len = text.length*ESC_PILL.char + ESC_PILL.pad*2;
+    g.append(svgEl("rect", {class:"lane-bg", x:cx - ESC_PILL.w / 2, y:cy - len / 2, width:ESC_PILL.w, height:len, rx:ESC_PILL.w / 2}));
+    const t = svgEl("text", {class:"lane-t", x:cx, y:cy + 10, "text-anchor":"middle", transform:`rotate(-90 ${cx} ${cy})`});
+    t.textContent = text;
+    g.append(t);
+    return g;
+  }
+
   function renderPlanStatic(svg) {
     const grid = FLOOR_GRID[state.floor];
     const walkway = grid.hall ? {x:0, y:0, width:grid.cols*CELL, height:grid.rows*CELL} : {x:0, y:3*CELL, width:grid.cols*CELL, height:1.4*CELL};
     svg.append(svgEl("rect", {class:"corridor", ...walkway}));
     PLAN_ROOMS.filter((r) => r.f === state.floor).forEach((r) => {
-      svg.append(svgEl("rect", {class:"room", x:r.x*CELL+PLAN_GAP, y:r.y*CELL+PLAN_GAP, width:r.w*CELL-2*PLAN_GAP, height:r.h*CELL-2*PLAN_GAP, rx:3}));
-      const label = svgEl("text", {class:r.mark ? "mark big" : "mark", x:(r.x + r.w / 2)*CELL, y:(r.y + r.h / 2)*CELL + (r.mark ? 16 : 6), "text-anchor":"middle"});
-      label.textContent = r.mark || r.name;
+      svg.append(svgEl("rect", {class:r.esc ? `room esc ${r.esc}` : "room", x:r.x*CELL+PLAN_GAP, y:r.y*CELL+PLAN_GAP, width:r.w*CELL-2*PLAN_GAP, height:r.h*CELL-2*PLAN_GAP, rx:3}));
+      if (r.esc) { svg.append(escLane(r)); return; }
+      const label = svgEl("text", {class:"mark", x:(r.x + r.w / 2)*CELL, y:(r.y + r.h / 2)*CELL + 6, "text-anchor":"middle"});
+      label.textContent = r.name;
       svg.append(label);
     });
     PLAN_MARKS[state.floor].forEach(([x, y, t]) => {
@@ -1396,8 +1424,8 @@ footer a:hover{color:var(--gold-hi)}
   // скільки пікселів картки закладу показуємо на телефоні одразу після вибору
   const CARD_PEEK = 190;
   const PLATE_MARKS = {
-    1:[[5.55, 5.3, "↑", "esc"], [6.35, 5.3, "↓", "esc"], [5.95, 7.4, "Ескалатори"], [6.2, 9.2, "Вхід / вихід", "door"]],
-    2:[[5.26, 4.9, "↑", "esc"], [7.33, 4.9, "↓", "esc"], [6.3, 7.6, "Ескалатори"]],
+    1:[[5.95, 7.4, "Ескалатори"], [6.2, 9.2, "Вхід / вихід", "door"]],
+    2:[[6.385, 7.6, "Ескалатори"]],
     3:[[6.6, 5.9, "Хол"]],
     4:[[6, 5.2, "Тераса"], [11.2, 3.2, "Сходи"]]
   };
@@ -1414,7 +1442,7 @@ footer a:hover{color:var(--gold-hi)}
   function plateHtml(f) {
     const marks = PLATE_MARKS[f].map(([x, y, t, kind]) => `<span class="mk${kind ? ` ${kind}` : ""}" style="left:${cells(x)};top:${cells(y)}">${t}</span>`).join("");
     const rooms = PLAN_ROOMS.filter((r) => r.f === f).map((r) =>
-      `<span class="room" style="--i:8;left:${cells(r.x)};top:${cells(r.y)};width:${cells(r.w)};height:${cells(r.h)}">${r.flat ? "" : `<span class="lbl"><span class="pin">${r.name}</span></span>`}</span>`).join("");
+      `<span class="room${r.esc ? ` esc ${r.esc}` : ""}" style="--i:8;left:${cells(r.x)};top:${cells(r.y)};width:${cells(r.w)};height:${cells(r.h)}">${r.esc ? `<span class="lane" style="--lf:${Math.min(r.w * ESC_PLATE_FONT.perCell, ESC_PLATE_FONT.max)}">${ESC_LABEL[r.esc]}</span>` : r.flat ? "" : `<span class="lbl"><span class="pin">${r.name}</span></span>`}</span>`).join("");
     const blocks = UNITS.filter((u) => u.f === f).map((u, i) => {
       const style = `--c:${cssVar(CATS[u.cat].c)};--i:${i};left:calc(${cells(u.x)} + 3px);top:calc(${cells(u.y)} + 3px);width:calc(${cells(u.w)} - 6px);height:calc(${cells(u.h)} - 6px)${labelSpot(u)}`;
       const top = u.shape ? `<i class="top poly">${shapeSvg(u, "glow")}${shapeSvg(u, "")}</i>` : `<i class="top"></i>`;
