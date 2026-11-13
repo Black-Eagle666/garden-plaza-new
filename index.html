@@ -390,8 +390,8 @@ p{margin:0}
   .floorsel{grid-template-columns:repeat(2,1fr)}
   .quick a{flex-direction:column;align-items:flex-start;gap:9px;padding:12px}
   .cut-stage{height:max(250px,min(94vw,62vh,480px));height:max(250px,min(94vw,62dvh,480px))}
-  .plate{--pw:min(94cqw,calc(138cqh - 90px));--rx:50deg;--rz:55deg}
-  .plate.is-deep{--pw:min(72cqw,calc(116cqh - 87px))}
+  /* план крутиться на 360°, тож його найдальший кут (--span, діаметр у клітинках) має вміщатися в ширину екрана за будь-якого повороту */
+  .plate,.plate.is-deep{--pw:min(calc(94cqw * 12 / var(--span, 13.6)),calc(138cqh - 90px));--rx:50deg;--rz:55deg}
   .cut-stage.is-deep{height:max(300px,min(118vw,62vh,520px));height:max(300px,min(118vw,62dvh,520px))}
   .pin{font-size:10.5px;padding:4px 8px}
   .pin small{display:none}
@@ -1467,12 +1467,22 @@ footer a:hover{color:var(--gold-hi)}
   // крок в історії, щоб кнопка «Назад» на телефоні закривала план, а не сайт
   const ensurePlanEntry = () => { if (!(history.state && history.state.plan)) history.pushState({plan:true}, ""); };
 
+  // Діаметр кола (у клітинках), яке описує план поверху разом із зонами за фасадом (паркінг) навколо центру плану:
+  // стільки місця план займає, коли його крутять
+  function plateSpan(f) {
+    const {cols, rows} = FLOOR_GRID[f];
+    const corners = [[0, 0], [cols, 0], [0, rows], [cols, rows],
+      ...PLATE_ZONES.filter((zn) => zn.f === f).flatMap((zn) => [[zn.x, zn.y + zn.h], [zn.x + zn.w, zn.y + zn.h]])];
+    return 2 * Math.max(...corners.map(([x, y]) => Math.hypot(x - cols / 2, y - rows / 2)));
+  }
+
   function openCut(f, highlight = null) {
     const wasClosed = cut.floor === null;
     cut = {...cut, floor:f, last:f, opener:wasClosed ? document.activeElement : cut.opener};
     plate.innerHTML = plateHtml(f);
     plate.style.setProperty("--rows", FLOOR_GRID[f].rows);
     plate.classList.toggle("is-deep", Boolean(FLOOR_GRID[f].hall));
+    plate.style.setProperty("--span", plateSpan(f).toFixed(2));
     cutStage.classList.toggle("is-deep", Boolean(FLOOR_GRID[f].hall));
     plate.style.setProperty("--ty", PLATE_ZONES.some((zn) => zn.f === f) ? "0%" : "8%");
     // новий поверх відкривається з початкового ракурсу, навіть якщо попередній покрутили
@@ -1533,39 +1543,89 @@ footer a:hover{color:var(--gold-hi)}
     requestAnimationFrame(() => { pinsQueued = false; layoutPins(); });
   };
   const angleOf = (name) => parseFloat(getComputedStyle(plate).getPropertyValue(name));
+  // поки план розгортається, не крутимо: Safari, якщо змінити кут посеред анімації, показує план завеликим або плоским
+  const isUnfolding = () => [plate, cutStage].some((el) => el.getAnimations && el.getAnimations().some((a) => a.playState === "running"));
 
-  function endSpin(e) {
-    if (!spin || e.pointerId !== spin.id) return;
+  // spin.id — номер вказівника миші або "touch" для пальця; tilt — мишкою можна ще й нахиляти план
+  function startSpin(id, x, y, tilt) {
+    spin = {id, x, y, rz:angleOf("--rz"), rx:angleOf("--rx"), tilt, active:false};
+    spinJustEnded = false;
+  }
+
+  // Повертає план на зсув dx, dy від початку жесту. Мишкою підписи перераховуються щокадру;
+  // пальцем — лише після жесту: на телефоні це плавніше, і підписи не стрибають
+  function applySpin(dx, dy) {
+    const rx = spin.tilt ? Math.min(SPIN.maxTilt, Math.max(SPIN.minTilt, spin.rx - dy * SPIN.tiltPerPx)) : spin.rx;
+    plate.style.setProperty("--rz", `${spin.rz + dx * SPIN.degPerPx}deg`);
+    plate.style.setProperty("--rx", `${rx}deg`);
+    if (spin.tilt) queuePins();
+  }
+
+  // true, коли рух уже став обертанням; поки зсув менший за threshold — це ще може бути клік
+  function activateSpin(dx, dy) {
+    if (spin.active) return true;
+    if (Math.hypot(dx, dy) < SPIN.threshold) return false;
+    spin = {...spin, active:true};
+    cutStage.classList.add("is-spinning");
+    return true;
+  }
+
+  function finishSpin() {
+    if (!spin) return;
     spinJustEnded = spin.active;
-    if (spin.active) cutStage.classList.remove("is-spinning");
+    if (spin.active) {
+      cutStage.classList.remove("is-spinning");
+      queuePins();
+    }
     spin = null;
   }
 
-  function bindSpin() {
+  // Мишка й перо — через pointer-події
+  function bindPointerSpin() {
+    const own = (e) => spin && e.pointerId === spin.id;
     cutStage.addEventListener("pointerdown", (e) => {
-      if (e.button !== 0 || cut.floor === null) return;
-      spin = {id:e.pointerId, x:e.clientX, y:e.clientY, rz:angleOf("--rz"), rx:angleOf("--rx"), tilt:e.pointerType === "mouse", active:false};
-      spinJustEnded = false;
+      if (e.pointerType === "touch" || e.button !== 0 || cut.floor === null || isUnfolding()) return;
+      startSpin(e.pointerId, e.clientX, e.clientY, true);
     });
     cutStage.addEventListener("pointermove", (e) => {
-      if (!spin || e.pointerId !== spin.id) return;
+      if (!own(e)) return;
       const dx = e.clientX - spin.x, dy = e.clientY - spin.y;
-      if (!spin.active) {
-        if (Math.hypot(dx, dy) < SPIN.threshold) return;
-        spin = {...spin, active:true};
-        // захоплення лише допомагає не загубити рух за межами сцени; якщо вказівник уже відпущено, крутимо без нього
-        if (cutStage.hasPointerCapture && !cutStage.hasPointerCapture(e.pointerId)) {
-          try { cutStage.setPointerCapture(e.pointerId); } catch (err) { console.warn("План: не вдалося захопити вказівник", err); }
-        }
-        cutStage.classList.add("is-spinning");
+      const wasActive = spin.active;
+      if (!activateSpin(dx, dy)) return;
+      // захоплення лише допомагає не загубити рух за межами сцени; якщо вказівник уже відпущено, крутимо без нього
+      if (!wasActive && cutStage.hasPointerCapture && !cutStage.hasPointerCapture(e.pointerId)) {
+        try { cutStage.setPointerCapture(e.pointerId); } catch (err) { console.warn("План: не вдалося захопити вказівник", err); }
       }
-      const rx = spin.tilt ? Math.min(SPIN.maxTilt, Math.max(SPIN.minTilt, spin.rx - dy * SPIN.tiltPerPx)) : spin.rx;
-      plate.style.setProperty("--rz", `${spin.rz + dx * SPIN.degPerPx}deg`);
-      plate.style.setProperty("--rx", `${rx}deg`);
-      queuePins();
+      applySpin(dx, dy);
     });
-    cutStage.addEventListener("pointerup", endSpin);
-    cutStage.addEventListener("pointercancel", endSpin);
+    cutStage.addEventListener("pointerup", (e) => { if (own(e)) finishSpin(); });
+    cutStage.addEventListener("pointercancel", (e) => { if (own(e)) finishSpin(); });
+  }
+
+  // Палець — через touch-події: Safari на iPhone перериває pointer-жест уже за кілька сантиметрів.
+  // Рух переважно вбік крутить план (і не дає Safari його перехопити); переважно вгору-вниз — прокрутка вікна
+  function bindTouchSpin() {
+    cutStage.addEventListener("touchstart", (e) => {
+      if (e.touches.length !== 1 || cut.floor === null || isUnfolding()) { spin = null; return; }
+      const t = e.touches[0];
+      startSpin("touch", t.clientX, t.clientY, false);
+    }, {passive:true});
+    cutStage.addEventListener("touchmove", (e) => {
+      if (!spin || spin.id !== "touch") return;
+      const t = e.touches[0];
+      const dx = t.clientX - spin.x, dy = t.clientY - spin.y;
+      if (!spin.active && Math.hypot(dx, dy) >= SPIN.threshold && Math.abs(dy) > Math.abs(dx)) { spin = null; return; }
+      if (!activateSpin(dx, dy)) return;
+      e.preventDefault();
+      applySpin(dx, dy);
+    }, {passive:false});
+    cutStage.addEventListener("touchend", finishSpin);
+    cutStage.addEventListener("touchcancel", finishSpin);
+  }
+
+  function bindSpin() {
+    bindPointerSpin();
+    bindTouchSpin();
     cutStage.addEventListener("click", (e) => {
       if (!spinJustEnded) return;
       spinJustEnded = false;
