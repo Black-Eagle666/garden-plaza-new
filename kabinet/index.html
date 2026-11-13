@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0806">
+<title>Кабінет · Garden Plaza</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 700;font-display:swap;src:url(../fonts/cormorant-garamond-normal-cyrillic.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 700;font-display:swap;src:url(../fonts/cormorant-garamond-normal-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Geist';font-style:normal;font-weight:300 700;font-display:swap;src:url(../fonts/geist-normal-cyrillic.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Geist';font-style:normal;font-weight:300 700;font-display:swap;src:url(../fonts/geist-normal-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+:root{
+  --bg:#0A0806;--panel:#14100C;--panel-2:#1C1711;--line:rgba(201,164,106,.22);--line-strong:rgba(201,164,106,.5);
+  --gold:#C9A46A;--gold-light:#E8CC94;--cream:#F4EADC;--muted:#B5A998;
+  --danger:#E58A72;--ok:#9FCB8E;--warn:#E8C26A;
+  --radius:14px;--sans:'Geist',system-ui,-apple-system,'Segoe UI',sans-serif;--serif:'Cormorant Garamond',Georgia,serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--cream);font-family:var(--sans);font-size:16px;line-height:1.5;min-height:100vh}
+a{color:var(--gold-light)}
+button,input,select,textarea{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Шапка */
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));background:rgba(10,8,6,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.brand img{width:34px;height:34px;flex:none}
+.brand span{font-size:13px;letter-spacing:.18em;color:var(--gold-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand b{font-weight:600}
+
+/* Кнопки */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:10px 20px;border-radius:999px;border:1px solid var(--line-strong);background:transparent;color:var(--gold-light);font-size:15px;font-weight:500;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s}
+.btn:hover{background:rgba(201,164,106,.1);border-color:var(--gold)}
+.btn:focus-visible,.unit:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold-light);outline-offset:2px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-main{background:linear-gradient(135deg,#EED39C,#C9A46A);color:#1A130A;border-color:transparent;font-weight:600}
+.btn-main:hover{background:linear-gradient(135deg,#F4DDAD,#D3B07A)}
+.btn-small{min-height:38px;padding:6px 14px;font-size:14px}
+.btn-danger{color:var(--danger);border-color:rgba(229,138,114,.45)}
+.btn-danger:hover{background:rgba(229,138,114,.1);border-color:var(--danger)}
+.icon-btn{width:44px;height:44px;flex:none;border-radius:50%;border:1px solid var(--line-strong);background:transparent;color:var(--gold-light);font-size:20px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.icon-btn:hover{background:rgba(201,164,106,.12)}
+.icon-btn:disabled{opacity:.3;cursor:default;background:transparent}
+
+/* Повідомлення */
+.notice{max-width:520px;margin:12vh auto 0;padding:0 16px;text-align:center}
+.notice h1{font-family:var(--serif);font-weight:500;font-size:34px;line-height:1.15;margin:0 0 12px;color:var(--cream)}
+.notice p{color:var(--muted);margin:0 0 10px}
+.msg{padding:12px 14px;border-radius:12px;border:1px solid;font-size:15px;margin:0 0 14px}
+.msg-error{color:#F6C3B5;border-color:rgba(229,138,114,.5);background:rgba(229,138,114,.08)}
+.msg-ok{color:#D6EBCD;border-color:rgba(159,203,142,.5);background:rgba(159,203,142,.08)}
+.msg-warn{color:#F3DFAE;border-color:rgba(232,194,106,.5);background:rgba(232,194,106,.08)}
+.msg a{font-weight:600}
+
+/* Вхід */
+.login{max-width:420px;margin:8vh auto 40px;padding:0 16px}
+.login h1{font-family:var(--serif);font-weight:500;font-size:36px;margin:0 0 6px}
+.login p.lead{color:var(--muted);margin:0 0 24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+
+/* Поля */
+.field{margin:0 0 18px}
+.field>label,.field>.label{display:block;font-size:14px;color:var(--gold-light);margin:0 0 6px;font-weight:500}
+.hint{display:block;font-size:13px;color:var(--muted);margin-top:6px;overflow-wrap:anywhere}
+.err{display:block;font-size:13px;color:var(--danger);margin-top:6px}
+input[type=text],input[type=email],input[type=password],input[type=tel],input[type=url],input[type=search],select,textarea{width:100%;min-height:50px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);font-size:16px}
+textarea{min-height:150px;resize:vertical;line-height:1.5}
+select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--gold) 50%),linear-gradient(135deg,var(--gold) 50%,transparent 50%);background-position:calc(100% - 20px) 22px,calc(100% - 14px) 22px;background-size:6px 6px;background-repeat:no-repeat;padding-right:40px}
+input::placeholder,textarea::placeholder{color:#7D7365}
+input[aria-invalid=true]{border-color:var(--danger)}
+.counter{float:right;font-family:var(--sans);font-size:13px;color:var(--muted);font-weight:400;font-variant-numeric:lining-nums;margin-top:4px}
+.counter.over{color:var(--danger)}
+
+/* Розкладка кабінету */
+.layout{display:block}
+.pane-list{padding:16px}
+.pane-edit{padding:16px 16px 110px}
+.search{position:sticky;top:59px;z-index:10;background:var(--bg);padding:4px 0 12px}
+.floor{margin:0 0 22px}
+.floor h2{font-family:var(--serif);font-weight:500;font-size:24px;margin:0 0 8px;color:var(--gold-light)}
+.units{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.units>li{min-width:0}
+.unit{width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--panel);text-align:left;cursor:pointer;min-height:64px}
+.unit:hover{border-color:var(--line-strong)}
+.unit[aria-current=true]{border-color:var(--gold);background:var(--panel-2)}
+.thumb{width:44px;height:44px;flex:none;border-radius:10px;background:#000 center/contain no-repeat;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:22px;color:var(--gold-light);overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:contain}
+.unit-text{min-width:0;flex:1}
+.unit-name{display:block;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.unit-sub{display:block;font-size:13px;color:var(--muted)}
+.badge{flex:none;font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line-strong);color:var(--gold-light)}
+.empty{color:var(--muted);padding:12px 0}
+
+/* Форма */
+.edit-head{display:flex;align-items:flex-start;gap:12px;margin:0 0 18px}
+.edit-head h1{font-family:var(--serif);font-weight:500;font-size:30px;line-height:1.15;margin:0;overflow-wrap:anywhere}
+.edit-head p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.section{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:0 0 16px}
+.section h2{font-family:var(--serif);font-weight:500;font-size:22px;margin:0 0 12px;color:var(--gold-light)}
+.row{display:flex;gap:8px;align-items:flex-start;margin:0 0 10px}
+.row .grow{flex:1;min-width:0}
+.link-row{display:grid;grid-template-columns:1fr auto;gap:8px;margin:0 0 14px;padding:0 0 14px;border-bottom:1px dashed var(--line)}
+.link-row .pair{display:grid;gap:8px;min-width:0}
+.media{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.media-prev{width:96px;height:96px;flex:none;border-radius:14px;border:1px solid var(--line);background:#000;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;overflow:hidden;text-align:center}
+.media-prev img{width:100%;height:100%;object-fit:contain}
+.media-prev.wide{width:200px;height:72px}
+.media-btns{display:flex;gap:8px;flex-wrap:wrap}
+.photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 12px}
+.photo{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#000}
+.photo img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.photo-tools{display:flex;justify-content:space-between;align-items:center;padding:6px}
+.photo-tools .icon-btn{width:38px;height:38px;font-size:17px}
+.photo-tools span{font-size:13px;color:var(--muted)}
+.status{font-size:14px;color:var(--gold-light);margin-top:8px;min-height:1px}
+.status.error{color:var(--danger)}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:15;display:flex;gap:10px;padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom));background:rgba(10,8,6,.95);border-top:1px solid var(--line)}
+.bar .btn{flex:1}
+.danger-zone{border-color:rgba(229,138,114,.3)}
+.danger-zone p{color:var(--muted);margin:0 0 12px;font-size:14px}
+.placeholder{color:var(--muted);text-align:center;padding:60px 20px}
+
+@media (min-width:900px){
+  .layout{display:grid;grid-template-columns:360px minmax(0,1fr);min-height:calc(100vh - 59px)}
+  .pane-list{border-right:1px solid var(--line);height:calc(100vh - 59px);overflow:auto;position:sticky;top:59px}
+  .search{top:0}
+  .pane-edit{padding:24px 32px 110px;max-width:860px}
+  .pane-edit[hidden],.pane-list[hidden]{display:block!important}
+  .bar{left:361px;justify-content:flex-start;padding-left:32px}
+  .bar .btn{flex:0 0 auto;min-width:180px}
+  .back-btn{display:none!important}
+  .photos{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .link-row .pair{grid-template-columns:200px 1fr}
+}
+</style>
+<script src="../gp-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img src="../gp-mark.svg" alt=""><span><b>GARDEN PLAZA</b> · кабінет</span></div>
+  <button type="button" class="btn btn-small" id="logout" hidden>Вийти</button>
+</header>
+<main id="app"><p class="placeholder">Завантаження…</p></main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Сталі ---------- */
+  var SITE_URL = 'https://black-eagle666.github.io/garden-plaza-new/';
+  var BUCKET = 'tenants';
+  var UNIT_COLUMNS = 'unit_id,floor,vacant,slug,name,cat,about,hours,phones,links,logo_url,wordmark_url,photos,updated_at';
+  var CATEGORIES = [
+    ['grocery', 'Продукти'], ['fashion', 'Одяг і взуття'], ['kids', 'Дітям'], ['tech', 'Техніка'],
+    ['home', 'Дім і готель'], ['services', 'Послуги'], ['food', 'Їжа'], ['fun', 'Спорт'],
+    ['beauty', 'Краса і прикраси'], ['shop', 'Магазини']
+  ];
+  var LIMITS = Object.freeze({ name: 80, slug: 60, about: 1200, hours: 120, phones: 4, links: 6, photos: 8, linkLabel: 40, fileBytes: 5 * 1024 * 1024 });
+  var IMAGE_SIDE = Object.freeze({ logo: 512, wordmark: 1024, photo: 1600 });
+  var IMAGE_QUALITY = 0.85;
+  var SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+  var ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
+
+  var app = document.getElementById('app');
+  var logoutBtn = document.getElementById('logout');
+  var client = null;
+
+  // Увесь стан — незмінний об'єкт, який щоразу замінюється новим.
+  var state = Object.freeze({ units: [], search: '', currentId: null, media: null, slugTouched: false, snapshot: '', busy: 0, flash: null });
+  function setState(patch) { state = Object.freeze(Object.assign({}, state, patch)); }
+
+  /* ---------- Допоміжне ---------- */
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function categoryLabel(code) {
+    var found = CATEGORIES.find(function (c) { return c[0] === code; });
+    return found ? found[1] : '';
+  }
+
+  // Відносні шляхи — файли сайту (додаємо ../), повні — лише https. Інше не показуємо.
+  function assetUrl(src) {
+    if (typeof src !== 'string' || !src.trim()) return '';
+    var s = src.trim();
+    if (/^https:\/\//i.test(s)) return s;
+    if (/^[a-z0-9._\-\/]+$/i.test(s) && s.indexOf('..') === -1 && s.charAt(0) !== '/') return '../' + s;
+    return '';
+  }
+
+  function pageUrl(slug) { return SITE_URL + 'zaklady/' + slug + '/'; }
+
+  function compareUnitIds(a, b) { return String(a).localeCompare(String(b), 'uk', { numeric: true }); }
+
+  /* ---------- Транслітерація (КМУ 2010) ---------- */
+  var TRANSLIT = {
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'h', 'ґ': 'g', 'д': 'd', 'е': 'e', 'є': 'ie', 'ж': 'zh', 'з': 'z',
+    'и': 'y', 'і': 'i', 'ї': 'i', 'й': 'i', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p',
+    'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh',
+    'щ': 'shch', 'ь': '', 'ю': 'iu', 'я': 'ia',
+    'ы': 'y', 'э': 'e', 'ё': 'io', 'ъ': ''
+  };
+  var TRANSLIT_WORD_START = { 'є': 'ye', 'ї': 'yi', 'й': 'y', 'ю': 'yu', 'я': 'ya' };
+  var APOSTROPHES = /['’ʼ`]/;
+
+  function isLetter(ch) { return /\p{L}/u.test(ch); }
+
+  function isWordStart(chars, index) {
+    var prev = chars[index - 1];
+    if (prev === undefined) return true;
+    if (APOSTROPHES.test(prev)) return false;
+    return !isLetter(prev);
+  }
+
+  function transliterate(text) {
+    var chars = Array.from(String(text || '').toLowerCase());
+    var out = '';
+    for (var i = 0; i < chars.length; i++) {
+      var ch = chars[i];
+      if (ch === 'з' && chars[i + 1] === 'г') { out += 'zgh'; i++; continue; }
+      if (APOSTROPHES.test(ch)) continue;
+      if (TRANSLIT_WORD_START[ch] && isWordStart(chars, i)) { out += TRANSLIT_WORD_START[ch]; continue; }
+      out += Object.prototype.hasOwnProperty.call(TRANSLIT, ch) ? TRANSLIT[ch] : ch;
+    }
+    return out;
+  }
+
+  function slugify(text) {
+    var latin = transliterate(text).normalize('NFD').replace(/[̀-ͯ]/g, '');
+    var slug = latin.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return slug.slice(0, LIMITS.slug).replace(/-+$/, '');
+  }
+
+  /* ---------- Телефони й посилання ---------- */
+  // Повертає 10 цифр «0XXXXXXXXX» або null, якщо номер неправильний.
+  function normalizePhone(raw) {
+    var digits = String(raw || '').replace(/\D/g, '');
+    if (digits.length === 12 && digits.indexOf('380') === 0) digits = '0' + digits.slice(3);
+    else if (digits.length === 11 && digits.indexOf('80') === 0) digits = '0' + digits.slice(2);
+    else if (digits.length === 9 && digits.charAt(0) !== '0') digits = '0' + digits;
+    return /^0\d{9}$/.test(digits) ? digits : null;
+  }
+
+  function formatPhone(digits) {
+    var d = String(digits || '');
+    return d.length === 10 ? d.slice(0, 3) + ' ' + d.slice(3, 6) + ' ' + d.slice(6, 8) + ' ' + d.slice(8) : d;
+  }
+
+  // Дописує https://, дозволяє лише http/https. Повертає адресу або null.
+  function normalizeLink(raw) {
+    var s = String(raw || '').trim();
+    if (!s) return null;
+    if (!/^[a-z][a-z0-9+.\-]*:/i.test(s)) s = 'https://' + s.replace(/^\/+/, '');
+    try {
+      var url = new URL(s);
+      if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
+      if (!url.hostname || url.hostname.indexOf('.') === -1) return null;
+      return url.href;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function sanitizeLinks(value) {
+    if (!Array.isArray(value)) return [];
+    return value.filter(function (l) { return l && typeof l === 'object'; })
+      .map(function (l) { return { label: String(l.label || ''), href: String(l.href || '') }; });
+  }
+
+  /* ---------- Зрозумілі помилки ---------- */
+  function friendlyError(err, context) {
+    console.error('[кабінет] ' + context + ':', err);
+    var message = String((err && (err.message || err.error_description || err.error)) || '');
+    var code = String((err && (err.code || err.statusCode || err.status)) || '');
+    if (err instanceof TypeError || /failed to fetch|networkerror|load failed|network request failed/i.test(message) || (err && err.name === 'AuthRetryableFetchError')) {
+      return 'Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.';
+    }
+    if (/invalid login credentials|invalid_credentials/i.test(message + code)) return 'Неправильна пошта або пароль.';
+    if (/email not confirmed/i.test(message)) return 'Цю пошту ще не підтверджено. Зверніться до власника кабінету.';
+    if (code === '429' || /rate limit|too many/i.test(message)) return 'Забагато спроб. Зачекайте кілька хвилин і спробуйте знову.';
+    if (/jwt expired|invalid jwt|refresh token|not authenticated|session/i.test(message)) return 'Час входу минув. Вийдіть і увійдіть знову.';
+    if (code === '42501' || code === '403' || /row-level security|permission denied|unauthorized/i.test(message)) {
+      return 'Цей обліковий запис не має прав адміністратора.';
+    }
+    if (code === '23514' || /check constraint/i.test(message)) return 'База не прийняла дані: перевірте, що назва й адреса сторінки заповнені правильно.';
+    if (/payload too large|exceeded the maximum allowed size|413/i.test(message + code)) return 'Файл завеликий. Можна до 5 МБ.';
+    if (/mime type|invalid_mime|not supported/i.test(message)) return 'Такий тип файлу не підходить. Підійдуть PNG, JPG, WEBP або SVG.';
+    return 'Щось пішло не так. Спробуйте ще раз. Якщо повториться — напишіть розробнику.';
+  }
+
+  /* ---------- Екрани ---------- */
+  function showNotice(title, text) {
+    logoutBtn.hidden = true;
+    app.innerHTML = '<section class="notice"><h1>' + escapeHtml(title) + '</h1><p>' + escapeHtml(text) + '</p></section>';
+  }
+
+  function renderLogin(errorText) {
+    logoutBtn.hidden = true;
+    app.innerHTML =
+      '<section class="login">' +
+        '<h1>Вхід до кабінету</h1>' +
+        '<p class="lead">Тут можна змінити заклади торгового центру на сайті.</p>' +
+        '<form class="card" id="login-form" novalidate>' +
+          (errorText ? '<div class="msg msg-error" role="alert">' + escapeHtml(errorText) + '</div>' : '') +
+          '<div class="field"><label for="login-email">Пошта</label>' +
+            '<input type="email" id="login-email" autocomplete="username" inputmode="email" required></div>' +
+          '<div class="field"><label for="login-pass">Пароль</label>' +
+            '<input type="password" id="login-pass" autocomplete="current-password" required></div>' +
+          '<button type="submit" class="btn btn-main" style="width:100%">Увійти</button>' +
+        '</form>' +
+      '</section>';
+    document.getElementById('login-form').addEventListener('submit', onLoginSubmit);
+  }
+
+  async function onLoginSubmit(event) {
+    event.preventDefault();
+    var form = event.currentTarget;
+    var email = form.querySelector('#login-email').value.trim();
+    var password = form.querySelector('#login-pass').value;
+    if (!email || !password) { renderLogin('Впишіть пошту й пароль.'); return; }
+    var button = form.querySelector('button[type=submit]');
+    button.disabled = true;
+    button.textContent = 'Входимо…';
+    try {
+      var res = await client.auth.signInWithPassword({ email: email, password: password });
+      if (res.error) throw res.error;
+      await openCabinet();
+    } catch (err) {
+      renderLogin(friendlyError(err, 'вхід'));
+      var emailInput = document.getElementById('login-email');
+      if (emailInput) emailInput.value = email;
+    }
+  }
+
+  async function signOut() {
+    if (isDirty() && !confirm('Є незбережені зміни. Все одно вийти?')) return;
+    try {
+      var res = await client.auth.signOut();
+      if (res && res.error) throw res.error;
+    } catch (err) {
+      friendlyError(err, 'вихід');
+    }
+    setState({ units: [], currentId: null, media: null, snapshot: '', flash: null });
+    renderLogin();
+  }
+
+  /* ---------- Кабінет: завантаження й список ---------- */
+  async function loadUnits() {
+    var res = await client.from('units').select(UNIT_COLUMNS).order('unit_id');
+    if (res.error) throw res.error;
+    var units = (res.data || []).slice().sort(function (a, b) { return compareUnitIds(a.unit_id, b.unit_id); });
+    setState({ units: units });
+  }
+
+  async function openCabinet() {
+    logoutBtn.hidden = false;
+    app.innerHTML = '<p class="placeholder">Завантажуємо приміщення…</p>';
+    try {
+      await loadUnits();
+    } catch (err) {
+      app.innerHTML = '<section class="notice"><h1>Не вдалося завантажити</h1><p>' + escapeHtml(friendlyError(err, 'список приміщень')) +
+        '</p><p><button type="button" class="btn" id="retry">Спробувати ще раз</button></p></section>';
+      document.getElementById('retry').addEventListener('click', openCabinet);
+      return;
+    }
+    app.innerHTML =
+      '<div class="layout">' +
+        '<section class="pane-list" id="pane-list" aria-label="Приміщення">' +
+          '<div class="search"><label class="sr-only" for="search">Пошук за назвою</label>' +
+          '<input type="search" id="search" placeholder="Пошук за назвою або номером" autocomplete="off"></div>' +
+          '<div id="list"></div>' +
+        '</section>' +
+        '<section class="pane-edit" id="pane-edit" hidden><p class="placeholder">Оберіть приміщення зі списку ліворуч.</p></section>' +
+      '</div>';
+    var search = document.getElementById('search');
+    search.value = state.search;
+    search.addEventListener('input', function () { setState({ search: search.value }); renderList(); });
+    document.getElementById('list').addEventListener('click', onListClick);
+    renderList();
+  }
+
+  function renderList() {
+    var list = document.getElementById('list');
+    if (!list) return;
+    var query = state.search.trim().toLowerCase();
+    var units = state.units.filter(function (u) {
+      if (!query) return true;
+      return String(u.name || '').toLowerCase().indexOf(query) !== -1 || String(u.unit_id).indexOf(query) !== -1;
+    });
+    if (!units.length) { list.innerHTML = '<p class="empty">Нічого не знайдено.</p>'; return; }
+    var html = '';
+    [1, 2, 3, 4].forEach(function (floor) {
+      var onFloor = units.filter(function (u) { return Number(u.floor) === floor; });
+      if (!onFloor.length) return;
+      html += '<div class="floor"><h2>' + floor + ' поверх</h2><ul class="units">' + onFloor.map(renderUnitRow).join('') + '</ul></div>';
+    });
+    list.innerHTML = html;
+  }
+
+  function renderUnitRow(unit) {
+    var title = unit.vacant ? 'Вільне приміщення' : (unit.name || 'Без назви');
+    var logo = unit.vacant ? '' : assetUrl(unit.logo_url);
+    var letter = Array.from(title.trim())[0] || '?';
+    var thumb = logo ? '<img src="' + escapeHtml(logo) + '" alt="" loading="lazy">' : escapeHtml(letter.toUpperCase());
+    return '<li><button type="button" class="unit" data-unit="' + escapeHtml(unit.unit_id) + '"' +
+      (state.currentId === unit.unit_id ? ' aria-current="true"' : '') + '>' +
+      '<span class="thumb">' + thumb + '</span>' +
+      '<span class="unit-text"><span class="unit-name">' + escapeHtml(title) + '</span>' +
+      '<span class="unit-sub">приміщення ' + escapeHtml(unit.unit_id) + '</span></span>' +
+      (unit.vacant ? '<span class="badge">Вільне</span>' : '') +
+      '</button></li>';
+  }
+
+  function onListClick(event) {
+    var button = event.target.closest('[data-unit]');
+    if (!button) return;
+    var id = button.getAttribute('data-unit');
+    if (id === state.currentId) return;
+    if (isDirty() && !confirm('Є незбережені зміни. Перейти без збереження?')) return;
+    openUnit(id, null);
+  }
+
+  function findUnit(id) { return state.units.find(function (u) { return u.unit_id === id; }) || null; }
+
+  /* ---------- Форма закладу ---------- */
+  function openUnit(id, flash) {
+    var unit = findUnit(id);
+    if (!unit) return;
+    var media = Object.freeze({
+      logo_url: unit.vacant ? null : (unit.logo_url || null),
+      wordmark_url: unit.vacant ? null : (unit.wordmark_url || null),
+      photos: Object.freeze(unit.vacant ? [] : (Array.isArray(unit.photos) ? unit.photos.slice(0, LIMITS.photos) : []))
+    });
+    setState({ currentId: id, media: media, slugTouched: !unit.vacant && !!unit.slug, flash: flash, busy: 0 });
+    renderEditor(unit);
+    setState({ snapshot: JSON.stringify(collectDraft()) });
+    renderList();
+    showPane('edit');
+  }
+
+  function showPane(which) {
+    var list = document.getElementById('pane-list');
+    var edit = document.getElementById('pane-edit');
+    if (!list || !edit) return;
+    list.hidden = which === 'edit';
+    edit.hidden = which !== 'edit';
+    window.scrollTo(0, 0);
+  }
+
+  function closeEditor() {
+    if (isDirty() && !confirm('Є незбережені зміни. Закрити без збереження?')) return;
+    setState({ currentId: null, media: null, snapshot: '', flash: null });
+    var edit = document.getElementById('pane-edit');
+    edit.innerHTML = '<p class="placeholder">Оберіть приміщення зі списку ліворуч.</p>';
+    renderList();
+    showPane('list');
+  }
+
+  function renderEditor(unit) {
+    var edit = document.getElementById('pane-edit');
+    var vacant = !!unit.vacant;
+    var name = vacant ? '' : (unit.name || '');
+    var title = vacant ? 'Новий заклад у приміщенні ' + unit.unit_id : (name || 'Без назви');
+    var phones = vacant || !Array.isArray(unit.phones) ? [] : unit.phones;
+    var links = vacant ? [] : sanitizeLinks(unit.links);
+    var catOptions = '<option value="">Оберіть категорію</option>' + CATEGORIES.map(function (c) {
+      return '<option value="' + c[0] + '"' + (!vacant && unit.cat === c[0] ? ' selected' : '') + '>' + escapeHtml(c[1]) + '</option>';
+    }).join('');
+    var flash = state.flash ? renderFlash(state.flash) : '';
+
+    edit.innerHTML =
+      '<form id="unit-form" novalidate autocomplete="off">' +
+      '<div class="edit-head">' +
+        '<button type="button" class="icon-btn back-btn" data-action="back" aria-label="Назад до списку">←</button>' +
+        '<div><h1 id="edit-title">' + escapeHtml(title) + '</h1>' +
+        '<p>Приміщення ' + escapeHtml(unit.unit_id) + ' · ' + escapeHtml(unit.floor) + ' поверх' + (vacant ? ' · зараз вільне' : '') + '</p></div>' +
+      '</div>' +
+      '<div id="flash">' + flash + '</div>' +
+
+      '<div class="section"><h2>Основне</h2>' +
+        fieldText('f-name', 'Назва закладу', name, LIMITS.name, 'Наприклад: Копійочка') +
+        '<div class="field"><label for="f-cat">Категорія</label><select id="f-cat">' + catOptions + '</select><span class="err" id="f-cat-err" hidden></span></div>' +
+        '<div class="field"><label for="f-slug">Адреса сторінки</label>' +
+          '<input type="text" id="f-slug" value="' + escapeHtml(vacant ? '' : (unit.slug || '')) + '" maxlength="' + LIMITS.slug + '" autocapitalize="off" spellcheck="false" inputmode="url">' +
+          '<span class="hint">Лише малі латинські літери, цифри й «-». Для нового закладу підставляється сама з назви.</span>' +
+          '<span class="hint" id="f-slug-url"></span>' +
+          '<span class="err" id="f-slug-err" hidden></span>' +
+          '<div class="msg msg-warn" id="f-slug-warn" style="margin:8px 0 0" hidden></div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="section"><h2>Опис і графік</h2>' +
+        '<div class="field"><label for="f-about">Опис <span class="counter" id="f-about-count"></span></label>' +
+          '<textarea id="f-about" maxlength="' + LIMITS.about + '" placeholder="Кілька речень про заклад: що тут можна купити чи замовити.">' + escapeHtml(vacant ? '' : (unit.about || '')) + '</textarea></div>' +
+        fieldText('f-hours', 'Графік роботи', vacant ? '' : (unit.hours || ''), LIMITS.hours, 'щодня 8:00–22:00') +
+      '</div>' +
+
+      '<div class="section"><h2>Телефони</h2>' +
+        '<div id="phones">' + phones.map(phoneRow).join('') + '</div>' +
+        '<button type="button" class="btn btn-small" data-action="add-phone">+ Додати телефон</button>' +
+        '<span class="hint">Можна писати як завгодно: (068) 123-45-67, +380681234567. Не більше ' + LIMITS.phones + '.</span>' +
+      '</div>' +
+
+      '<div class="section"><h2>Посилання</h2>' +
+        '<div id="links">' + links.map(linkRow).join('') + '</div>' +
+        '<button type="button" class="btn btn-small" data-action="add-link">+ Додати посилання</button>' +
+        '<span class="hint">Наприклад: Instagram, Сайт, Telegram. Не більше ' + LIMITS.links + '.</span>' +
+      '</div>' +
+
+      '<div class="section"><h2>Логотип</h2>' +
+        '<div class="field"><span class="label">Квадратний логотип</span><div id="media-logo"></div></div>' +
+        '<div class="field" style="margin:0"><span class="label">Широкий логотип для плиток (необов\'язково)</span>' +
+          '<span class="hint" style="margin:0 0 8px">Якщо логотип довгий, як напис — завантажте його сюди.</span><div id="media-wordmark"></div></div>' +
+      '</div>' +
+
+      '<div class="section"><h2>Фото <span class="counter" id="photos-count"></span></h2>' +
+        '<div class="photos" id="photos"></div>' +
+        '<button type="button" class="btn btn-small" data-action="add-photos" id="add-photos">+ Додати фото</button>' +
+        '<input type="file" id="file-photos" accept="image/png,image/jpeg,image/webp" multiple hidden>' +
+        '<div class="status" id="photos-status" role="status"></div>' +
+      '</div>' +
+
+      (vacant ? '' :
+        '<div class="section danger-zone"><h2>Заклад закрився?</h2>' +
+          '<p>Приміщення стане вільним, а на сайті з\'явиться напис «Оренда». Усі дані закладу буде стерто.</p>' +
+          '<button type="button" class="btn btn-danger" data-action="vacate">Звільнити приміщення</button></div>') +
+
+      '<div class="bar">' +
+        '<button type="button" class="btn" data-action="cancel">Скасувати</button>' +
+        '<button type="submit" class="btn btn-main" id="save-btn">Зберегти</button>' +
+      '</div>' +
+      '</form>';
+
+    var form = document.getElementById('unit-form');
+    form.addEventListener('submit', onSave);
+    form.addEventListener('click', onEditorClick);
+    form.addEventListener('input', onEditorInput);
+    form.addEventListener('change', onEditorChange);
+    form.addEventListener('focusout', onEditorBlur);
+    renderMedia();
+    updateSlugInfo();
+    updateCounters();
+    updateAddButtons();
+  }
+
+  function fieldText(id, label, value, max, placeholder) {
+    return '<div class="field"><label for="' + id + '">' + escapeHtml(label) + '</label>' +
+      '<input type="text" id="' + id + '" value="' + escapeHtml(value) + '" maxlength="' + max + '" placeholder="' + escapeHtml(placeholder) + '">' +
+      '<span class="err" id="' + id + '-err" hidden></span></div>';
+  }
+
+  function phoneRow(value) {
+    return '<div class="phone-row"><div class="row"><div class="grow">' +
+      '<label class="sr-only">Телефон</label>' +
+      '<input type="tel" class="f-phone" value="' + escapeHtml(formatPhone(value || '')) + '" placeholder="068 123 45 67" inputmode="tel" autocomplete="off">' +
+      '<span class="err" hidden></span></div>' +
+      '<button type="button" class="icon-btn" data-action="remove-row" aria-label="Видалити телефон">×</button></div></div>';
+  }
+
+  function linkRow(link) {
+    var l = link || { label: '', href: '' };
+    return '<div class="link-row"><div class="pair">' +
+      '<div><label class="sr-only">Підпис</label><input type="text" class="f-link-label" value="' + escapeHtml(l.label) + '" maxlength="' + LIMITS.linkLabel + '" placeholder="Підпис: Instagram"></div>' +
+      '<div><label class="sr-only">Адреса</label><input type="url" class="f-link-href" value="' + escapeHtml(l.href) + '" placeholder="Адреса: https://…" inputmode="url" autocapitalize="off" spellcheck="false">' +
+      '<span class="err" hidden></span></div>' +
+      '</div><button type="button" class="icon-btn" data-action="remove-row" aria-label="Видалити посилання">×</button></div>';
+  }
+
+  function renderFlash(flash) {
+    var cls = flash.type === 'ok' ? 'msg-ok' : flash.type === 'warn' ? 'msg-warn' : 'msg-error';
+    var link = flash.slug ? ' <a href="' + escapeHtml(pageUrl(flash.slug)) + '" target="_blank" rel="noopener">Відкрити сторінку закладу</a>' : '';
+    return '<div class="msg ' + cls + '" role="' + (flash.type === 'error' ? 'alert' : 'status') + '">' + escapeHtml(flash.text) + link + '</div>';
+  }
+
+  function showFlash(flash) {
+    setState({ flash: flash });
+    var box = document.getElementById('flash');
+    if (!box) return;
+    box.innerHTML = flash ? renderFlash(flash) : '';
+    if (flash) box.scrollIntoView({ block: 'center', behavior: 'instant' });
+  }
+
+  /* ---------- Медіа (логотипи й фото) ---------- */
+  function renderMedia() {
+    renderSingleMedia('logo', 'media-logo', state.media.logo_url, false);
+    renderSingleMedia('wordmark', 'media-wordmark', state.media.wordmark_url, true);
+    renderPhotos();
+  }
+
+  function renderSingleMedia(kind, boxId, url, wide) {
+    var box = document.getElementById(boxId);
+    if (!box) return;
+    var src = assetUrl(url);
+    box.innerHTML =
+      '<div class="media"><div class="media-prev' + (wide ? ' wide' : '') + '">' +
+        (src ? '<img src="' + escapeHtml(src) + '" alt="">' : 'немає') + '</div>' +
+      '<div class="media-btns">' +
+        '<button type="button" class="btn btn-small" data-action="pick" data-kind="' + kind + '">Завантажити</button>' +
+        (url ? '<button type="button" class="btn btn-small btn-danger" data-action="clear-media" data-kind="' + kind + '">Прибрати</button>' : '') +
+      '</div></div>' +
+      '<input type="file" id="file-' + kind + '" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>' +
+      '<div class="status" id="status-' + kind + '" role="status"></div>';
+  }
+
+  function renderPhotos() {
+    var box = document.getElementById('photos');
+    if (!box) return;
+    var photos = state.media.photos;
+    box.innerHTML = photos.map(function (url, i) {
+      var src = assetUrl(url);
+      return '<div class="photo">' + (src ? '<img src="' + escapeHtml(src) + '" alt="Фото ' + (i + 1) + '" loading="lazy">' : '') +
+        '<div class="photo-tools">' +
+          '<button type="button" class="icon-btn" data-action="photo-left" data-index="' + i + '" aria-label="Перемістити ліворуч"' + (i === 0 ? ' disabled' : '') + '>←</button>' +
+          '<span>' + (i + 1) + '</span>' +
+          '<button type="button" class="icon-btn" data-action="photo-right" data-index="' + i + '" aria-label="Перемістити праворуч"' + (i === photos.length - 1 ? ' disabled' : '') + '>→</button>' +
+          '<button type="button" class="icon-btn" data-action="photo-remove" data-index="' + i + '" aria-label="Видалити фото">×</button>' +
+        '</div></div>';
+    }).join('');
+    document.getElementById('photos-count').textContent = photos.length + ' з ' + LIMITS.photos;
+    document.getElementById('add-photos').disabled = photos.length >= LIMITS.photos;
+  }
+
+  function setMedia(patch) {
+    setState({ media: Object.freeze(Object.assign({}, state.media, patch)) });
+  }
+
+  function movePhoto(index, delta) {
+    var photos = state.media.photos.slice();
+    var target = index + delta;
+    if (target < 0 || target >= photos.length) return;
+    var item = photos[index];
+    photos[index] = photos[target];
+    photos[target] = item;
+    setMedia({ photos: Object.freeze(photos) });
+    renderPhotos();
+  }
+
+  function setStatus(id, text, isError) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = text || '';
+    el.classList.toggle('error', !!isError);
+  }
+
+  function changeBusy(delta) {
+    setState({ busy: Math.max(0, state.busy + delta) });
+    var save = document.getElementById('save-btn');
+    if (save) { save.disabled = state.busy > 0; save.textContent = state.busy > 0 ? 'Завантаження…' : 'Зберегти'; }
+  }
+
+  function loadImage(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('Не вдалося прочитати зображення')); };
+      img.src = url;
+    });
+  }
+
+  function canvasToBlob(canvas, type) {
+    return new Promise(function (resolve) { canvas.toBlob(resolve, type, IMAGE_QUALITY); });
+  }
+
+  // Зменшує зображення до maxSide і кодує у webp (старі Safari не вміють webp — тоді jpeg).
+  async function resizeImage(file, maxSide) {
+    var img = await loadImage(file);
+    var scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+    var canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+    var ctx = canvas.getContext('2d');
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    var blob = await canvasToBlob(canvas, 'image/webp');
+    if (blob && blob.type === 'image/webp') return { blob: blob, ext: 'webp', type: 'image/webp' };
+    blob = await canvasToBlob(canvas, 'image/jpeg');
+    if (!blob) throw new Error('Не вдалося обробити зображення');
+    return { blob: blob, ext: 'jpg', type: 'image/jpeg' };
+  }
+
+  function randomPart() {
+    var bytes = new Uint8Array(4);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+  }
+
+  // Готує файл (зменшення або SVG як є) і кладе в сховище. Повертає публічну адресу.
+  async function uploadImage(file, kind) {
+    if (ALLOWED_TYPES.indexOf(file.type) === -1) throw { userMessage: 'Файл «' + file.name + '» не підходить. Підійдуть PNG, JPG або WEBP' + (kind === 'photo' ? '.' : ', а для логотипа ще й SVG.') };
+    var isSvg = file.type === 'image/svg+xml';
+    if (isSvg && kind === 'photo') throw { userMessage: 'SVG можна лише для логотипа. Для фото оберіть JPG, PNG або WEBP.' };
+    var prepared = isSvg ? { blob: file, ext: 'svg', type: 'image/svg+xml' } : await resizeImage(file, IMAGE_SIDE[kind]);
+    if (prepared.blob.size > LIMITS.fileBytes) throw { userMessage: 'Файл «' + file.name + '» завеликий навіть після зменшення. Можна до 5 МБ.' };
+    var path = state.currentId + '/' + Date.now() + '-' + randomPart() + '.' + prepared.ext;
+    var res = await client.storage.from(BUCKET).upload(path, prepared.blob, { contentType: prepared.type, cacheControl: '31536000', upsert: false });
+    if (res.error) throw res.error;
+    var pub = client.storage.from(BUCKET).getPublicUrl(path);
+    var url = pub && pub.data && pub.data.publicUrl;
+    if (!url) throw new Error('Сховище не повернуло адресу файлу');
+    return url;
+  }
+
+  function uploadErrorText(err) {
+    if (err && err.userMessage) return err.userMessage;
+    if (err && /прочитати зображення/.test(err.message || '')) return 'Не вдалося відкрити цей файл як зображення.';
+    return friendlyError(err, 'завантаження файлу');
+  }
+
+  async function onSingleFile(kind, file) {
+    var unitId = state.currentId;
+    changeBusy(1);
+    setStatus('status-' + kind, 'Завантаження…', false);
+    try {
+      var url = await uploadImage(file, kind);
+      if (state.currentId !== unitId) return;
+      setMedia(kind === 'logo' ? { logo_url: url } : { wordmark_url: url });
+      renderSingleMedia(kind, 'media-' + kind, url, kind === 'wordmark');
+      setStatus('status-' + kind, 'Готово. Не забудьте натиснути «Зберегти».', false);
+    } catch (err) {
+      setStatus('status-' + kind, uploadErrorText(err), true);
+    } finally {
+      changeBusy(-1);
+    }
+  }
+
+  async function onPhotoFiles(files) {
+    var unitId = state.currentId;
+    var free = LIMITS.photos - state.media.photos.length;
+    var chosen = files.slice(0, free);
+    var skipped = files.length - chosen.length;
+    if (!chosen.length) { setStatus('photos-status', 'Уже є ' + LIMITS.photos + ' фото — це максимум.', true); return; }
+    changeBusy(1);
+    var errors = [];
+    try {
+      for (var i = 0; i < chosen.length; i++) {
+        setStatus('photos-status', 'Завантаження… ' + (i + 1) + ' з ' + chosen.length, false);
+        try {
+          var url = await uploadImage(chosen[i], 'photo');
+          if (state.currentId !== unitId) return;
+          setMedia({ photos: Object.freeze(state.media.photos.concat([url])) });
+          renderPhotos();
+        } catch (err) {
+          errors.push(uploadErrorText(err));
+        }
+      }
+      var notes = errors.slice();
+      if (skipped > 0) notes.push('Не додано ' + skipped + ' фото: можна не більше ' + LIMITS.photos + '.');
+      setStatus('photos-status', notes.length ? notes.join(' ') : 'Готово. Не забудьте натиснути «Зберегти».', notes.length > 0);
+    } finally {
+      changeBusy(-1);
+    }
+  }
+
+  /* ---------- Події форми ---------- */
+  function onEditorClick(event) {
+    var button = event.target.closest('[data-action]');
+    if (!button) return;
+    var action = button.getAttribute('data-action');
+    var index = Number(button.getAttribute('data-index'));
+    var kind = button.getAttribute('data-kind');
+    if (action === 'back' || action === 'cancel') closeEditor();
+    else if (action === 'add-phone') addRow('phones', phoneRow(''), LIMITS.phones, '.phone-row', '.f-phone');
+    else if (action === 'add-link') addRow('links', linkRow(null), LIMITS.links, '.link-row', '.f-link-label');
+    else if (action === 'remove-row') { button.closest('.phone-row, .link-row').remove(); updateAddButtons(); }
+    else if (action === 'pick') document.getElementById('file-' + kind).click();
+    else if (action === 'add-photos') document.getElementById('file-photos').click();
+    else if (action === 'clear-media') {
+      setMedia(kind === 'logo' ? { logo_url: null } : { wordmark_url: null });
+      renderSingleMedia(kind, 'media-' + kind, null, kind === 'wordmark');
+    }
+    else if (action === 'photo-left') movePhoto(index, -1);
+    else if (action === 'photo-right') movePhoto(index, 1);
+    else if (action === 'photo-remove') {
+      setMedia({ photos: Object.freeze(state.media.photos.filter(function (_, i) { return i !== index; })) });
+      renderPhotos();
+    }
+    else if (action === 'vacate') onVacate();
+  }
+
+  function addRow(containerId, html, max, rowSelector, focusSelector) {
+    var box = document.getElementById(containerId);
+    if (box.querySelectorAll(rowSelector).length >= max) return;
+    box.insertAdjacentHTML('beforeend', html);
+    var rows = box.querySelectorAll(rowSelector);
+    rows[rows.length - 1].querySelector(focusSelector).focus();
+    updateAddButtons();
+  }
+
+  // Вимикає «+ Додати…», коли рядків уже максимум.
+  function updateAddButtons() {
+    var form = document.getElementById('unit-form');
+    if (!form) return;
+    form.querySelector('[data-action=add-phone]').disabled = form.querySelectorAll('.phone-row').length >= LIMITS.phones;
+    form.querySelector('[data-action=add-link]').disabled = form.querySelectorAll('.link-row').length >= LIMITS.links;
+  }
+
+  function onEditorInput(event) {
+    var target = event.target;
+    if (target.id === 'f-name') {
+      if (!state.slugTouched) document.getElementById('f-slug').value = slugify(target.value);
+      var vacant = findUnit(state.currentId).vacant;
+      if (!vacant) document.getElementById('edit-title').textContent = target.value.trim() || 'Без назви';
+      updateSlugInfo();
+    } else if (target.id === 'f-slug') {
+      setState({ slugTouched: target.value.trim() !== '' });
+      updateSlugInfo();
+    }
+    if (target.id === 'f-about' || target.id === 'f-name' || target.id === 'f-hours') updateCounters();
+    if (state.flash && state.flash.type === 'ok') showFlash(null);
+  }
+
+  function onEditorChange(event) {
+    var target = event.target;
+    if (target.type !== 'file') return;
+    var files = Array.from(target.files || []);
+    target.value = '';
+    if (!files.length) return;
+    if (target.id === 'file-photos') onPhotoFiles(files);
+    else onSingleFile(target.id === 'file-logo' ? 'logo' : 'wordmark', files[0]);
+  }
+
+  function onEditorBlur(event) {
+    var target = event.target;
+    if (target.classList.contains('f-phone')) validatePhoneInput(target, true);
+    if (target.classList.contains('f-link-href')) validateLinkInput(target, true);
+    if (target.id === 'f-slug') {
+      target.value = target.value.trim().toLowerCase();
+      updateSlugInfo();
+    }
+  }
+
+  function setFieldError(input, text) {
+    var err = input.parentElement.querySelector('.err');
+    input.setAttribute('aria-invalid', text ? 'true' : 'false');
+    if (!err) return;
+    err.textContent = text || '';
+    err.hidden = !text;
+  }
+
+  function validatePhoneInput(input, reformat) {
+    var raw = input.value.trim();
+    if (!raw) { setFieldError(input, ''); return { ok: true, value: null }; }
+    var phone = normalizePhone(raw);
+    if (!phone) { setFieldError(input, 'Неправильний номер. Потрібно 10 цифр, наприклад 068 123 45 67.'); return { ok: false }; }
+    if (reformat) input.value = formatPhone(phone);
+    setFieldError(input, '');
+    return { ok: true, value: phone };
+  }
+
+  function validateLinkInput(input, reformat) {
+    var raw = input.value.trim();
+    if (!raw) { setFieldError(input, ''); return { ok: true, value: null }; }
+    var href = normalizeLink(raw);
+    if (!href) { setFieldError(input, 'Неправильна адреса. Приклад: https://instagram.com/назва'); return { ok: false }; }
+    if (reformat) input.value = href;
+    setFieldError(input, '');
+    return { ok: true, value: href };
+  }
+
+  function updateCounters() {
+    var about = document.getElementById('f-about');
+    var counter = document.getElementById('f-about-count');
+    if (!about || !counter) return;
+    counter.textContent = about.value.length + ' / ' + LIMITS.about;
+    counter.classList.toggle('over', about.value.length > LIMITS.about);
+  }
+
+  function updateSlugInfo() {
+    var slug = document.getElementById('f-slug').value.trim();
+    var name = document.getElementById('f-name').value.trim();
+    var urlHint = document.getElementById('f-slug-url');
+    var err = document.getElementById('f-slug-err');
+    var warn = document.getElementById('f-slug-warn');
+    urlHint.textContent = slug ? 'Сторінка буде тут: ' + pageUrl(slug) : '';
+    var problem = slug && !SLUG_RE.test(slug) ? 'Можна лише малі латинські літери, цифри й «-» між ними (без «-» на початку й у кінці).' : '';
+    err.textContent = problem;
+    err.hidden = !problem;
+    var twin = slug ? state.units.find(function (u) {
+      return u.unit_id !== state.currentId && !u.vacant && u.slug === slug &&
+        String(u.name || '').trim().toLowerCase() !== name.toLowerCase();
+    }) : null;
+    warn.hidden = !twin;
+    warn.textContent = twin ? 'Таку адресу вже має інший заклад — «' + (twin.name || '') + '» (приміщення ' + twin.unit_id +
+      '). Так можна лише для однієї мережі в кількох приміщеннях. Якщо це різні заклади — змініть адресу.' : '';
+  }
+
+  /* ---------- Збір і перевірка даних ---------- */
+  function collectDraft() {
+    var form = document.getElementById('unit-form');
+    if (!form || !state.media) return null;
+    return {
+      name: form.querySelector('#f-name').value.trim(),
+      cat: form.querySelector('#f-cat').value,
+      slug: form.querySelector('#f-slug').value.trim(),
+      about: form.querySelector('#f-about').value.trim(),
+      hours: form.querySelector('#f-hours').value.trim(),
+      phones: Array.from(form.querySelectorAll('.f-phone')).map(function (i) { return i.value.trim(); }),
+      links: Array.from(form.querySelectorAll('.link-row')).map(function (row) {
+        return { label: row.querySelector('.f-link-label').value.trim(), href: row.querySelector('.f-link-href').value.trim() };
+      }),
+      logo_url: state.media.logo_url,
+      wordmark_url: state.media.wordmark_url,
+      photos: state.media.photos.slice()
+    };
+  }
+
+  function isDirty() {
+    if (!state.currentId || !state.snapshot) return false;
+    var draft = collectDraft();
+    return !!draft && JSON.stringify(draft) !== state.snapshot;
+  }
+
+  // Повертає {payload} або {errors: [...]} і підсвічує поля з помилками.
+  function validateDraft() {
+    var form = document.getElementById('unit-form');
+    var draft = collectDraft();
+    var errors = [];
+    var nameInput = form.querySelector('#f-name');
+    setFieldError(nameInput, draft.name ? '' : 'Впишіть назву закладу.');
+    if (!draft.name) errors.push('назва');
+    var catErr = form.querySelector('#f-cat-err');
+    catErr.textContent = draft.cat ? '' : 'Оберіть категорію.';
+    catErr.hidden = !!draft.cat;
+    if (!draft.cat) errors.push('категорія');
+    if (!draft.slug || !SLUG_RE.test(draft.slug)) {
+      var slugErr = form.querySelector('#f-slug-err');
+      slugErr.textContent = draft.slug ? slugErr.textContent || 'Неправильна адреса сторінки.' : 'Впишіть адресу сторінки (латиницею).';
+      slugErr.hidden = false;
+      errors.push('адреса сторінки');
+    }
+    if (draft.about.length > LIMITS.about) errors.push('опис задовгий');
+    var phones = [];
+    form.querySelectorAll('.f-phone').forEach(function (input) {
+      var r = validatePhoneInput(input, true);
+      if (!r.ok) errors.push('телефон');
+      else if (r.value && phones.indexOf(r.value) === -1) phones.push(r.value);
+    });
+    var links = [];
+    form.querySelectorAll('.link-row').forEach(function (row) {
+      var hrefInput = row.querySelector('.f-link-href');
+      var label = row.querySelector('.f-link-label').value.trim();
+      var r = validateLinkInput(hrefInput, true);
+      if (!r.ok) { errors.push('посилання'); return; }
+      if (!r.value && !label) return;
+      if (!r.value) { setFieldError(hrefInput, 'Впишіть адресу або видаліть цей рядок.'); errors.push('посилання'); return; }
+      links.push({ label: label || new URL(r.value).hostname.replace(/^www\./, ''), href: r.value });
+    });
+    if (errors.length) return { errors: errors };
+    return {
+      payload: {
+        vacant: false, name: draft.name, cat: draft.cat, slug: draft.slug, about: draft.about, hours: draft.hours,
+        phones: phones.slice(0, LIMITS.phones), links: links.slice(0, LIMITS.links),
+        logo_url: draft.logo_url || null, wordmark_url: draft.wordmark_url || null,
+        photos: draft.photos.slice(0, LIMITS.photos)
+      }
+    };
+  }
+
+  /* ---------- Збереження й звільнення ---------- */
+  async function updateUnit(unitId, payload) {
+    var res = await client.from('units').update(payload).eq('unit_id', unitId).select(UNIT_COLUMNS);
+    if (res.error) throw res.error;
+    // Якщо RLS не пустила — помилки немає, але й змінених рядків нуль.
+    if (!res.data || !res.data.length) throw { code: '42501', message: 'no rows updated (row-level security)' };
+    var saved = res.data[0];
+    setState({ units: state.units.map(function (u) { return u.unit_id === unitId ? saved : u; }) });
+    return saved;
+  }
+
+  async function onSave(event) {
+    event.preventDefault();
+    if (state.busy > 0) return;
+    var result = validateDraft();
+    if (result.errors) {
+      showFlash({ type: 'error', text: 'Перевірте поля, позначені червоним.' });
+      var firstBad = document.querySelector('#unit-form [aria-invalid=true], #unit-form .err:not([hidden])');
+      if (firstBad) firstBad.scrollIntoView({ block: 'center', behavior: 'instant' });
+      return;
+    }
+    var unitId = state.currentId;
+    var save = document.getElementById('save-btn');
+    save.disabled = true;
+    save.textContent = 'Зберігаємо…';
+    try {
+      var saved = await updateUnit(unitId, result.payload);
+      setState({ snapshot: '' });
+      openUnit(unitId, { type: 'ok', text: 'Збережено. Головна сторінка вже оновилась, сторінка закладу оновиться протягом 15 хвилин.', slug: saved.slug });
+      showFlash(state.flash);
+    } catch (err) {
+      showFlash({ type: 'error', text: friendlyError(err, 'збереження') });
+      save.disabled = false;
+      save.textContent = 'Зберегти';
+    }
+  }
+
+  async function onVacate() {
+    var unit = findUnit(state.currentId);
+    if (!unit) return;
+    var ok = confirm('Заклад „' + (unit.name || '') + '“ закрився? Приміщення стане вільним, на сайті буде „Оренда“.');
+    if (!ok) return;
+    var payload = {
+      vacant: true, name: '', slug: null, about: '', hours: '', phones: [], links: [],
+      logo_url: null, wordmark_url: null, photos: []
+    };
+    try {
+      await updateUnit(unit.unit_id, payload);
+      setState({ snapshot: '' });
+      openUnit(unit.unit_id, { type: 'ok', text: 'Приміщення ' + unit.unit_id + ' тепер вільне. На сайті вже показано «Оренда».' });
+      showFlash(state.flash);
+    } catch (err) {
+      showFlash({ type: 'error', text: friendlyError(err, 'звільнення приміщення') });
+    }
+  }
+
+  /* ---------- Запуск ---------- */
+  async function init() {
+    var config = window.GP_CONFIG || {};
+    if (!config.supabaseUrl || !config.supabaseKey) {
+      showNotice('Кабінет ще не підключено до бази', 'Коли власник сайту впише адресу бази, тут з\'явиться вхід для адміністратора.');
+      return;
+    }
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+      console.error('[кабінет] supabase-js не завантажився');
+      showNotice('Не вдалося відкрити кабінет', 'Перевірте інтернет і оновіть сторінку.');
+      return;
+    }
+    try {
+      client = window.supabase.createClient(config.supabaseUrl, config.supabaseKey, { auth: { persistSession: true, autoRefreshToken: true } });
+      logoutBtn.addEventListener('click', signOut);
+      client.auth.onAuthStateChange(function (eventName) {
+        if (eventName !== 'SIGNED_OUT' || logoutBtn.hidden) return;
+        setState({ units: [], currentId: null, media: null, snapshot: '', flash: null });
+        renderLogin('Ви вийшли з кабінету. Увійдіть знову.');
+      });
+      var res = await client.auth.getSession();
+      if (res.error) throw res.error;
+      if (res.data && res.data.session) await openCabinet();
+      else renderLogin();
+    } catch (err) {
+      renderLogin(friendlyError(err, 'запуск'));
+    }
+  }
+
+  window.addEventListener('beforeunload', function (event) {
+    if (isDirty() || state.busy > 0) { event.preventDefault(); event.returnValue = ''; }
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>

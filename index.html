@@ -142,6 +142,8 @@ p{margin:0}
 .wm-img img{display:block;width:auto;height:15px;max-width:100%}
 .wm-mid img{height:20px}
 .wm-tall img{height:30px}
+/* широкий логотип із кабінету: невідомих пропорцій, тож обмежуємо і висоту, і ширину */
+.wm-up img{height:28px;max-width:100%;object-fit:contain}
 .wm-hotel{font:500 12px var(--serif);color:var(--gold-hi);letter-spacing:.18em}
 
 .quick{position:absolute;z-index:3;right:clamp(16px,1.4vw,26px);bottom:4.5%;width:clamp(152px,10.8vw,182px);display:flex;flex-direction:column;gap:8px}
@@ -846,6 +848,7 @@ footer a:hover{color:var(--gold-hi)}
   <a href="#visit" data-tab="visit" aria-current="false"><svg aria-hidden="true"><use href="#i-pin"/></svg><span>Контакти</span></a>
 </nav>
 
+<script src="gp-config.js"></script>
 <script>
 (() => {
   const $ = (s) => document.querySelector(s);
@@ -944,7 +947,6 @@ footer a:hover{color:var(--gold-hi)}
     "3.08":{about:"Банкетний зал на третьому поверсі для весіль, хрестин, ювілеїв і корпоративів. Подробиці й бронювання — у ресторані Garden Plaza.", phone:"0685350099", hours:"за домовленістю", pics:[]},
     "4.01":{about:"Готель на четвертому поверсі: затишні номери зі своєю ванною, Wi‑Fi і краєвидом на гори. Сніданок у ресторані Garden Plaza, безкоштовний паркінг для гостей.", phone:"0685350099", hours:"цілодобово"}
   };
-  const UNITS = UNITS_BASE.map((u) => ({...u, ...SHOP_INFO[u.id]}));
   const telHref = (n) => `tel:+38${n}`;
   // безкоштовні номери 0 800 пишемо так, як їх звикли бачити: 0 800 212 338
   const telLabel = (n) => (n.startsWith("0800")
@@ -967,6 +969,56 @@ footer a:hover{color:var(--gold-hi)}
     "1.12":[{href:"https://zolotiyvik.ua/", label:"zolotiyvik.ua"}],
     "parking":[{href:"https://www.google.com/maps/search/?api=1&query=48.1196052,23.7721827", label:"Прокласти маршрут"}]
   };
+  // Заклади. Дані вище — вбудовані й запасні: щойно відповідає база кабінету (gp-config.js), сайт показує її.
+  // Приміщення (рамки на плані) завжди беруться з UNITS_BASE, з бази — лише заклад, що в приміщенні зараз.
+  const BUILTIN = new Map(UNITS_BASE.map((u) => {
+    const local = {...u, ...SHOP_INFO[u.id]};
+    const pics = local.pics || [1, 2].map((n) => `shops/${u.id}-${n}.webp`);
+    return [u.id, {...local, pics, links:SHOP_LINKS[u.id] || [], thumb:pics.length ? `shops/t/${u.id}.webp` : local.logo || null}];
+  }));
+  let UNITS = UNITS_BASE.map((u) => BUILTIN.get(u.id));
+  const VACANT_ABOUT = "Вільне приміщення. Здається в оренду: телефонуйте адміністрації центру.";
+  const BASE_TIMEOUT_MS = 5000;
+  const sameList = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+  // адреса з бази: повна https-адреса сховища або відносний шлях до файлу сайту; решту відкидаємо
+  const safeUrl = (s) => (typeof s === "string" && /^(https:\/\/|shops\/)[^"'<>\s]+$/.test(s) ? s : null);
+
+  // рядок таблиці units → заклад у форматі сайту. Текст із бази вставляється в HTML, тож екрануємо його тут
+  function fromBase(base, row) {
+    const own = BUILTIN.get(base.id);
+    if (row.vacant) {
+      return {...base, slug:undefined, vacant:true, name:"Оренда", cat:"services", about:VACANT_ABOUT,
+        tags:"оренда вільне приміщення", pics:[], links:[], logo:null, wordmark:null, thumb:null};
+    }
+    const cat = CATS[row.cat] ? row.cat : "shop";
+    const photos = (row.photos || []).map(safeUrl).filter(Boolean);
+    const sameTenant = own.slug === row.slug;
+    return {...base, slug:row.slug, vacant:false, name:escapeHtml(row.name), cat, about:escapeHtml(row.about || ""),
+      hours:row.hours ? escapeHtml(row.hours) : undefined, phones:(row.phones || []).length ? row.phones : undefined,
+      links:(row.links || []).filter((l) => /^https?:\/\//.test(l.href || "")).map((l) => ({href:escapeHtml(l.href), label:escapeHtml(l.label || l.href)})),
+      logo:safeUrl(row.logo_url), wordmark:safeUrl(row.wordmark_url), pics:photos,
+      thumb:(sameTenant && own.thumb && sameList(photos, own.pics) ? own.thumb : null) || safeUrl(row.logo_url) || photos[0] || null,
+      tags:sameTenant ? own.tags : `${row.name} ${CATS[cat].name} ${row.slug.replace(/-/g, " ")}`};
+  }
+
+  // заклади з бази; null, якщо бази не налаштовано або вона не відповіла — тоді лишаються вбудовані
+  async function loadBaseUnits() {
+    const cfg = window.GP_CONFIG || {};
+    if (!cfg.supabaseUrl || !cfg.supabaseKey) return null;
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), BASE_TIMEOUT_MS);
+    try {
+      const res = await fetch(`${cfg.supabaseUrl}/rest/v1/units?select=*`, {headers:{apikey:cfg.supabaseKey}, signal:ctrl.signal});
+      if (!res.ok) throw new Error(`база відповіла ${res.status}`);
+      const byId = new Map((await res.json()).map((r) => [r.unit_id, r]));
+      return UNITS_BASE.map((u) => (byId.has(u.id) ? fromBase(u, byId.get(u.id)) : BUILTIN.get(u.id)));
+    } catch (err) {
+      console.warn("Заклади з бази не завантажились, показуємо вбудовані:", err);
+      return null;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
   // зони поза приміщеннями; координати в клітинках плану, y більший за висоту поверху — перед фасадом
   const PLATE_ZONES = [{id:"parking", f:1, x:0, y:9.95, w:7, h:1.5, name:"Паркінг", note:"1000 місць"}];
   // скільки закладів видно в каталозі на телефоні до кнопки «Показати всі»
@@ -1184,12 +1236,12 @@ footer a:hover{color:var(--gold-hi)}
     if (!unit) return null;
     return {id:unit.id, slug:unit.slug, name:unit.name, tag:CATS[unit.cat].name, color:cssVar(CATS[unit.cat].c), where:`${unit.f} поверх, приміщення ${unit.id}`,
       hours:unit.hours || DEFAULT_HOURS, about:unit.about, phones:unit.phones || [unit.phone || MALL_PHONE], logo:unit.logo || null,
-      pics:unit.pics || [1, 2].map((n) => `shops/${unit.id}-${n}.webp`), links:SHOP_LINKS[id] || []};
+      pics:unit.pics || [], links:unit.links || []};
   }
-  const hasPics = (u) => !u.pics || u.pics.length > 0;
-  const thumbHtml = (u) => (hasPics(u)
-    ? `<img src="shops/t/${u.id}.webp" alt="" loading="lazy" decoding="async" width="120" height="120">`
-    : u.logo
+  // мініатюра в списку закладів: готовий маленький кадр, логотип або перше фото (thumb задає BUILTIN чи fromBase)
+  const thumbHtml = (u) => (u.thumb
+    ? `<img src="${u.thumb}" alt="" loading="lazy" decoding="async" width="120" height="120">`
+    : u.thumb === undefined && u.logo
       ? `<img src="${u.logo}" alt="" loading="lazy" decoding="async" width="120" height="120">`
       : `<span class="ph" aria-hidden="true">${u.name[0]}</span>`);
   const picsHtml = (s) => s.pics.map((src, i) =>
@@ -1373,10 +1425,14 @@ footer a:hover{color:var(--gold-hi)}
     return rooms + marks + zones + blocks;
   }
 
-  // знак закладу з POPULAR (логотип або фірмовий напис); null, якщо знака немає
+  // знак закладу: широкий логотип із кабінету або вбудований знак із POPULAR (лише поки в приміщенні той самий заклад,
+  // що й у вбудованих даних); null, якщо знака немає
   function brandMark(id) {
+    const unit = UNITS.find((u) => u.id === id);
+    if (!unit || unit.vacant) return null;
+    if (unit.wordmark) return `<span class="wm wm-img wm-up"><img src="${unit.wordmark}" alt="" decoding="async"></span>`;
     const logo = POPULAR.find((x) => x.unit === id || (x.also || []).includes(id));
-    return logo ? `<span class="wm ${logo.cls}">${logo.html}</span>` : null;
+    return logo && unit.slug === BUILTIN.get(id).slug ? `<span class="wm ${logo.cls}">${logo.html}</span>` : null;
   }
   // знак закладу на плитці: логотип або назва
   function tileMark(u) {
@@ -1386,12 +1442,14 @@ footer a:hover{color:var(--gold-hi)}
   // усі заклади для стрічки на першому екрані: спершу ті, що з логотипами, далі решта по поверхах.
   // Кілька точок одного закладу на поверсі (Фурт сервіс) показуємо однією плиткою
   function shopStrip() {
-    const popular = POPULAR.map((p) => UNITS.find((u) => u.id === p.unit));
-    const covered = new Set(POPULAR.flatMap((p) => [p.unit, ...(p.also || [])]));
-    const rest = UNITS.filter((u) => !u.vacant && !covered.has(u.id))
-      .sort((a, b) => a.f - b.f || a.id.localeCompare(b.id))
+    const open = UNITS.filter((u) => !u.vacant)
       .filter((u, i, all) => all.findIndex((x) => x.f === u.f && x.name === u.name) === i);
-    return [...popular, ...rest];
+    // порядок POPULAR, далі інші заклади зі знаком, далі решта по поверхах
+    const rank = (u) => {
+      const p = POPULAR.findIndex((x) => x.unit === u.id || (x.also || []).includes(u.id));
+      return brandMark(u.id) ? (p >= 0 && !u.wordmark ? p : POPULAR.length) : POPULAR.length + 1;
+    };
+    return open.sort((a, b) => rank(a) - rank(b) || a.f - b.f || a.id.localeCompare(b.id));
   }
 
   function listHtml(f) {
@@ -1841,8 +1899,17 @@ footer a:hover{color:var(--gold-hi)}
   watchSections();
   render();
   // ?zaklad=1.09 — перехід зі сторінки закладу: одразу показуємо його на 3D-плані
-  const wantedUnit = new URLSearchParams(location.search).get("zaklad");
-  if (UNITS.some((u) => u.id === wantedUnit)) showShop(wantedUnit);
+  // спершу сторінка малюється з вбудованих даних, а щойно відповість база — перемальовується з її даних
+  loadBaseUnits().then((units) => {
+    if (units) {
+      UNITS = units;
+      buildHero();
+      render();
+      if (cut.floor !== null) openCut(cut.floor, cut.hl);
+    }
+    const wantedUnit = new URLSearchParams(location.search).get("zaklad");
+    if (UNITS.some((u) => u.id === wantedUnit)) showShop(wantedUnit);
+  });
   if ("ResizeObserver" in window) {
     new ResizeObserver(() => { if (cut.floor !== null) requestAnimationFrame(layoutPins); }).observe(cutStage);
   }
