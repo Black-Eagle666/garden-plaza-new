@@ -173,6 +173,10 @@ p{margin:0}
 .cut-floors button[aria-pressed="true"]{background:linear-gradient(180deg,#EED39C,#C9A46A);border-color:#EED39C;color:var(--espresso)}
 .cut-stage{flex:1;min-height:0;container-type:size;display:grid;place-items:center;opacity:0;transform:scale(.18);transform-origin:var(--ox,50%) var(--oy,20%);transition:opacity .5s ease,transform .5s ease}
 .hero.is-open .cut-stage{opacity:1;transform:none;transition:opacity .6s ease .45s,transform 1s cubic-bezier(.2,.8,.2,1) .45s}
+/* план крутиться перетягуванням; на телефоні вертикальний рух пальця лишається прокруткою вікна */
+.cut-stage{cursor:grab;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.cut-stage.is-spinning{cursor:grabbing}
+.cut-stage.is-spinning .blk,.cut-stage.is-spinning .zone{cursor:grabbing}
 
 .plate{--pw:min(84cqw,142cqh);--u:calc(var(--pw) / 12);--h:calc(var(--u) * .28);--rx:56deg;--rz:30deg;position:relative;width:var(--pw);height:calc(var(--u) * var(--rows,6.4));transform:translateY(var(--ty,8%)) rotateX(var(--rx)) rotateZ(calc(var(--rz) * -1));transform-style:preserve-3d;background:linear-gradient(135deg,#241B13,#15100B);border:1px solid rgba(232,204,148,.7);box-shadow:0 0 0 calc(var(--u) * .12) rgba(201,164,106,.12),0 0 calc(var(--u) * 1.2) rgba(232,204,148,.28)}
 /* майже квадратний поверх: план глибший, тож вужчий */
@@ -191,6 +195,9 @@ p{margin:0}
 .blk .top{inset:0;transform:translateZ(var(--h));background:#2B2118;background:color-mix(in srgb,var(--c) 34%,#1A140F);border:1px solid var(--c)}
 .blk .wf{left:0;bottom:0;width:100%;height:var(--h);transform-origin:bottom;transform:rotateX(-90deg);background:#1D1610;background:color-mix(in srgb,var(--c) 22%,#0D0A07)}
 .blk .ws{left:0;top:0;width:var(--h);height:100%;transform-origin:left;transform:rotateY(-90deg);background:#15100B;background:color-mix(in srgb,var(--c) 13%,#0D0A07)}
+/* задня й права стіни: видно, коли план повернутий іншим боком */
+.blk .wb{left:0;top:0;width:100%;height:var(--h);transform-origin:top;transform:rotateX(90deg);background:#1D1610;background:color-mix(in srgb,var(--c) 22%,#0D0A07)}
+.blk .we{right:0;top:0;width:var(--h);height:100%;transform-origin:right;transform:rotateY(90deg);background:#15100B;background:color-mix(in srgb,var(--c) 13%,#0D0A07)}
 .blk:hover .top,.blk:focus-visible .top{background:#4A3A28;background:color-mix(in srgb,var(--c) 64%,#1A140F)}
 /* приміщення складної форми (Г-подібне): верхня грань — багатокутник. Стіни лишаються по рамці:
    виріз у дальньому правому куті відкриває лише грані, яких з цього боку не видно */
@@ -220,8 +227,8 @@ p{margin:0}
 .blk.hl .top,.zone.hl::before{border:1px solid #FFE7B0;box-shadow:0 0 0 2px #F2D08A,0 0 14px 3px rgba(255,214,130,.9),0 0 46px 10px rgba(232,190,110,.48),inset 0 0 24px rgba(255,214,130,.38)}
 .blk.hl .top::after,.zone.hl::after{content:"";position:absolute;inset:-2px;box-shadow:0 0 24px 7px rgba(255,214,130,.95),0 0 76px 20px rgba(232,190,110,.55),inset 0 0 30px rgba(255,214,130,.4);opacity:0;pointer-events:none;animation:neon 1.5s ease-in-out infinite alternate}
 .blk.hl .top{background:#5A4520;background:color-mix(in srgb,var(--c) 42%,#4A3818)}
-.blk.hl .wf{background:#C9A46A}
-.blk.hl .ws{background:#8A6E44}
+.blk.hl .wf,.blk.hl .wb{background:#C9A46A}
+.blk.hl .ws,.blk.hl .we{background:#8A6E44}
 .blk.hl .top.poly{background:none;border:0;box-shadow:none}
 .blk.hl .top.poly::after{content:none}
 .blk.hl .top.poly svg:not(.glow){filter:drop-shadow(0 0 4px rgba(255,214,130,.95)) drop-shadow(0 0 14px rgba(232,190,110,.6))}
@@ -649,7 +656,7 @@ footer a:hover{color:var(--gold-hi)}
     <div class="cut-list" id="cutList" role="group" aria-label="Заклади на поверсі"></div>
     <div class="cut-info glass" id="cutInfo" aria-live="polite" hidden></div>
     <div class="cut-legend" id="cutLegend"></div>
-    <p class="cut-hint">Оберіть заклад на плані або в списку: покажемо опис, графік і телефон.</p>
+    <p class="cut-hint">Потягніть план убік, щоб покрутити його. Оберіть заклад на плані або в списку: покажемо опис, графік і телефон.</p>
   </div>
 
   <header class="hhead">
@@ -1338,7 +1345,7 @@ footer a:hover{color:var(--gold-hi)}
     const blocks = UNITS.filter((u) => u.f === f).map((u, i) => {
       const style = `--c:${cssVar(CATS[u.cat].c)};--i:${i};left:calc(${cells(u.x)} + 3px);top:calc(${cells(u.y)} + 3px);width:calc(${cells(u.w)} - 6px);height:calc(${cells(u.h)} - 6px)${labelSpot(u)}`;
       const top = u.shape ? `<i class="top poly">${shapeSvg(u, "glow")}${shapeSvg(u, "")}</i>` : `<i class="top"></i>`;
-      return `<div class="blk${u.shape ? " shaped" : ""}" role="button" tabindex="0" data-cut-unit="${u.id}" aria-label="${u.name}, приміщення ${u.id}" style="${style}"><i class="ws"></i><i class="wf"></i>${top}<span class="lbl"><span class="pin">${u.name}<small>${u.id}</small></span></span></div>`;
+      return `<div class="blk${u.shape ? " shaped" : ""}" role="button" tabindex="0" data-cut-unit="${u.id}" aria-label="${u.name}, приміщення ${u.id}" style="${style}"><i class="ws"></i><i class="wf"></i>${u.shape ? "" : '<i class="wb"></i><i class="we"></i>'}${top}<span class="lbl"><span class="pin">${u.name}<small>${u.id}</small></span></span></div>`;
     }).join("");
     const zones = PLATE_ZONES.filter((zn) => zn.f === f).map((zn) =>
       `<div class="zone" role="button" tabindex="0" data-cut-unit="${zn.id}" aria-label="${zn.name}" style="--c:var(--gold);--i:9;left:${cells(zn.x)};top:${cells(zn.y)};width:${cells(zn.w)};height:${cells(zn.h)}"><span class="lbl"><span class="pin">${zn.name}<small>${zn.note}</small></span></span></div>`).join("");
@@ -1468,6 +1475,9 @@ footer a:hover{color:var(--gold-hi)}
     plate.classList.toggle("is-deep", Boolean(FLOOR_GRID[f].hall));
     cutStage.classList.toggle("is-deep", Boolean(FLOOR_GRID[f].hall));
     plate.style.setProperty("--ty", PLATE_ZONES.some((zn) => zn.f === f) ? "0%" : "8%");
+    // новий поверх відкривається з початкового ракурсу, навіть якщо попередній покрутили
+    plate.style.removeProperty("--rx");
+    plate.style.removeProperty("--rz");
     const strip = $("#cutList");
     strip.innerHTML = listHtml(f);
     strip.scrollLeft = 0;
@@ -1511,7 +1521,61 @@ footer a:hover{color:var(--gold-hi)}
     if (unit) showFloor(unit.f, unit.id);
   };
 
+  // Обертання 3D-плану: тягнути вбік — поворот на 360°, мишкою вгору-вниз — нахил у межах minTilt…maxTilt.
+  // Рух, коротший за threshold, лишається звичайним кліком по закладу; після справжнього обертання клік гаситься
+  const SPIN = {degPerPx:.45, tiltPerPx:.25, minTilt:38, maxTilt:70, threshold:6};
+  let spin = null;
+  let spinJustEnded = false;
+  let pinsQueued = false;
+  const queuePins = () => {
+    if (pinsQueued) return;
+    pinsQueued = true;
+    requestAnimationFrame(() => { pinsQueued = false; layoutPins(); });
+  };
+  const angleOf = (name) => parseFloat(getComputedStyle(plate).getPropertyValue(name));
+
+  function endSpin(e) {
+    if (!spin || e.pointerId !== spin.id) return;
+    spinJustEnded = spin.active;
+    if (spin.active) cutStage.classList.remove("is-spinning");
+    spin = null;
+  }
+
+  function bindSpin() {
+    cutStage.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0 || cut.floor === null) return;
+      spin = {id:e.pointerId, x:e.clientX, y:e.clientY, rz:angleOf("--rz"), rx:angleOf("--rx"), tilt:e.pointerType === "mouse", active:false};
+      spinJustEnded = false;
+    });
+    cutStage.addEventListener("pointermove", (e) => {
+      if (!spin || e.pointerId !== spin.id) return;
+      const dx = e.clientX - spin.x, dy = e.clientY - spin.y;
+      if (!spin.active) {
+        if (Math.hypot(dx, dy) < SPIN.threshold) return;
+        spin = {...spin, active:true};
+        // захоплення лише допомагає не загубити рух за межами сцени; якщо вказівник уже відпущено, крутимо без нього
+        if (cutStage.hasPointerCapture && !cutStage.hasPointerCapture(e.pointerId)) {
+          try { cutStage.setPointerCapture(e.pointerId); } catch (err) { console.warn("План: не вдалося захопити вказівник", err); }
+        }
+        cutStage.classList.add("is-spinning");
+      }
+      const rx = spin.tilt ? Math.min(SPIN.maxTilt, Math.max(SPIN.minTilt, spin.rx - dy * SPIN.tiltPerPx)) : spin.rx;
+      plate.style.setProperty("--rz", `${spin.rz + dx * SPIN.degPerPx}deg`);
+      plate.style.setProperty("--rx", `${rx}deg`);
+      queuePins();
+    });
+    cutStage.addEventListener("pointerup", endSpin);
+    cutStage.addEventListener("pointercancel", endSpin);
+    cutStage.addEventListener("click", (e) => {
+      if (!spinJustEnded) return;
+      spinJustEnded = false;
+      e.stopPropagation();
+      e.preventDefault();
+    }, true);
+  }
+
   function bindEvents() {
+    bindSpin();
     // делегування: поверхи, плитки й кнопки «Показати на плані» малює і перемальовує скрипт
     document.addEventListener("click", (e) => {
       const floorEl = e.target.closest("[data-floor]");
