@@ -217,7 +217,12 @@ p{margin:0}
 /* приміщення складної форми (Г-подібне): верхня грань — багатокутник. Стіни лишаються по рамці:
    виріз у дальньому правому куті відкриває лише грані, яких з цього боку не видно */
 .blk.shaped{pointer-events:none}
-.blk.shaped .wf,.blk.shaped .ws,.blk.shaped .pin,.blk.shaped svg:not(.glow) polygon{pointer-events:auto}
+/* стіни приміщення складної форми: по одній на кожну сторону контуру, а не по рамці, інакше стіна вилазить за приміщення */
+.blk .wp{position:absolute;height:var(--h);transform-origin:0 0;transform:rotateZ(var(--a)) rotateX(90deg);background:#1D1610;background:color-mix(in srgb,var(--c) 22%,#0D0A07)}
+.blk .wp.v{background:#15100B;background:color-mix(in srgb,var(--c) 13%,#0D0A07)}
+.blk.hl .wp{background:#C9A46A}
+.blk.hl .wp.v{background:#8A6E44}
+.blk.shaped .wp,.blk.shaped .pin,.blk.shaped svg:not(.glow) polygon{pointer-events:auto}
 .blk .top.poly,.blk:hover .top.poly,.blk:focus-visible .top.poly{background:none;border:0}
 .blk .top.poly svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .blk .top.poly polygon{fill:#2B2118;fill:color-mix(in srgb,var(--c) 34%,#1A140F);stroke:var(--c);stroke-width:1px;vector-effect:non-scaling-stroke;transition:fill .2s}
@@ -1565,14 +1570,25 @@ footer a:hover{color:var(--gold-hi)}
   // де стоїть підпис: зазвичай у центрі рамки, для складної форми — у точці label
   const labelSpot = (u) => (u.label ? `;--lx:${(u.label[0] - u.x) / u.w * 100}%;--ly:${(u.label[1] - u.y) / u.h * 100}%` : "");
 
+  // стіни для приміщення складної форми: кожна сторона контуру — окрема стіна (координати у відсотках рамки приміщення)
+  function shapeWalls(u) {
+    return u.shape.map(([x1, y1], i) => {
+      const [x2, y2] = u.shape[(i + 1) % u.shape.length];
+      const vertical = x1 === x2;
+      const angle = Math.round(Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI);
+      const len = vertical ? `calc(100% * ${Math.abs(y2 - y1) / u.h} * var(--bh) / var(--bw))` : `${Math.abs(x2 - x1) / u.w * 100}%`;
+      return `<i class="wp${vertical ? " v" : ""}" style="left:${(x1 - u.x) / u.w * 100}%;top:${(y1 - u.y) / u.h * 100}%;width:${len};--a:${angle}deg"></i>`;
+    }).join("");
+  }
+
   function plateHtml(f) {
     const marks = PLATE_MARKS[f].map(([x, y, t, kind]) => `<span class="mk${kind ? ` ${kind}` : ""}" style="left:${cells(x)};top:${cells(y)}">${t}</span>`).join("");
     const rooms = PLAN_ROOMS.filter((r) => r.f === f).map((r) =>
       `<span class="room${r.esc ? ` esc ${r.esc}` : ""}" style="--i:8;left:${cells(r.x)};top:${cells(r.y)};width:${cells(r.w)};height:${cells(r.h)}">${r.esc ? `<span class="lane" style="--lf:${Math.min(r.w * ESC_PLATE_FONT.perCell, ESC_PLATE_FONT.max)}">${ESC_LABEL[r.esc]}</span>` : r.flat ? "" : `<span class="lbl"><span class="pin">${r.name}</span></span>`}</span>`).join("");
     const blocks = UNITS.filter((u) => u.f === f).map((u, i) => {
-      const style = `--c:${cssVar(CATS[u.cat].c)};--i:${i};left:calc(${cells(u.x)} + 3px);top:calc(${cells(u.y)} + 3px);width:calc(${cells(u.w)} - 6px);height:calc(${cells(u.h)} - 6px)${labelSpot(u)}`;
+      const style = `--c:${cssVar(CATS[u.cat].c)};--i:${i};left:calc(${cells(u.x)} + 3px);top:calc(${cells(u.y)} + 3px);width:calc(${cells(u.w)} - 6px);height:calc(${cells(u.h)} - 6px)${labelSpot(u)}${u.shape ? `;--bw:${u.w};--bh:${u.h}` : ""}`;
       const top = u.shape ? `<i class="top poly">${shapeSvg(u, "glow")}${shapeSvg(u, "")}</i>` : `<i class="top"></i>`;
-      return `<div class="blk${u.shape ? " shaped" : ""}" role="button" tabindex="0" data-cut-unit="${u.id}" aria-label="${u.name}, приміщення ${u.id}" style="${style}"><i class="ws"></i><i class="wf"></i>${u.shape ? "" : '<i class="wb"></i><i class="we"></i>'}${top}<span class="lbl"><span class="pin">${u.name}<small>${u.id}</small></span></span></div>`;
+      return `<div class="blk${u.shape ? " shaped" : ""}" role="button" tabindex="0" data-cut-unit="${u.id}" aria-label="${u.name}, приміщення ${u.id}" style="${style}">${u.shape ? shapeWalls(u) : '<i class="ws"></i><i class="wf"></i><i class="wb"></i><i class="we"></i>'}${top}<span class="lbl"><span class="pin">${u.name}<small>${u.id}</small></span></span></div>`;
     }).join("");
     const zones = PLATE_ZONES.filter((zn) => zn.f === f).map((zn) =>
       `<div class="zone" role="button" tabindex="0" data-cut-unit="${zn.id}" aria-label="${zn.name}" style="--c:var(--gold);--i:9;left:${cells(zn.x)};top:${cells(zn.y)};width:${cells(zn.w)};height:${cells(zn.h)}"><span class="lbl"><span class="pin">${zn.name}<small>${zn.note}</small></span></span></div>`).join("");
