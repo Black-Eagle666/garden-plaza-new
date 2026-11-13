@@ -174,11 +174,17 @@ p{margin:0}
 .cut-stage{flex:1;min-height:0;container-type:size;display:grid;place-items:center;opacity:0;transform:scale(.18);transform-origin:var(--ox,50%) var(--oy,20%);transition:opacity .5s ease,transform .5s ease}
 .hero.is-open .cut-stage{opacity:1;transform:none;transition:opacity .6s ease .45s,transform 1s cubic-bezier(.2,.8,.2,1) .45s}
 /* план крутиться перетягуванням; на телефоні вертикальний рух пальця лишається прокруткою вікна */
-.cut-stage{cursor:grab;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.cut-stage{position:relative;overflow:hidden;cursor:grab;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+/* масштаб плану: кнопки в правому нижньому куті сцени */
+.cut-zoom{position:absolute;right:10px;bottom:10px;z-index:5;display:flex;flex-direction:column;gap:6px;opacity:0;transition:opacity .4s}
+.hero.is-open .cut-zoom{opacity:1;transition-delay:1.2s}
+.cut-zoom button{width:38px;height:38px;padding:0;border-radius:50%;border:1px solid rgba(201,164,106,.45);background:rgba(14,11,8,.86);color:var(--gold-hi);display:grid;place-items:center;cursor:pointer;transition:background .2s}
+.cut-zoom button:hover{background:rgba(201,164,106,.18)}
+.cut-zoom svg{width:16px;height:16px}
 .cut-stage.is-spinning{cursor:grabbing}
 .cut-stage.is-spinning .blk,.cut-stage.is-spinning .zone{cursor:grabbing}
 
-.plate{--pw:min(84cqw,142cqh);--u:calc(var(--pw) / 12);--h:calc(var(--u) * .28);--rx:56deg;--rz:30deg;position:relative;width:var(--pw);height:calc(var(--u) * var(--rows,6.4));transform:translateY(var(--ty,8%)) rotateX(var(--rx)) rotateZ(calc(var(--rz) * -1));transform-style:preserve-3d;background:linear-gradient(135deg,#241B13,#15100B);border:1px solid rgba(232,204,148,.7);box-shadow:0 0 0 calc(var(--u) * .12) rgba(201,164,106,.12),0 0 calc(var(--u) * 1.2) rgba(232,204,148,.28)}
+.plate{--pw:min(84cqw,142cqh);--u:calc(var(--pw) * var(--zoom, 1) / 12);--h:calc(var(--u) * .28);--rx:56deg;--rz:30deg;position:relative;width:calc(var(--pw) * var(--zoom, 1));height:calc(var(--u) * var(--rows,6.4));transform:translate(var(--px,0px),var(--py,0px)) translateY(var(--ty,8%)) rotateX(var(--rx)) rotateZ(calc(var(--rz) * -1));transform-style:preserve-3d;background:linear-gradient(135deg,#241B13,#15100B);border:1px solid rgba(232,204,148,.7);box-shadow:0 0 0 calc(var(--u) * .12) rgba(201,164,106,.12),0 0 calc(var(--u) * 1.2) rgba(232,204,148,.28)}
 /* майже квадратний поверх: план глибший, тож вужчий */
 .plate.is-deep{--pw:min(70cqw,calc(132cqh - 120px))}
 .hero.is-open .plate{animation:unfold 1.3s cubic-bezier(.2,.8,.2,1) .3s both}
@@ -652,11 +658,17 @@ footer a:hover{color:var(--gold-hi)}
       <button class="cut-close" type="button" id="cutClose" aria-label="Закрити план поверху"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div class="cut-floors" id="cutFloors" role="group" aria-label="Поверх"><button type="button" data-floor="1">1 поверх</button><button type="button" data-floor="2">2 поверх</button><button type="button" data-floor="3">3 поверх</button><button type="button" data-floor="4">4 поверх</button></div>
-    <div class="cut-stage" id="cutStage"><div class="plate" id="plate"></div></div>
+    <div class="cut-stage" id="cutStage"><div class="plate" id="plate"></div>
+      <div class="cut-zoom" role="group" aria-label="Масштаб плану">
+        <button type="button" data-zoom="in" aria-label="Збільшити план"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 5v14M5 12h14"/></svg></button>
+        <button type="button" data-zoom="out" aria-label="Зменшити план"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M5 12h14"/></svg></button>
+        <button type="button" data-zoom="reset" aria-label="Повернути план як було"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4"/></svg></button>
+      </div>
+    </div>
     <div class="cut-list" id="cutList" role="group" aria-label="Заклади на поверсі"></div>
     <div class="cut-info glass" id="cutInfo" aria-live="polite" hidden></div>
     <div class="cut-legend" id="cutLegend"></div>
-    <p class="cut-hint">Потягніть план убік, щоб покрутити його. Оберіть заклад на плані або в списку: покажемо опис, графік і телефон.</p>
+    <p class="cut-hint">Потягніть план убік, щоб покрутити його; двома пальцями, коліщатком або кнопками «+» і «−» — збільшити чи зменшити. Оберіть заклад на плані або в списку: покажемо опис, графік і телефон.</p>
   </div>
 
   <header class="hhead">
@@ -858,7 +870,7 @@ footer a:hover{color:var(--gold-hi)}
     {id:"1.06",f:1,x:8.45,y:0,w:3.55,h:1.35,cat:"fashion",name:"Одяг",about:"Магазин одягу.",tags:"одяг"},
     {id:"1.07",f:1,x:9.95,y:1.35,w:2.05,h:1.9,cat:"home",name:"Килими",about:"Килими й доріжки для дому.",tags:"килими ковер доріжка"},
     {id:"1.08",f:1,x:0,y:3.45,w:1.8,h:2.65,cat:"shop",name:"Версаль",about:"Магазин «Версаль».",tags:"версаль versal versailles"},
-    {id:"1.09",f:1,x:0,y:6.1,w:1.8,h:3.05,cat:"shop",name:"ALMA",about:"Магазин ALMA.",tags:"alma алма"},
+    {id:"1.09",f:1,x:0,y:6.1,w:1.8,h:3.05,cat:"grocery",name:"ALMA",about:"Супермаркет ALMA.",tags:"alma алма супермаркет продукти хліб пекарня м'ясо випічка"},
     {id:"1.10",f:1,x:3.4,y:3.65,w:1.2,h:1.85,cat:"services",name:"Фурт сервіс",about:"Острівець «Фурт сервіс».",tags:"фурт сервіс furt service"},
     {id:"1.11",f:1,vacant:true,x:7.25,y:3.65,w:1.2,h:1.85,cat:"services",name:"Оренда",about:"Вільний острівець під оренду.",tags:"оренда вільне місце острівець орендувати"},
     {id:"1.12",f:1,x:3.4,y:6.85,w:1.3,h:1.95,cat:"beauty",name:"Золотий вік",about:"Ювелірний острівець.",tags:"золотий вік ювелірний золото срібло прикраси острівець"},
@@ -891,7 +903,8 @@ footer a:hover{color:var(--gold-hi)}
   // 3.03 Mezey Shop (Instagram @mezey_shop), 3.04 Tiffany (Instagram @tiffany_beauty_salon_; телефону й графіка в профілі немає),
   // 3.05 MonoTaxi (monotaxi.com.ua, 12.11.2026), телефон ресторану й готелю.
   // 1 поверх: назви з малюнка Миколи, описи загальні, телефонів і фото немає (дзвінок іде адміністрації центру);
-  // що продають ALMA, «Версаль» і «Фурт сервіс», невідомо.
+  // 1.09 ALMA — супермаркет мережі ALMA (alma.com.ua: Нересниця, вул. Грушевського, 30; щодня 8:00–22:00; гаряча лінія 0 800 212 338; 13.11.2026).
+  // що продають «Версаль» і «Фурт сервіс», невідомо.
   // 2 поверх: розкладка й назви з малюнка Миколи від 12.11.2026; описи Джентельмена, Кредо й Штор і їхні телефони вигадані,
   // що продають Зима-Літо, Файна пані, Brand, Шарм, Astel, невідомо. 3.06 — ПРИКЛАД: текст і номер вигадані.
   // 3.07 «Взуття» (12.11 Микола: «обув»): назва справжня, опису, телефону й фото немає.
@@ -904,7 +917,7 @@ footer a:hover{color:var(--gold-hi)}
     "1.06":{about:"Магазин одягу на першому поверсі, праворуч у дальньому кутку.", pics:[]},
     "1.07":{about:"Килими й доріжки для дому.", pics:[]},
     "1.08":{about:"Магазин «Версаль» на першому поверсі, ліворуч уздовж стіни.", pics:[]},
-    "1.09":{about:"Магазин ALMA на першому поверсі, ліворуч від входу.", pics:[]},
+    "1.09":{about:"Супермаркет закарпатської мережі ALMA: свіжі продукти, власна пекарня й м'ясний цех, товари місцевих виробників і перевірених брендів. На першому поверсі, ліворуч від входу.", phones:["0800212338"], hours:"щодня 8:00–22:00", logo:"shops/logo/alma-sq.svg", pics:[]},
     "1.10":{about:"Острівець «Фурт сервіс» у холі біля ескалаторів. Ще одна точка — праворуч від входу.", pics:[]},
     "1.11":{about:"Вільний острівець у холі біля ескалаторів. Здається в оренду: телефонуйте адміністрації центру.", pics:[]},
     "1.12":{about:"Ювелірний острівець «Золотий вік» у холі біля входу: каблучки, обручки, сережки й ланцюжки із золота та срібла.", logo:"shops/logo/zolotyi-vik-sq.svg", pics:[]},
@@ -931,7 +944,10 @@ footer a:hover{color:var(--gold-hi)}
   };
   const UNITS = UNITS_BASE.map((u) => ({...u, ...SHOP_INFO[u.id]}));
   const telHref = (n) => `tel:+38${n}`;
-  const telLabel = (n) => `(${n.slice(0, 3)}) ${n.slice(3, 6)}-${n.slice(6, 8)}-${n.slice(8)}`;
+  // безкоштовні номери 0 800 пишемо так, як їх звикли бачити: 0 800 212 338
+  const telLabel = (n) => (n.startsWith("0800")
+    ? `0 800 ${n.slice(4, 7)} ${n.slice(7)}`
+    : `(${n.slice(0, 3)}) ${n.slice(3, 6)}-${n.slice(6, 8)}-${n.slice(8)}`);
   const DEFAULT_HOURS = "10:00–22:00";
   const CELL = 100;
   const MALL_PHONE = "0685350099";
@@ -945,6 +961,7 @@ footer a:hover{color:var(--gold-hi)}
     "3.05":[{href:"https://monotaxi.com.ua/", label:"monotaxi.com.ua"}, {href:"https://www.instagram.com/mono.taxi/", label:"Instagram"}],
     "1.01":[{href:"https://www.kopiyochka.ua/", label:"kopiyochka.ua"}],
     "1.04":[{href:"https://prostor.ua/", label:"prostor.ua"}],
+    "1.09":[{href:"https://alma.com.ua/", label:"alma.com.ua"}, {href:"https://www.instagram.com/alma.zakarpattya/", label:"Instagram"}],
     "1.12":[{href:"https://zolotiyvik.ua/", label:"zolotiyvik.ua"}],
     "parking":[{href:"https://www.google.com/maps/search/?api=1&query=48.1196052,23.7721827", label:"Прокласти маршрут"}]
   };
@@ -1291,7 +1308,8 @@ footer a:hover{color:var(--gold-hi)}
     {unit:"4.01", cls:"wm-hotel", html:"ГОТЕЛЬ"},
     {unit:"1.01", cls:"wm-img wm-mid", html:'<img src="shops/logo/1.01-wide.webp" alt="" width="544" height="120" decoding="async">', label:"Копійочка"},
     {unit:"1.12", cls:"wm-img wm-tall", html:'<img src="shops/logo/zolotyi-vik.svg" alt="" width="100" height="40" decoding="async">', label:"Золотий вік"},
-    {unit:"1.04", cls:"wm-img wm-mid", html:'<img src="shops/logo/prostor.svg" alt="" width="195" height="32" decoding="async">', label:"PROSTOR"}
+    {unit:"1.04", cls:"wm-img wm-mid", html:'<img src="shops/logo/prostor.svg" alt="" width="195" height="32" decoding="async">', label:"PROSTOR"},
+    {unit:"1.09", cls:"wm-img wm-tall", html:'<img src="shops/logo/alma.svg" alt="" width="222" height="88" decoding="async">', label:"ALMA"}
   ];
   let hero = {floor:4};
 
@@ -1397,8 +1415,11 @@ footer a:hover{color:var(--gold-hi)}
     const wall = plate.querySelector(".wf");
     const lift = (wall ? wall.offsetHeight : 0) * Math.sin(rx);
     const half = cutStage.clientWidth / 2 - PIN.edge;
+    // зсув збільшеного плану (--px, --py): межі сцени рахуємо від центру плану, тож віднімаємо його
+    const panX = parseFloat(plate.style.getPropertyValue("--px")) || 0;
+    const panY = parseFloat(plate.style.getPropertyValue("--py")) || 0;
     // верхній край сцени в координатах від центру плану; сам план зсунутий униз на --ty відсотків своєї висоти
-    const roof = PIN.edge - cutStage.clientHeight / 2 - parseFloat(plate.style.getPropertyValue("--ty") || "8") / 100 * h;
+    const roof = PIN.edge - cutStage.clientHeight / 2 - panY - parseFloat(plate.style.getPropertyValue("--ty") || "8") / 100 * h;
     const stems = Array.from({length:Math.floor((PIN.max - PIN.min) / PIN.step) + 1}, (_, i) => PIN.min + i * PIN.step);
     const boxAt = (p, stem) => ({l:p.x - p.w / 2, r:p.x + p.w / 2, t:p.y - stem - p.h, b:p.y - stem});
     const overlaps = (a, b) => a.l < b.r + PIN.gap && b.l < a.r + PIN.gap && a.t < b.b + PIN.gap && b.t < a.b + PIN.gap;
@@ -1409,7 +1430,9 @@ footer a:hover{color:var(--gold-hi)}
       const cy = el.offsetTop + lbl.offsetTop - h / 2;
       const anchorX = cx * Math.cos(rz) + cy * Math.sin(rz);
       const pinW = pin.offsetWidth;
-      const x = Math.max(pinW / 2 - half, Math.min(half - pinW / 2, anchorX));
+      // підпис закладу, що поза сценою (план збільшено), лишаємо над ним — його просто не видно; решту тримаємо в межах
+      const offStage = Math.abs(anchorX + panX) > half;
+      const x = offStage ? anchorX : Math.max(pinW / 2 - half - panX, Math.min(half - pinW / 2 - panX, anchorX));
       return {el, x, dx:x - anchorX, y:(cy * Math.cos(rz) - cx * Math.sin(rz)) * Math.cos(rx) - lift, w:pinW, h:pin.offsetHeight};
     }).sort((a, b) => b.y - a.y);
     pins.reduce((placed, p) => {
@@ -1485,9 +1508,8 @@ footer a:hover{color:var(--gold-hi)}
     plate.style.setProperty("--span", plateSpan(f).toFixed(2));
     cutStage.classList.toggle("is-deep", Boolean(FLOOR_GRID[f].hall));
     plate.style.setProperty("--ty", PLATE_ZONES.some((zn) => zn.f === f) ? "0%" : "8%");
-    // новий поверх відкривається з початкового ракурсу, навіть якщо попередній покрутили
-    plate.style.removeProperty("--rx");
-    plate.style.removeProperty("--rz");
+    // новий поверх відкривається з початкового ракурсу й масштабу, навіть якщо попередній покрутили чи збільшили
+    resetView();
     const strip = $("#cutList");
     strip.innerHTML = listHtml(f);
     strip.scrollLeft = 0;
@@ -1584,7 +1606,7 @@ footer a:hover{color:var(--gold-hi)}
   function bindPointerSpin() {
     const own = (e) => spin && e.pointerId === spin.id;
     cutStage.addEventListener("pointerdown", (e) => {
-      if (e.pointerType === "touch" || e.button !== 0 || cut.floor === null || isUnfolding()) return;
+      if (e.pointerType === "touch" || e.button !== 0 || cut.floor === null || isUnfolding() || e.target.closest(".cut-zoom")) return;
       startSpin(e.pointerId, e.clientX, e.clientY, true);
     });
     cutStage.addEventListener("pointermove", (e) => {
@@ -1603,14 +1625,32 @@ footer a:hover{color:var(--gold-hi)}
   }
 
   // Палець — через touch-події: Safari на iPhone перериває pointer-жест уже за кілька сантиметрів.
-  // Рух переважно вбік крутить план (і не дає Safari його перехопити); переважно вгору-вниз — прокрутка вікна
+  // Один палець: рух переважно вбік крутить план (і не дає Safari його перехопити), вгору-вниз — прокрутка вікна.
+  // Два пальці: щипок збільшує чи зменшує план, а рух обох пальців пересуває його
+  const touchMid = (e) => ({x:(e.touches[0].clientX + e.touches[1].clientX) / 2, y:(e.touches[0].clientY + e.touches[1].clientY) / 2});
+  const touchGap = (e) => Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+
   function bindTouchSpin() {
     cutStage.addEventListener("touchstart", (e) => {
-      if (e.touches.length !== 1 || cut.floor === null || isUnfolding()) { spin = null; return; }
+      spin = null;
+      pinch = null;
+      if (cut.floor === null || isUnfolding() || e.target.closest(".cut-zoom")) return;
+      if (e.touches.length === 2) {
+        pinch = {gap:touchGap(e), at:stagePoint(touchMid(e)), view};
+        return;
+      }
+      if (e.touches.length !== 1) return;
       const t = e.touches[0];
       startSpin("touch", t.clientX, t.clientY, false);
     }, {passive:true});
     cutStage.addEventListener("touchmove", (e) => {
+      if (pinch && e.touches.length === 2) {
+        e.preventDefault();
+        const k = clampZoom(pinch.view.zoom * touchGap(e) / pinch.gap) / pinch.view.zoom;
+        const at = stagePoint(touchMid(e));
+        setView({zoom:pinch.view.zoom * k, px:at.x - k * (pinch.at.x - pinch.view.px), py:at.y - k * (pinch.at.y - pinch.view.py)});
+        return;
+      }
       if (!spin || spin.id !== "touch") return;
       const t = e.touches[0];
       const dx = t.clientX - spin.x, dy = t.clientY - spin.y;
@@ -1619,13 +1659,69 @@ footer a:hover{color:var(--gold-hi)}
       e.preventDefault();
       applySpin(dx, dy);
     }, {passive:false});
-    cutStage.addEventListener("touchend", finishSpin);
-    cutStage.addEventListener("touchcancel", finishSpin);
+    const endTouch = (e) => {
+      if (pinch && e.touches.length < 2) { pinch = null; queuePins(); }
+      finishSpin();
+    };
+    cutStage.addEventListener("touchend", endTouch);
+    cutStage.addEventListener("touchcancel", endTouch);
+    // Safari на iPhone інакше збільшив би всю сторінку замість плану
+    cutStage.addEventListener("gesturestart", (e) => e.preventDefault());
+  }
+
+  // Масштаб і зсув 3D-плану: кнопки «+ − ↺», коліщатко миші (і щипок на тачпаді), два пальці на телефоні.
+  // --zoom множить ширину плану (підписи лишаються свого розміру), --px/--py — зсув у пікселях екрана
+  const ZOOM = {min:.6, max:2.5, step:1.3, wheel:.0015};
+  let view = {zoom:1, px:0, py:0};
+  let pinch = null;
+  const clampZoom = (z) => Math.min(ZOOM.max, Math.max(ZOOM.min, z));
+  // точка екрана відносно центру сцени
+  const stagePoint = ({x, y}) => {
+    const r = cutStage.getBoundingClientRect();
+    return {x:x - (r.left + r.width / 2), y:y - (r.top + r.height / 2)};
+  };
+
+  // зсув обмежений, щоб план не можна було «загубити» за краєм сцени
+  function setView(next) {
+    const zoom = clampZoom(next.zoom);
+    const limX = cutStage.clientWidth / 2 * zoom, limY = cutStage.clientHeight / 2 * zoom;
+    view = {zoom, px:Math.max(-limX, Math.min(limX, next.px)), py:Math.max(-limY, Math.min(limY, next.py))};
+    plate.style.setProperty("--zoom", String(view.zoom));
+    plate.style.setProperty("--px", `${view.px}px`);
+    plate.style.setProperty("--py", `${view.py}px`);
+  }
+
+  // змінює масштаб так, щоб точка at (відносно центру сцени) лишилась на місці
+  function zoomAt(at, zoom) {
+    const k = clampZoom(zoom) / view.zoom;
+    setView({zoom:view.zoom * k, px:at.x - k * (at.x - view.px), py:at.y - k * (at.y - view.py)});
+    queuePins();
+  }
+
+  // початковий ракурс: без збільшення, зсуву й обертання
+  function resetView() {
+    view = {zoom:1, px:0, py:0};
+    ["--zoom", "--px", "--py", "--rx", "--rz"].forEach((name) => plate.style.removeProperty(name));
+  }
+
+  function bindZoom() {
+    cutStage.addEventListener("wheel", (e) => {
+      if (cut.floor === null || isUnfolding()) return;
+      e.preventDefault();
+      zoomAt(stagePoint({x:e.clientX, y:e.clientY}), view.zoom * Math.exp(-e.deltaY * ZOOM.wheel));
+    }, {passive:false});
+    $(".cut-zoom").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-zoom]");
+      if (!b || cut.floor === null) return;
+      if (b.dataset.zoom === "reset") { resetView(); queuePins(); return; }
+      zoomAt({x:0, y:0}, b.dataset.zoom === "in" ? view.zoom * ZOOM.step : view.zoom / ZOOM.step);
+    });
   }
 
   function bindSpin() {
     bindPointerSpin();
     bindTouchSpin();
+    bindZoom();
     cutStage.addEventListener("click", (e) => {
       if (!spinJustEnded) return;
       spinJustEnded = false;
