@@ -143,6 +143,7 @@ p{margin:0}
 .wm-mid img{height:20px}
 .wm-tall img{height:30px}
 .wm-kids img{height:38px}
+.wm-goddes img{height:22px}
 /* широкий логотип із кабінету: невідомих пропорцій, тож обмежуємо і висоту, і ширину */
 .wm-up img{height:28px;max-width:100%;object-fit:contain}
 .wm-hotel{font:500 12px var(--serif);color:var(--gold-hi);letter-spacing:.18em}
@@ -1026,7 +1027,7 @@ footer a:hover{color:var(--gold-hi)}
     {id:"3.04",slug:"tiffany-beauty-salon",f:3,x:9.75,y:7.75,w:2.25,h:3.15,cat:"services",name:"Tiffany Beauty Salon",about:"Салон краси Tiffany.",tags:"tiffany тіффані тифані салон краси перукарня стрижка фарбування зачіска макіяж манікюр педикюр брови вії косметологія масаж"},
     {id:"3.05",slug:"monotaxi",f:3,x:9.75,y:1.25,w:2.25,h:1.5,cat:"services",name:"MonoTaxi",about:"Служба таксі MonoTaxi.",tags:"monotaxi mono taxi монотаксі таксі офіс доставка тверезий водій"},
     {id:"3.06",slug:"dytiacha-kimnata",f:3,x:0,y:0,w:3.55,h:4.65,cat:"kids",name:"Дитяча кімната",about:"Дитяча ігрова кімната.",tags:"діти дитяча ігрова кімната зала розваги малеча"},
-    {id:"3.07",slug:"vzuttia",f:3,x:9.75,y:6.15,w:2.25,h:1.6,cat:"fashion",name:"Взуття",about:"Взуттєвий магазин.",tags:"взуття обув обувь черевики кросівки туфлі чоботи"},
+    {id:"3.07",slug:"vzuttia",f:3,x:9.75,y:6.15,w:2.25,h:1.6,cat:"fashion",name:"Goddes",about:"Магазин взуття Goddes.",tags:"goddes годдес годес взуття обув обувь черевики кросівки туфлі чоботи"},
     {id:"3.08",slug:"banketnyi-zal",f:3,x:9.75,y:2.75,w:2.25,h:1.7,cat:"food",name:"Банкетний зал",about:"Зал для банкетів ресторану Garden Plaza.",tags:"банкетний зал банкет весілля хрестини ювілей корпоратив свято garden plaza"},
 
     {id:"4.01",slug:"hotel",f:4,x:0,y:0,w:12,h:3,cat:"home",name:"Готель",about:"Номери для гостей. Бронювання за телефоном (068) 535-00-99.",hours:"цілодобово",tags:"готель номер ночівля"}
@@ -1040,7 +1041,7 @@ footer a:hover{color:var(--gold-hi)}
   // що продають «Версаль» і «Фурт сервіс», невідомо.
   // 2 поверх: розкладка й назви з малюнка Миколи від 12.11.2026; описи Джентельмена, Кредо й Штор і їхні телефони вигадані,
   // що продають Зима-Літо, Файна пані, Brand, Шарм, Astel, невідомо. 3.06 — ПРИКЛАД: текст і номер вигадані.
-  // 3.07 «Взуття» (12.11 Микола: «обув»): назва справжня, опису, телефону й фото немає.
+  // 3.07 Goddes (до 14.11 «Взуття»; назва з логотипа, який дав Микола): назва справжня, опису, телефону й фото немає.
   const SHOP_INFO = {
     "1.01":{about:"Магазин мережі «Копійочка»: товари для дому, побутова хімія, посуд і дрібниці на щодень.", logo:"shops/logo/1.01.webp", pics:[]},
     "1.02":{about:"Ліки за рецептом і без, вітаміни, дитяче харчування, засоби догляду."},
@@ -1071,7 +1072,7 @@ footer a:hover{color:var(--gold-hi)}
     "3.04":{about:"Салон краси Tiffany: фарбування й догляд за волоссям, стрижки, зачіски та макіяж, манікюр і педикюр, брови й вії, косметологія та масаж. Майстра обираєте самі.", phones:[], hours:"уточнюйте в салоні", logo:"shops/logo/3.04.webp"},
     "3.05":{about:"Служба таксі MonoTaxi: поїздки Нересницею та за її межі, «тверезий водій», кур'єрська доставка й доставка продуктів. Виклик авто безкоштовний, тариф від 29 грн/км, мінімальне замовлення — 150 грн. Офіс на третьому поверсі центру.", phones:["0981873000", "0981874000"], hours:"7:00–01:00", logo:"shops/logo/3.05.webp"},
     "3.06":{about:"Ігрова кімната для дітей: гірки, сухий басейн, лабіринт і куточок для найменших. Малеча грається під наглядом, поки батьки в ресторані чи на покупках.", phone:"0680000306", hours:"10:00–21:00", logo:"shops/logo/3.06.webp"},
-    "3.07":{about:"Взуттєвий магазин на третьому поверсі, праворуч між Mezey Shop і салоном Tiffany.", pics:[]},
+    "3.07":{about:"Магазин взуття Goddes на третьому поверсі, праворуч між Mezey Shop і салоном Tiffany.", logo:"shops/logo/3.07.webp", pics:[]},
     "3.08":{about:"Банкетний зал на третьому поверсі для весіль, хрестин, ювілеїв і корпоративів. Подробиці й бронювання — у ресторані Garden Plaza.", phone:"0685350099", hours:"за домовленістю", pics:[]},
     "4.01":{about:"Готель на четвертому поверсі: затишні номери зі своєю ванною, Wi‑Fi і краєвидом на гори. Сніданок у ресторані Garden Plaza, безкоштовний паркінг для гостей.", phone:"0685350099", hours:"цілодобово"}
   };
@@ -1519,6 +1520,7 @@ footer a:hover{color:var(--gold-hi)}
     {unit:"2.05", cls:"wm-credo", html:"КРЕДО<small>клініка</small>", label:"Кредо клініка"},
     {unit:"3.02", cls:"wm-gymmaxi", html:'<svg viewBox="0 0 20 28" aria-hidden="true"><rect x="3" width="14" height="4" rx="1"/><rect y="5" width="20" height="6" rx="1.5"/><rect x="7" y="11" width="6" height="6"/><rect y="17" width="20" height="6" rx="1.5"/><rect x="3" y="24" width="14" height="4" rx="1"/></svg><span>GYM<b>MAXI</b></span>', label:"GYM MAXI"},
     {unit:"3.06", cls:"wm-img wm-kids", html:'<img src="shops/logo/3.06-wide.webp" alt="" width="400" height="197" decoding="async">', label:"Дитяча кімната BAAMM"},
+    {unit:"3.07", cls:"wm-img wm-goddes", html:'<img src="shops/logo/3.07-wide.webp" alt="" width="520" height="100" decoding="async">', label:"Goddes"},
     {unit:"3.04", cls:"wm-tiffany", html:"TIFFANY<small>Beauty Salon</small>", label:"Tiffany Beauty Salon"},
     {unit:"3.05", cls:"wm-img", html:'<img src="shops/logo/3.05-wide.webp" alt="" width="500" height="74" decoding="async">', label:"MonoTaxi"},
     {unit:"4.01", cls:"wm-hotel", html:"ГОТЕЛЬ"},
