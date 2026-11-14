@@ -101,7 +101,7 @@ textarea{min-height:170px;resize:vertical}
   var BUCKET = 'tenants';
   var NEWS_COLUMNS = 'id,kind,title,body,photo_url,unit_ids,valid_until,published,created_at';
   var KINDS = [['news', 'Новина'], ['promo', 'Акція'], ['sale', 'Знижка'], ['rent', 'Оренда']];
-  var LIMITS = Object.freeze({ title: 120, body: 2000, units: 12, sourceBytes: 20 * 1024 * 1024 });
+  var LIMITS = Object.freeze({ title: 120, body: 2000, units: 40, sourceBytes: 20 * 1024 * 1024 });
   var PHOTO_SIDE = 1600;
   var PHOTO_QUALITY = 0.85;
   var PHOTO_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
@@ -243,8 +243,10 @@ textarea{min-height:170px;resize:vertical}
           '<textarea id="f-body" maxlength="' + LIMITS.body + '" placeholder="Коротко: що, де, до якого числа.">' + escapeHtml(item ? item.body : '') + '</textarea></div>' +
         '<div class="field"><span class="label">Фотографія</span><div class="photo-box" id="photo-box"></div>' +
           '<span class="hint" id="photo-status">JPG, PNG або WEBP. Найкраще виглядає горизонтальне фото.</span></div>' +
-        '<div class="field"><span class="label">Заклади, яких це стосується</span>' + unitChips(item ? (item.unit_ids || []) : []) +
-          '<span class="hint">Можна не відмічати жодного. На сайті відмічені заклади будуть кнопками, що ведуть на план.</span></div>' +
+        '<div class="field"><span class="label">Заклади, яких це стосується</span>' +
+          '<div class="chips"><button type="button" class="btn btn-small" id="units-all">Відмітити всі</button>' +
+          '<button type="button" class="btn btn-small" id="units-none">Зняти всі</button></div>' + unitChips(item ? (item.unit_ids || []) : []) +
+          '<span class="hint">Можна не відмічати жодного або відмітити всі. На сайті відмічені заклади будуть кнопками, що ведуть на план; якщо відмічено всі — одна кнопка «Усі заклади центру».</span></div>' +
         '<div class="field"><label for="f-until">Діє до (необов\'язково)</label>' +
           '<input type="date" id="f-until" value="' + escapeHtml(item && item.valid_until ? item.valid_until : '') + '">' +
           '<span class="hint">Після цієї дати запис сам зникне з сайту. Для акцій і знижок краще вказати.</span></div>' +
@@ -256,10 +258,20 @@ textarea{min-height:170px;resize:vertical}
     document.getElementById('back').addEventListener('click', function () { showPane('list'); });
     document.getElementById('form').addEventListener('submit', onSave);
     document.getElementById('form').addEventListener('input', updateCounters);
+    document.getElementById('units-all').addEventListener('click', function () { setAllUnits(true); });
+    document.getElementById('units-none').addEventListener('click', function () { setAllUnits(false); });
     var del = document.getElementById('delete');
     if (del) del.addEventListener('click', onDelete);
     renderPhoto();
     updateCounters();
+  }
+
+  // «Відмітити всі» бере лише зайняті приміщення: вільні відмічають вручну для оголошень про оренду
+  function setAllUnits(checked) {
+    var vacant = state.units.filter(function (u) { return u.vacant; }).map(function (u) { return u.unit_id; });
+    document.querySelectorAll('#form .f-unit').forEach(function (input) {
+      input.checked = checked && vacant.indexOf(input.value) === -1;
+    });
   }
 
   function updateCounters() {

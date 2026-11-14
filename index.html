@@ -636,7 +636,8 @@ section{padding:110px 0}
 .post-until{font-size:13px;color:var(--k)}
 .post-units{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
 .post-units button{padding:8px 13px;border-radius:99px;border:1px solid rgba(201,164,106,.35);background:none;color:var(--gold-hi);font:500 13px/1 var(--sans);cursor:pointer}
-.post-units button:hover{background:rgba(201,164,106,.14);border-color:var(--gold)}
+.post-units button:hover,.post-all:hover{background:rgba(201,164,106,.14);border-color:var(--gold)}
+.post-all{padding:8px 13px;border-radius:99px;border:1px solid rgba(201,164,106,.35);color:var(--gold-hi);font:500 13px/1 var(--sans);text-decoration:none}
 @media (max-width:1000px){.news-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}}
 @media (max-width:640px){
   .news-filter{margin:-8px calc(var(--gut) * -1) 20px;padding:0 var(--gut);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
@@ -1250,7 +1251,13 @@ footer a:hover{color:var(--gold-hi)}
 
   // кнопки відмічених закладів ведуть на 3D-план (спільний обробник data-unit)
   function newsUnitsHtml(item) {
-    const chips = item.units.map((id) => UNITS.find((u) => u.id === id)).filter(Boolean).map((u) =>
+    const marked = item.units.map((id) => UNITS.find((u) => u.id === id)).filter(Boolean);
+    // відмічено всі зайняті приміщення — замість десятків кнопок одна, що веде до списку закладів
+    const occupied = UNITS.filter((u) => !u.vacant);
+    if (occupied.length > 1 && occupied.every((u) => marked.includes(u))) {
+      return `<div class="post-units"><a class="post-all" href="#map">Усі заклади центру</a></div>`;
+    }
+    const chips = marked.map((u) =>
       `<button type="button" data-unit="${u.id}">${u.vacant ? `Приміщення ${u.id}` : u.name} · ${u.f} поверх</button>`);
     return chips.length ? `<div class="post-units">${chips.join("")}</div>` : "";
   }
