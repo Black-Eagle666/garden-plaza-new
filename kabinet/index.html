@@ -114,7 +114,24 @@ input[aria-invalid=true]{border-color:var(--danger)}
 .photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 12px}
 .photo{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#000}
 .photo img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.photo{position:relative}
+.photo-crop{position:absolute;top:6px;right:6px;min-height:32px;padding:5px 11px;border-radius:999px;border:1px solid var(--line-strong);background:rgba(10,8,6,.82);color:var(--gold-light);font-size:13px;cursor:pointer}
+.photo-crop:hover{background:rgba(201,164,106,.25)}
 .photo-tools{display:flex;justify-content:space-between;align-items:center;padding:6px}
+/* Вікно обрізки фото */
+.crop{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:12px;background:rgba(5,4,3,.9);overflow:auto}
+.crop-card{width:min(100%,620px);background:var(--panel);border:1px solid var(--line-strong);border-radius:var(--radius);padding:16px}
+.crop-card h2{font-family:var(--serif);font-weight:500;font-size:26px;margin:0 0 4px}
+.crop-card .hint{margin:0 0 12px}
+.crop-frame{position:relative;margin:0 auto 14px;overflow:hidden;border-radius:10px;border:1px solid var(--gold);background:#000;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.crop-frame.is-drag{cursor:grabbing}
+.crop-frame img{position:absolute;left:0;top:0;max-width:none;transform-origin:0 0;pointer-events:none;-webkit-user-drag:none}
+.crop-shapes{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.crop-shapes button{min-height:38px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);font-size:14px;cursor:pointer}
+.crop-shapes button[aria-pressed=true]{background:linear-gradient(135deg,#EED39C,#C9A46A);color:#1A130A;border-color:transparent;font-weight:600}
+.crop-range{display:grid;grid-template-columns:118px 1fr;align-items:center;gap:10px;margin:0 0 8px;font-size:14px;color:var(--gold-light)}
+.crop-range input{width:100%;accent-color:#C9A46A;min-height:32px}
+.crop-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:14px}
 .photo-tools .icon-btn{width:38px;height:38px;font-size:17px}
 .photo-tools span{font-size:13px;color:var(--muted)}
 .status{font-size:14px;color:var(--gold-light);margin-top:8px;min-height:1px}
@@ -636,6 +653,7 @@ input[aria-invalid=true]{border-color:var(--danger)}
     box.innerHTML = photos.map(function (url, i) {
       var src = assetUrl(url);
       return '<div class="photo">' + (src ? '<img src="' + escapeHtml(src) + '" alt="Фото ' + (i + 1) + '" loading="lazy">' : '') +
+        '<button type="button" class="photo-crop" data-action="photo-crop" data-index="' + i + '">Обрізати</button>' +
         '<div class="photo-tools">' +
           '<button type="button" class="icon-btn" data-action="photo-left" data-index="' + i + '" aria-label="Перемістити ліворуч"' + (i === 0 ? ' disabled' : '') + '>←</button>' +
           '<span>' + (i + 1) + '</span>' +
@@ -761,9 +779,13 @@ input[aria-invalid=true]{border-color:var(--danger)}
     var errors = [];
     try {
       for (var i = 0; i < chosen.length; i++) {
-        setStatus('photos-status', 'Завантаження… ' + (i + 1) + ' з ' + chosen.length, false);
+        setStatus('photos-status', 'Фото ' + (i + 1) + ' з ' + chosen.length + ': оберіть, як обрізати', false);
         try {
-          var url = await uploadImage(chosen[i], 'photo');
+          var picked = await cropNewFile(chosen[i], (i + 1) + ' з ' + chosen.length);
+          if (state.currentId !== unitId) return;
+          if (!picked) continue;
+          setStatus('photos-status', 'Завантаження… ' + (i + 1) + ' з ' + chosen.length, false);
+          var url = await uploadImage(picked, 'photo');
           if (state.currentId !== unitId) return;
           setMedia({ photos: Object.freeze(state.media.photos.concat([url])) });
           renderPhotos();
@@ -774,6 +796,187 @@ input[aria-invalid=true]{border-color:var(--danger)}
       var notes = errors.slice();
       if (skipped > 0) notes.push('Не додано ' + skipped + ' фото: можна не більше ' + LIMITS.photos + '.');
       setStatus('photos-status', notes.length ? notes.join(' ') : 'Готово. Не забудьте натиснути «Зберегти».', notes.length > 0);
+    } finally {
+      changeBusy(-1);
+    }
+  }
+
+  /* ---------- Обрізка фото ---------- */
+  // Форми кадру. Перша — як фото показується в картках на сайті (4:3), тому вона стоїть за замовчуванням.
+  var CROP_SHAPES = [
+    { id: 'wide', label: 'Горизонтальне 4:3', ratio: 4 / 3 },
+    { id: 'tall', label: 'Вертикальне 3:4', ratio: 3 / 4 },
+    { id: 'square', label: 'Квадрат', ratio: 1 },
+    { id: 'pano', label: 'Широке 16:9', ratio: 16 / 9 }
+  ];
+  var CROP = Object.freeze({ maxZoom: 4, frameMax: 560, frameMaxHeight: 0.5, margin: 56, outSide: 1600 });
+
+  // Показує вікно обрізки. Повертає File з обрізаним фото, рядок 'original' («Без обрізки») або null («Скасувати»).
+  function cropDialog(img, title, allowOriginal) {
+    return new Promise(function (resolve) {
+      var view = Object.freeze({ shape: CROP_SHAPES[0], zoom: 1, px: 0.5, py: 0.5, w: 0, h: 0 });
+      var drag = null;
+      var box = document.createElement('div');
+      box.className = 'crop';
+      box.setAttribute('role', 'dialog');
+      box.setAttribute('aria-modal', 'true');
+      box.setAttribute('aria-label', 'Обрізка фото');
+      box.innerHTML = '<div class="crop-card"><h2>Обрізати фото' + (title ? ' <small style="font:400 15px var(--sans);color:var(--muted)">' + escapeHtml(title) + '</small>' : '') + '</h2>' +
+        '<p class="hint">Тягніть фото в рамці або рухайте повзунки. У рамці те, що буде видно на сайті.</p>' +
+        '<div class="crop-shapes" role="group" aria-label="Форма кадру">' + CROP_SHAPES.map(function (sh) {
+          return '<button type="button" data-shape="' + sh.id + '" aria-pressed="' + (sh.id === view.shape.id) + '">' + sh.label + '</button>';
+        }).join('') + '</div>' +
+        '<div class="crop-frame" id="crop-frame"></div>' +
+        '<label class="crop-range">Наблизити<input type="range" id="crop-zoom" min="1" max="' + CROP.maxZoom + '" step="0.01" value="1"></label>' +
+        '<label class="crop-range">По горизонталі<input type="range" id="crop-x" min="0" max="1" step="0.005" value="0.5"></label>' +
+        '<label class="crop-range">По вертикалі<input type="range" id="crop-y" min="0" max="1" step="0.005" value="0.5"></label>' +
+        '<div class="crop-actions"><button type="button" class="btn btn-small" data-crop="cancel">Скасувати</button>' +
+          (allowOriginal ? '<button type="button" class="btn btn-small" data-crop="original">Без обрізки</button>' : '') +
+          '<button type="button" class="btn btn-small btn-main" data-crop="done">Готово</button></div></div>';
+      var frame = box.querySelector('#crop-frame');
+      var zoomInput = box.querySelector('#crop-zoom');
+      var xInput = box.querySelector('#crop-x');
+      var yInput = box.querySelector('#crop-y');
+      frame.appendChild(img);
+
+      function setView(patch) { view = Object.freeze(Object.assign({}, view, patch)); }
+      function clamp01(v) { return Math.min(1, Math.max(0, v)); }
+      // масштаб, за якого фото повністю закриває рамку, помножений на наближення
+      function scale() { return Math.max(view.w / img.naturalWidth, view.h / img.naturalHeight) * view.zoom; }
+      function slack() { return { x: img.naturalWidth * scale() - view.w, y: img.naturalHeight * scale() - view.h }; }
+
+      function layout() {
+        var maxW = Math.min(CROP.frameMax, window.innerWidth - CROP.margin);
+        var maxH = Math.max(180, window.innerHeight * CROP.frameMaxHeight);
+        var w = Math.min(maxW, maxH * view.shape.ratio);
+        setView({ w: Math.round(w), h: Math.round(w / view.shape.ratio) });
+        frame.style.width = view.w + 'px';
+        frame.style.height = view.h + 'px';
+        paint();
+      }
+
+      function paint() {
+        var s = scale(), free = slack();
+        img.style.transform = 'translate(' + (-free.x * view.px) + 'px,' + (-free.y * view.py) + 'px) scale(' + s + ')';
+        zoomInput.value = view.zoom;
+        xInput.value = view.px;
+        yInput.value = view.py;
+        // повзунок зсуву має сенс, лише коли фото в цьому напрямку ширше за рамку
+        xInput.disabled = free.x < 1;
+        yInput.disabled = free.y < 1;
+        box.querySelectorAll('[data-shape]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-shape') === view.shape.id)); });
+      }
+
+      function finish(result) {
+        document.removeEventListener('keydown', onKey, true);
+        window.removeEventListener('resize', layout);
+        box.remove();
+        resolve(result);
+      }
+
+      function exportFile() {
+        var s = scale(), free = slack();
+        var sw = view.w / s, sh = view.h / s;
+        var k = Math.min(1, CROP.outSide / Math.max(sw, sh));
+        var canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(sw * k));
+        canvas.height = Math.max(1, Math.round(sh * k));
+        var ctx = canvas.getContext('2d');
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, free.x * view.px / s, free.y * view.py / s, sw, sh, 0, 0, canvas.width, canvas.height);
+        // PNG без втрат: стискає вже uploadImage, один раз
+        canvas.toBlob(function (blob) {
+          finish(blob ? new File([blob], 'obrizane.png', { type: 'image/png' }) : null);
+        }, 'image/png');
+      }
+
+      function onKey(event) {
+        if (event.key !== 'Escape') return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        finish(null);
+      }
+
+      box.addEventListener('click', function (event) {
+        var shapeBtn = event.target.closest('[data-shape]');
+        if (shapeBtn) {
+          setView({ shape: CROP_SHAPES.find(function (sh) { return sh.id === shapeBtn.getAttribute('data-shape'); }), zoom: 1, px: 0.5, py: 0.5 });
+          layout();
+          return;
+        }
+        var act = event.target.closest('[data-crop]');
+        if (!act) return;
+        var what = act.getAttribute('data-crop');
+        if (what === 'done') exportFile();
+        else finish(what === 'original' ? 'original' : null);
+      });
+      zoomInput.addEventListener('input', function () { setView({ zoom: Number(zoomInput.value) }); paint(); });
+      xInput.addEventListener('input', function () { setView({ px: Number(xInput.value) }); paint(); });
+      yInput.addEventListener('input', function () { setView({ py: Number(yInput.value) }); paint(); });
+      frame.addEventListener('pointerdown', function (event) {
+        drag = { x: event.clientX, y: event.clientY, px: view.px, py: view.py };
+        // захоплення вказівника — зручність (рух за межами рамки); якщо браузер відмовив, тягнути все одно можна
+        try { frame.setPointerCapture(event.pointerId); } catch (err) { console.warn('[кабінет] захоплення вказівника не вдалося:', err); }
+        frame.classList.add('is-drag');
+      });
+      frame.addEventListener('pointermove', function (event) {
+        if (!drag) return;
+        var free = slack();
+        setView({
+          px: free.x > 0 ? clamp01(drag.px - (event.clientX - drag.x) / free.x) : view.px,
+          py: free.y > 0 ? clamp01(drag.py - (event.clientY - drag.y) / free.y) : view.py
+        });
+        paint();
+      });
+      ['pointerup', 'pointercancel'].forEach(function (name) {
+        frame.addEventListener(name, function () { drag = null; frame.classList.remove('is-drag'); });
+      });
+      document.addEventListener('keydown', onKey, true);
+      window.addEventListener('resize', layout);
+      document.body.appendChild(box);
+      layout();
+      box.querySelector('[data-crop="done"]').focus();
+    });
+  }
+
+  // Нове фото з пристрою: після вікна обрізки повертає файл для завантаження або null, якщо фото скасували.
+  async function cropNewFile(file, title) {
+    if (ALLOWED_TYPES.indexOf(file.type) === -1 || file.type === 'image/svg+xml') return file;  // помилку покаже uploadImage
+    var img = await loadImage(file);
+    var result = await cropDialog(img, title, true);
+    return result === 'original' ? file : result;
+  }
+
+  // Фото, яке вже є в закладі: обрізаємо, кладемо в сховище новим файлом і ставимо на те саме місце.
+  function loadSavedImage(src) {
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      var remote = /^https:\/\//.test(src);
+      // для фото зі сховища просимо дозвіл на читання пікселів; окрема адреса, щоб браузер не взяв копію без дозволу
+      if (remote) img.crossOrigin = 'anonymous';
+      img.onload = function () { resolve(img); };
+      img.onerror = function () { reject({ userMessage: 'Не вдалося відкрити це фото для обрізки.' }); };
+      img.src = remote ? src + (src.indexOf('?') === -1 ? '?' : '&') + 'crop=1' : src;
+    });
+  }
+
+  async function onCropExisting(index) {
+    var unitId = state.currentId;
+    var current = state.media.photos[index];
+    if (!current || state.busy) return;
+    changeBusy(1);
+    try {
+      var img = await loadSavedImage(assetUrl(current));
+      var file = await cropDialog(img, '', false);
+      if (!file || state.currentId !== unitId) return;
+      setStatus('photos-status', 'Зберігаємо обрізане фото…', false);
+      var url = await uploadImage(file, 'photo');
+      if (state.currentId !== unitId) return;
+      setMedia({ photos: Object.freeze(state.media.photos.map(function (p) { return p === current ? url : p; })) });
+      renderPhotos();
+      setStatus('photos-status', 'Фото обрізано. Не забудьте натиснути «Зберегти».', false);
+    } catch (err) {
+      setStatus('photos-status', uploadErrorText(err), true);
     } finally {
       changeBusy(-1);
     }
@@ -798,6 +1001,7 @@ input[aria-invalid=true]{border-color:var(--danger)}
     }
     else if (action === 'photo-left') movePhoto(index, -1);
     else if (action === 'photo-right') movePhoto(index, 1);
+    else if (action === 'photo-crop') onCropExisting(index);
     else if (action === 'photo-remove') {
       setMedia({ photos: Object.freeze(state.media.photos.filter(function (_, i) { return i !== index; })) });
       renderPhotos();
