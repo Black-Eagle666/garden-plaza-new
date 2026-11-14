@@ -17,13 +17,12 @@
 <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
 <link rel="preload" as="font" type="font/woff2" href="../../fonts/geist-normal-cyrillic.woff2" crossorigin>
 <style>
-@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 700;font-display:swap;src:url(../../fonts/cormorant-garamond-normal-cyrillic.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
-@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 700;font-display:swap;src:url(../../fonts/cormorant-garamond-normal-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Geist';font-style:normal;font-weight:300 700;font-display:swap;src:url(../../fonts/geist-normal-cyrillic.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
 @font-face{font-family:'Geist';font-style:normal;font-weight:300 700;font-display:swap;src:url(../../fonts/geist-normal-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 
+button,input,select,textarea{font-family:inherit}
 :root{--gold:#C9A46A;--gold-hi:#E8CC94;--cream:#F4EADC;--muted:#B5A998;
-  --serif:'Cormorant Garamond',Georgia,serif;--sans:'Geist',system-ui,sans-serif;
+  --serif:var(--sans);--sans:'Geist',system-ui,sans-serif;
   --sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px)}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -133,7 +132,7 @@ footer a{color:var(--gold-hi);text-decoration:none}
   </article>
   <div class="acts"><a class="btn main live" href="tel:+380975350099"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>(097) 535-00-99</a><a class="btn live" href="https://www.instagram.com/gym_maxi_new/" target="_blank" rel="noopener">Instagram</a><a class="btn" href="../../?zaklad=3.02"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M12 2.8 20 7.3v9.4l-8 4.5-8-4.5V7.3zM4 7.3l8 4.6 8-4.6M12 11.9v9.3"/></svg>Показати на 3D-плані</a><a class="btn" href="https://www.google.com/maps/search/?api=1&query=48.1196052,23.7721827" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></g></svg>Прокласти маршрут</a></div>
   <section><h2>Про заклад</h2><p class="about" data-live="about">Спортзал GYM MAXI: бігові доріжки, вільна вага й тренажери. Персональні заняття з тренером і групові з боксу, ММА, фітнесу та стретчингу. У святкові дні зал працює з 12:00 до 22:00.</p></section>
-  <section data-live="pics"><h2>Фото</h2><div class="pics"><img src="https://asduilrhzkbtgmmghpzl.supabase.co/storage/v1/object/public/tenants/3.02/1794695662902-ef4d1e1f.webp" alt="GYM MAXI, фото 1" loading="lazy" decoding="async" width="640" height="480"><img src="https://asduilrhzkbtgmmghpzl.supabase.co/storage/v1/object/public/tenants/3.02/1794695669280-9e504fc9.webp" alt="GYM MAXI, фото 2" loading="lazy" decoding="async" width="640" height="480"><img src="https://asduilrhzkbtgmmghpzl.supabase.co/storage/v1/object/public/tenants/3.02/1794696836477-274f541f.webp" alt="GYM MAXI, фото 3" loading="lazy" decoding="async" width="640" height="480"></div></section>
+  <section data-live="pics"><h2>Фото</h2><div class="pics"><img src="https://asduilrhzkbtgmmghpzl.supabase.co/storage/v1/object/public/tenants/3.02/1794695662902-ef4d1e1f.webp" alt="GYM MAXI, фото 1" loading="lazy" decoding="async" width="640" height="480"><img src="https://asduilrhzkbtgmmghpzl.supabase.co/storage/v1/object/public/tenants/3.02/1794697200936-3be25a64.webp" alt="GYM MAXI, фото 2" loading="lazy" decoding="async" width="640" height="480"><img src="https://asduilrhzkbtgmmghpzl.supabase.co/storage/v1/object/public/tenants/3.02/1794697225509-0b362ecd.webp" alt="GYM MAXI, фото 3" loading="lazy" decoding="async" width="640" height="480"></div></section>
   <section><h2>Як знайти</h2>
     <dl class="facts">
       <dt>Поверх</dt><dd>3 поверх</dd>

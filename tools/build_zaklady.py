@@ -484,8 +484,9 @@ def sitemap_xml(places):
 
 
 PAGE_CSS = """
+button,input,select,textarea{font-family:inherit}
 :root{--gold:#C9A46A;--gold-hi:#E8CC94;--cream:#F4EADC;--muted:#B5A998;
-  --serif:'Cormorant Garamond',Georgia,serif;--sans:'Geist',system-ui,sans-serif;
+  --serif:var(--sans);--sans:'Geist',system-ui,sans-serif;
   --sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px)}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
