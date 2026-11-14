@@ -425,6 +425,21 @@ input[aria-invalid=true]{border-color:var(--danger)}
     var id = button.getAttribute('data-unit');
     if (id === state.currentId) return;
     if (isDirty() && !confirm('Є незбережені зміни. Перейти без збереження?')) return;
+    openFresh(id);
+  }
+
+  // Перед редагуванням беремо свіжий рядок із бази: кабінет зберігає всі поля закладу разом,
+  // тож зі старої копії він затер би зміни, внесені тим часом деінде.
+  async function openFresh(id) {
+    try {
+      var res = await client.from('units').select(UNIT_COLUMNS).eq('unit_id', id);
+      if (res.error) throw res.error;
+      var fresh = res.data && res.data[0];
+      if (fresh) setState({ units: state.units.map(function (u) { return u.unit_id === id ? fresh : u; }) });
+    } catch (err) {
+      console.error('[кабінет] оновлення закладу перед редагуванням:', err);
+      alert(friendlyError(err, 'дані закладу') + ' Показуємо дані, завантажені раніше — перед збереженням оновіть сторінку.');
+    }
     openUnit(id, null);
   }
 
@@ -993,7 +1008,7 @@ input[aria-invalid=true]{border-color:var(--danger)}
     try {
       var saved = await updateUnit(unitId, result.payload);
       setState({ snapshot: '' });
-      openUnit(unitId, { type: 'ok', text: 'Збережено. Головна сторінка вже оновилась, сторінка закладу оновиться протягом 15 хвилин.', slug: saved.slug });
+      openUnit(unitId, { type: 'ok', text: 'Збережено. Головна сторінка вже оновилась, сторінка закладу оновиться протягом кількох годин.', slug: saved.slug });
       showFlash(state.flash);
     } catch (err) {
       showFlash({ type: 'error', text: friendlyError(err, 'збереження') });

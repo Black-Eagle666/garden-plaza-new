@@ -146,6 +146,13 @@ p{margin:0}
 .wm-goddes img{height:22px}
 .wm-zima img{height:26px}
 .wm-brand img{height:24px}
+.wm-sharm img{height:22px}
+.wm-faina img{height:22px}
+.wm-astell img{height:20px}
+.wm-imperia img{height:15px}
+.wm-butik img{height:26px}
+.wm-apteka img{height:17px}
+.wm-zhasmin img{height:17px}
 /* широкий логотип із кабінету: невідомих пропорцій, тож обмежуємо і висоту, і ширину */
 .wm-up img{height:28px;max-width:100%;object-fit:contain}
 .wm-hotel{font:500 12px var(--serif);color:var(--gold-hi);letter-spacing:.18em}
@@ -999,16 +1006,16 @@ footer a:hover{color:var(--gold-hi)}
   // 1 і 3 поверхи розкладено за малюнками Миколи від 12.11.2026 (1 клітинка 1 поверху = 52 px малюнка)
   const UNITS_BASE = [
     {id:"1.01",slug:"kopiyochka",f:1,x:0,y:0,w:4.2,h:1.23,cat:"home",name:"Копійочка",about:"Товари для дому й побутова хімія.",tags:"копійочка kopiyochka товари для дому побутова хімія посуд господарські"},
-    {id:"1.02",slug:"apteka",f:1,x:10.52,y:3.57,w:1.48,h:1.21,cat:"services",name:"Аптека",about:"Ліки, вітаміни, засоби гігієни.",tags:"аптека ліки вітаміни"},
+    {id:"1.02",slug:"apteka",f:1,x:10.52,y:3.57,w:1.48,h:1.21,cat:"services",name:"Аптека Подорожник",about:"Ліки, вітаміни, засоби гігієни.",tags:"аптека подорожник podorozhnyk ліки вітаміни доступні ліки"},
     {id:"1.03",slug:"obmin-valyut",f:1,x:0,y:1.84,w:1.99,h:0.77,cat:"services",name:"Обмін валют",about:"Пункт обміну валют.",tags:"обмін валют валюта долар євро крони гроші курс"},
     {id:"1.04",slug:"prostor",f:1,x:4.2,y:0,w:3.73,h:1.23,cat:"beauty",name:"PROSTOR",about:"Магазин косметики PROSTOR.",tags:"prostor простор косметика парфумерія парфуми догляд крем помада побутова хімія"},
-    {id:"1.05",slug:"kvity",f:1,x:10.52,y:2.41,w:1.48,h:1.16,cat:"home",name:"Квіти",about:"Букети й кімнатні рослини.",tags:"квіти букет рослини"},
+    {id:"1.05",slug:"zhasmin",f:1,x:10.52,y:2.41,w:1.48,h:1.16,cat:"fashion",name:"Жасмін",about:"Магазин жіночого одягу «Жасмін».",tags:"жасмін jasmin zhasmin жіночий одяг сукні костюми верхній одяг"},
     {id:"1.06",slug:"odyag",f:1,x:7.93,y:0,w:4.07,h:1.23,cat:"fashion",name:"Одяг",about:"Магазин одягу.",tags:"одяг"},
     {id:"1.07",slug:"kylymy",f:1,x:10.52,y:1.23,w:1.48,h:1.18,cat:"home",name:"Килими",about:"Килими й доріжки для дому.",tags:"килими ковер доріжка"},
     {id:"1.08",slug:"versal",f:1,x:0,y:2.61,w:1.99,h:2.17,cat:"shop",name:"Версаль",about:"Магазин «Версаль».",tags:"версаль versal versailles"},
     {id:"1.09",slug:"alma",f:1,x:0,y:4.78,w:1.99,h:4.38,cat:"grocery",name:"ALMA",about:"Супермаркет ALMA.",tags:"alma алма супермаркет продукти хліб пекарня м'ясо випічка"},
     {id:"1.10",slug:"furt-servis",f:1,x:3.17,y:1.9,w:0.86,h:0.95,cat:"services",name:"Фурт сервіс",about:"Острівець «Фурт сервіс».",tags:"фурт сервіс furt service"},
-    {id:"1.11",f:1,vacant:true,x:7.88,y:1.94,w:0.82,h:0.93,cat:"services",name:"Оренда",about:"Вільний острівець під оренду.",tags:"оренда вільне місце острівець орендувати"},
+    {id:"1.11",slug:"zhasmin-ostrivok",f:1,x:7.88,y:1.94,w:0.82,h:0.93,cat:"fashion",name:"Жасмін острівок.",about:"Острівець «Жасмін»: декор і сувеніри.",tags:"жасмін острівок декор сувеніри ікони посуд подарунки новорічні прикраси квіти"},
     {id:"1.12",slug:"zolotyi-vik",f:1,x:3.22,y:3.43,w:0.83,h:0.95,cat:"beauty",name:"Золотий вік",about:"Ювелірний острівець.",tags:"золотий вік ювелірний золото срібло прикраси острівець"},
     {id:"1.13",slug:"susheni-frukty",f:1,x:7.89,y:3.41,w:0.83,h:0.96,cat:"grocery",name:"Сушені фрукти",about:"Сушені фрукти на вагу.",tags:"сушені засушені фрукти сухофрукти горіхи"},
     {id:"1.14",slug:"furt-servis",f:1,x:9.09,y:4.24,w:1.04,h:0.54,cat:"services",name:"Фурт сервіс",about:"«Фурт сервіс» біля входу.",tags:"фурт сервіс furt service"},
@@ -1018,10 +1025,10 @@ footer a:hover{color:var(--gold-hi)}
     {id:"2.03",slug:"faina-pani",f:2,x:9.38,y:4.29,w:2.62,h:2.04,cat:"shop",name:"Файна пані",about:"Магазин «Файна пані».",tags:"файна пані"},
     {id:"2.04",slug:"brand",f:2,x:9.38,y:2.5,w:2.62,h:1.79,cat:"shop",name:"Brand",about:"Магазин Brand.",tags:"brand бренд"},
     {id:"2.05",slug:"kredo-klinika",f:2,x:0,y:7.81,w:9.3,h:6.16,shape:[[0,7.81],[9.3,7.81],[9.3,9.39],[2.45,9.39],[2.45,13.97],[0,13.97]],label:[5.6,8.6],cat:"services",name:"Кредо клініка",about:"Медична клініка «Кредо».",tags:"кредо credo клініка лікар медицина"},
-    {id:"2.06",slug:"shtory",f:2,x:0,y:0,w:4.51,h:1.14,cat:"home",name:"Штори",about:"Штори, тюль, карнизи.",tags:"штори занавіски тюль карниз"},
+    {id:"2.06",slug:"shtory",f:2,x:0,y:0,w:4.51,h:1.14,cat:"home",name:"IMPERIA GARDIN",about:"Салон штор: штори, тюль, карнизи.",tags:"imperia gardin імперія гардин штори занавіски гардини тюль карниз подушки"},
     {id:"2.07",slug:"sharm",f:2,x:9.38,y:1.13,w:2.62,h:1.37,cat:"shop",name:"Шарм",about:"Магазин «Шарм».",tags:"шарм sharm charm"},
-    {id:"2.08",slug:"astel",f:2,x:0,y:1.14,w:2.42,h:2.42,cat:"shop",name:"Astel",about:"Магазин Astel.",tags:"astel астел"},
-    {id:"2.09",slug:"la-butik",f:2,x:4.54,y:0,w:3.63,h:1.77,cat:"fashion",name:"La Butik",about:"Бутик La Butik.",tags:"la butik ла бутік бутик одяг"},
+    {id:"2.08",slug:"astel",f:2,x:0,y:1.14,w:2.42,h:2.42,cat:"shop",name:"Astell",about:"Магазин жіночого одягу Astell.",tags:"astell astel астел астелл одяг жіночий куртки пуховики"},
+    {id:"2.09",slug:"la-butik",f:2,x:4.54,y:0,w:3.63,h:1.77,cat:"fashion",name:"La Butik",about:"Магазин взуття La Butik.",tags:"la butik ла бутік бутик взуття обув кросівки туфлі черевики"},
 
     {id:"3.01",slug:"restoran-garden-plaza",f:3,x:3.6,y:0,w:5,h:3,cat:"food",name:"Garden Plaza",about:"Ресторан: кухня й бар, бронювання столу, доставка. Меню з цінами на gardenplaza.com.ua.",tags:"ресторан їжа обід доставка garden plaza бар"},
     {id:"3.02",slug:"gym-maxi",f:3,x:0,y:6,w:9.75,h:4.9,shape:[[0,6],[3.55,6],[3.55,9],[9.75,9],[9.75,10.9],[0,10.9]],label:[3.2,9.95],cat:"fun",name:"GYM MAXI",about:"Спортзал GYM MAXI.",tags:"gym maxi джим максі спорт спортзал тренажерний зал фітнес бокс мма стретчинг тренер"},
@@ -1029,7 +1036,7 @@ footer a:hover{color:var(--gold-hi)}
     {id:"3.04",slug:"tiffany-beauty-salon",f:3,x:9.75,y:7.75,w:2.25,h:3.15,cat:"services",name:"Tiffany Beauty Salon",about:"Салон краси Tiffany.",tags:"tiffany тіффані тифані салон краси перукарня стрижка фарбування зачіска макіяж манікюр педикюр брови вії косметологія масаж"},
     {id:"3.05",slug:"monotaxi",f:3,x:9.75,y:1.25,w:2.25,h:1.5,cat:"services",name:"MonoTaxi",about:"Служба таксі MonoTaxi.",tags:"monotaxi mono taxi монотаксі таксі офіс доставка тверезий водій"},
     {id:"3.06",slug:"dytiacha-kimnata",f:3,x:0,y:0,w:3.55,h:4.65,cat:"kids",name:"Дитяча кімната",about:"Дитяча ігрова кімната.",tags:"діти дитяча ігрова кімната зала розваги малеча"},
-    {id:"3.07",slug:"vzuttia",f:3,x:9.75,y:6.15,w:2.25,h:1.6,cat:"fashion",name:"Goddes",about:"Магазин взуття Goddes.",tags:"goddes годдес годес взуття обув обувь черевики кросівки туфлі чоботи"},
+    {id:"3.07",slug:"goddes",f:3,x:9.75,y:6.15,w:2.25,h:1.6,cat:"fashion",name:"Goddes",about:"Магазин взуття Goddes.",tags:"goddes годдес годес взуття обув обувь черевики кросівки туфлі чоботи"},
     {id:"3.08",slug:"banketnyi-zal",f:3,x:9.75,y:2.75,w:2.25,h:1.7,cat:"food",name:"Банкетний зал",about:"Зал для банкетів ресторану Garden Plaza.",tags:"банкетний зал банкет весілля хрестини ювілей корпоратив свято garden plaza"},
 
     {id:"4.01",slug:"hotel",f:4,x:0,y:0,w:12,h:3,cat:"home",name:"Готель",about:"Номери для гостей. Бронювання за телефоном (068) 535-00-99.",hours:"цілодобово",tags:"готель номер ночівля"}
@@ -1046,28 +1053,28 @@ footer a:hover{color:var(--gold-hi)}
   // 3.07 Goddes (до 14.11 «Взуття»; назва з логотипа, який дав Микола): назва справжня, опису, телефону й фото немає.
   const SHOP_INFO = {
     "1.01":{about:"Магазин мережі «Копійочка»: товари для дому, побутова хімія, посуд і дрібниці на щодень.", logo:"shops/logo/1.01.webp", pics:[]},
-    "1.02":{about:"Ліки за рецептом і без, вітаміни, дитяче харчування, засоби догляду."},
+    "1.02":{about:"Аптека мережі «Подорожник»: ліки за рецептом і без, вітаміни, дитяче харчування, засоби догляду. Діє програма «Доступні ліки» за електронним рецептом.", hours:"Пн–Сб 8:00–21:00, Нд 9:00–21:00", logo:"shops/logo/1.02.webp"},
     "1.03":{about:"Пункт обміну валют: купівля й продаж долара, євро та інших валют. Курс уточнюйте на місці.", pics:[]},
     "1.04":{about:"Магазин мережі PROSTOR: декоративна косметика, парфумерія, засоби догляду за шкірою й волоссям, побутова хімія.", logo:"shops/logo/prostor-sq.svg", pics:[]},
-    "1.05":{about:"Свіжі квіти й букети на будь-який привід, кімнатні рослини."},
+    "1.05":{about:"Магазин жіночого одягу «Жасмін» на першому поверсі, праворуч: сукні, костюми, блузи, верхній одяг.", logo:"shops/logo/zhasmin-sq.webp", pics:["shops/1.05-1.webp","shops/1.05-2.webp"]},
     "1.06":{about:"Магазин одягу на першому поверсі, праворуч у дальньому кутку.", pics:[]},
     "1.07":{about:"Килими й доріжки для дому.", pics:[]},
     "1.08":{about:"Магазин «Версаль» на першому поверсі, ліворуч уздовж стіни.", pics:[]},
     "1.09":{about:"Супермаркет закарпатської мережі ALMA: свіжі продукти, власна пекарня й м'ясний цех, товари місцевих виробників і перевірених брендів. На першому поверсі, ліворуч від входу.", phones:["0800212338"], hours:"щодня 8:00–22:00", logo:"shops/logo/alma-sq.svg", pics:[]},
     "1.10":{about:"Острівець «Фурт сервіс» у холі біля ескалаторів. Ще одна точка — праворуч від входу.", pics:[]},
-    "1.11":{about:"Вільний острівець у холі біля ескалаторів. Здається в оренду: телефонуйте адміністрації центру.", pics:[]},
+    "1.11":{about:"Острівець магазину «Жасмін» у холі біля ескалаторів: декор для дому, сувеніри, ікони, посуд і святкові прикраси.", logo:"shops/logo/zhasmin-sq.webp", pics:["shops/1.11-1.webp","shops/1.11-2.webp"]},
     "1.12":{about:"Ювелірний острівець «Золотий вік» у холі біля входу: каблучки, обручки, сережки й ланцюжки із золота та срібла.", logo:"shops/logo/zolotyi-vik-sq.svg", pics:[]},
     "1.13":{about:"Острівець у холі: сушені фрукти на вагу.", pics:[]},
-    "1.14":{about:"«Фурт сервіс» праворуч від входу. Ще один острівець — у холі біля ескалаторів.", pics:[]},
-    "2.01":{about:"Магазин чоловічого одягу: класичні костюми, сорочки, пальта, трикотаж і аксесуари. Допоможемо зібрати образ на весілля, випускний чи ділову зустріч, підгін по фігурі на місці.", phone:"0680000201", hours:"10:00–20:00"},
+    "1.14":{about:"«Фурт сервіс» праворуч від входу. Ще один острівець — у холі біля ескалаторів.", pics:["shops/1.14-1.webp"]},
+    "2.01":{about:"Магазин чоловічого одягу: класичні костюми, сорочки, пальта, трикотаж і аксесуари. Допоможемо зібрати образ на весілля, випускний чи ділову зустріч, підгін по фігурі на місці.", phone:"0683477707", hours:"10:00–20:00", logo:"shops/logo/2.01.webp"},
     "2.02":{about:"Магазин «Зима-Літо» на другому поверсі, праворуч у дальньому кутку.", logo:"shops/logo/2.02.webp", pics:[]},
-    "2.03":{about:"Магазин «Файна пані» на другому поверсі, ліворуч уздовж стіни.", pics:[]},
+    "2.03":{about:"Магазин «Файна пані»: прикраси, біжутерія, аксесуари для волосся й косметика. Другий поверх, праворуч уздовж стіни.", logo:"shops/logo/2.03.webp", pics:["shops/2.03-1.webp"]},
     "2.04":{about:"Магазин Brand на другому поверсі, праворуч уздовж стіни.", logo:"shops/logo/brand-sq.svg", pics:["shops/2.04-1.webp"]},
     "2.05":{about:"Медична клініка «Кредо»: прийом терапевта, педіатра й вузьких спеціалістів, УЗД, аналізи. Запис на зручний час телефоном, результати аналізів надсилаємо на пошту.", phone:"0680000205", hours:"Пн–Сб 8:00–19:00"},
-    "2.06":{about:"Штори, тюль, римські й рулонні штори, карнизи. Понад 300 тканин у наявності, пошиття за вашими розмірами, виїзд на замір і монтаж.", phone:"0680000206", hours:"10:00–19:00"},
-    "2.07":{about:"Магазин «Шарм» на другому поверсі, ліворуч уздовж стіни.", pics:[]},
-    "2.08":{about:"Магазин Astel на другому поверсі, праворуч між «Джентельменом» і «Шторами».", pics:[]},
-    "2.09":{about:"Бутик La Butik на другому поверсі, навпроти ескалаторів.", pics:[]},
+    "2.06":{about:"Салон штор IMPERIA GARDIN: штори, тюль, римські й рулонні штори, карнизи, декоративні подушки. Понад 300 тканин у наявності, пошиття за вашими розмірами, виїзд на замір і монтаж.", phone:"0680000206", hours:"10:00–19:00", logo:"shops/logo/2.06.webp"},
+    "2.07":{about:"Магазин жіночого одягу «Шарм» на другому поверсі, праворуч уздовж стіни.", logo:"shops/logo/sharm-sq.svg", pics:["shops/2.07-1.webp","shops/2.07-2.webp"]},
+    "2.08":{about:"Магазин жіночого одягу Astell на другому поверсі, ліворуч між IMPERIA GARDIN і «Джентельменом».", logo:"shops/logo/astell-sq.svg", pics:["shops/2.08-1.webp"]},
+    "2.09":{about:"Магазин взуття La Butik на другому поверсі, навпроти ескалаторів: чоловіче й жіноче взуття, кросівки, туфлі.", logo:"shops/logo/2.09.webp", pics:["shops/2.09-1.webp"]},
     "3.01":{about:"Ресторан Garden Plaza: європейська й закарпатська кухня, власний бар, літня тераса з краєвидом на гори. Бронювання столів, банкети, доставка по Нересниці та селах поруч.", phone:"0685350099", hours:"10:00–23:00"},
     "3.02":{about:"Спортзал GYM MAXI: бігові доріжки, вільна вага й тренажери. Персональні заняття з тренером і групові з боксу, ММА, фітнесу та стретчингу. У святкові дні зал працює з 12:00 до 22:00.", phones:["0975350099"], hours:"Пн–Сб 8:00–22:00, Нд 13:00–20:00", logo:"shops/logo/3.02.webp", pics:["shops/3.02-1.webp"]},
     "3.03":{about:"Mezey Shop: нова та вживана техніка Apple — iPhone, iPad, MacBook, AirPods і фірмові аксесуари. Ремонт техніки будь-якої складності.", phones:["0968477627"], hours:"Пн–Сб 9:00–18:00, Нд вихідний", logo:"shops/logo/3.03.webp", pics:["shops/3.03-1.webp","shops/3.03-2.webp","shops/3.03-3.webp"]},
@@ -1088,6 +1095,8 @@ footer a:hover{color:var(--gold-hi)}
   const MALL_PHONE = "0685350099";
   // посилання закладів, у яких є свій сайт
   const SHOP_LINKS = {
+    "1.02":[{href:"https://podorozhnyk.ua", label:"podorozhnyk.ua"}],
+    "2.01":[{href:"https://www.instagram.com/gentleman.neresnytsya/", label:"Instagram"}],
     "3.01":[{href:"https://gardenplaza.com.ua", label:"Меню і доставка"}],
     "3.08":[{href:"https://gardenplaza.com.ua", label:"Ресторан Garden Plaza"}],
     "3.02":[{href:"https://www.instagram.com/gym_maxi_new/", label:"Instagram"}],
@@ -1525,6 +1534,13 @@ footer a:hover{color:var(--gold-hi)}
     {unit:"3.07", cls:"wm-img wm-goddes", html:'<img src="shops/logo/3.07-wide.webp" alt="" width="520" height="100" decoding="async">', label:"Goddes"},
     {unit:"2.02", cls:"wm-img wm-zima", html:'<img src="shops/logo/2.02-wide.webp" alt="" width="520" height="112" decoding="async">', label:"Зима-Літо"},
     {unit:"2.04", cls:"wm-img wm-brand", html:'<img src="shops/logo/brand.svg" alt="" width="1220" height="262" decoding="async">', label:"Brand"},
+    {unit:"2.07", cls:"wm-img wm-sharm", html:'<img src="shops/logo/sharm.svg" alt="" width="1140" height="280" decoding="async">', label:"Шарм"},
+    {unit:"2.03", cls:"wm-img wm-faina", html:'<img src="shops/logo/2.03-wide.webp" alt="" width="640" height="107" decoding="async">', label:"Файна пані"},
+    {unit:"2.08", cls:"wm-img wm-astell", html:'<img src="shops/logo/astell.svg" alt="" width="1210" height="240" decoding="async">', label:"Astell"},
+    {unit:"2.06", cls:"wm-img wm-imperia", html:'<img src="shops/logo/2.06-wide.webp" alt="" width="577" height="48" decoding="async">', label:"IMPERIA GARDIN"},
+    {unit:"2.09", cls:"wm-img wm-butik", html:'<img src="shops/logo/2.09-wide.webp" alt="" width="462" height="118" decoding="async">', label:"La Butik"},
+    {unit:"1.02", cls:"wm-img wm-apteka", html:'<img src="shops/logo/1.02-wide.webp" alt="" width="615" height="96" decoding="async">', label:"Аптека Подорожник"},
+    {unit:"1.05", also:["1.11"], cls:"wm-img wm-zhasmin", html:'<img src="shops/logo/zhasmin.webp" alt="" width="361" height="55" decoding="async">', label:"Жасмін"},
     {unit:"3.04", cls:"wm-tiffany", html:"TIFFANY<small>Beauty Salon</small>", label:"Tiffany Beauty Salon"},
     {unit:"3.05", cls:"wm-img", html:'<img src="shops/logo/3.05-wide.webp" alt="" width="500" height="74" decoding="async">', label:"MonoTaxi"},
     {unit:"4.01", cls:"wm-hotel", html:"ГОТЕЛЬ"},
