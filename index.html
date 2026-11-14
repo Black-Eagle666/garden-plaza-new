@@ -774,6 +774,10 @@ footer a:hover{color:var(--gold-hi)}
   footer{padding-top:36px}
   footer .wrap{flex-direction:column;gap:18px}
 }
+/* фото закладів і новин показуємо цілими, у власних пропорціях, без обрізання */
+.cut-info .pics,.card .pics{align-items:start}
+.cut-info .pics img,.cut-info .pics img:only-child,.card .pics img,.card .pics img:only-child{width:100%;height:auto;max-height:80vh;aspect-ratio:auto 4/3;object-fit:contain}
+.post img{aspect-ratio:auto 3/2;object-fit:contain;max-height:560px}
 </style>
 </head>
 <body>
