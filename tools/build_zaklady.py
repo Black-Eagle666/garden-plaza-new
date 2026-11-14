@@ -326,6 +326,7 @@ def place_page(place, places, data):
 {footer_html(up, data)}
 <script src="{up}gp-config.js"></script>
 <script src="../live.js" defer></script>
+<script src="{up}gp-lightbox.js" defer></script>
 </body>
 </html>
 """
