@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0806">
+<title>Новини · кабінет Garden Plaza</title>
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<style>
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 700;font-display:swap;src:url(../../fonts/cormorant-garamond-normal-cyrillic.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 700;font-display:swap;src:url(../../fonts/cormorant-garamond-normal-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
+@font-face{font-family:'Geist';font-style:normal;font-weight:300 700;font-display:swap;src:url(../../fonts/geist-normal-cyrillic.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Geist';font-style:normal;font-weight:300 700;font-display:swap;src:url(../../fonts/geist-normal-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
+:root{
+  --bg:#0A0806;--panel:#14100C;--panel-2:#1C1711;--line:rgba(201,164,106,.22);--line-strong:rgba(201,164,106,.5);
+  --gold:#C9A46A;--gold-light:#E8CC94;--cream:#F4EADC;--muted:#B5A998;--danger:#E58A72;
+  --sans:'Geist',system-ui,-apple-system,'Segoe UI',sans-serif;--serif:'Cormorant Garamond',Georgia,serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--cream);font-family:var(--sans);font-size:16px;line-height:1.5;min-height:100vh}
+a{color:var(--gold-light)}
+button,input,select,textarea{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));background:rgba(10,8,6,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.brand img{width:34px;height:34px;flex:none}
+.brand span{font-size:13px;letter-spacing:.18em;color:var(--gold-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:10px 20px;border-radius:999px;border:1px solid var(--line-strong);background:transparent;color:var(--gold-light);font-size:15px;font-weight:500;cursor:pointer;text-decoration:none}
+.btn:hover{background:rgba(201,164,106,.1);border-color:var(--gold)}
+.btn:focus-visible,input:focus-visible,textarea:focus-visible,.row:focus-visible,.chip:focus-within{outline:2px solid var(--gold-light);outline-offset:2px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-main{background:linear-gradient(135deg,#EED39C,#C9A46A);color:#1A130A;border-color:transparent;font-weight:600}
+.btn-small{min-height:38px;padding:6px 14px;font-size:14px}
+.btn-danger{color:var(--danger);border-color:rgba(229,138,114,.45)}
+.notice{max-width:520px;margin:12vh auto 0;padding:0 16px;text-align:center}
+.notice h1{font-family:var(--serif);font-weight:500;font-size:34px;line-height:1.15;margin:0 0 12px}
+.notice p{color:var(--muted);margin:0 0 14px}
+.placeholder{color:var(--muted);padding:24px 16px}
+.msg{padding:12px 14px;border-radius:12px;border:1px solid;font-size:15px;margin:0 0 14px}
+.msg-error{color:#F6C3B5;border-color:rgba(229,138,114,.5);background:rgba(229,138,114,.08)}
+.msg-ok{color:#D6EBCD;border-color:rgba(159,203,142,.5);background:rgba(159,203,142,.08)}
+.layout{display:block}
+.pane-list{padding:16px}
+.pane-edit{padding:16px 16px 110px}
+.pane-list h1{font-family:var(--serif);font-weight:500;font-size:30px;margin:0 0 4px}
+.pane-list .lead{color:var(--muted);font-size:14px;margin:0 0 14px}
+.rows{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--panel);cursor:pointer}
+.row[aria-current=true]{border-color:var(--gold);background:var(--panel-2)}
+.row img,.row .ph{width:56px;height:56px;flex:none;border-radius:8px;object-fit:cover;background:var(--panel-2)}
+.row .ph{display:grid;place-items:center;color:var(--gold);font-family:var(--serif);font-size:22px}
+.row b{display:block;font-weight:500;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
+.row small{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.row .off{color:var(--danger)}
+.pane-edit h2{font-family:var(--serif);font-weight:500;font-size:28px;margin:0 0 16px}
+.field{margin:0 0 20px}
+.field>label,.field>.label{display:block;font-size:14px;color:var(--gold-light);margin:0 0 6px;font-weight:500}
+.hint{display:block;font-size:13px;color:var(--muted);margin-top:6px}
+input[type=text],input[type=date],textarea{width:100%;min-height:50px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);font-size:16px}
+input[type=date]{color-scheme:dark;max-width:240px}
+textarea{min-height:170px;resize:vertical}
+.counter{float:right;font-size:13px;color:var(--muted);font-weight:400}
+.counter.over{color:var(--danger)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative;display:inline-flex;align-items:center;min-height:40px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2);font-size:14px;cursor:pointer;user-select:none}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip:has(input:checked){background:linear-gradient(135deg,#EED39C,#C9A46A);color:#1A130A;border-color:transparent;font-weight:600}
+.floor-cap{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
+.photo-box{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.photo-box img{width:200px;max-width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
+.check{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.check input{width:22px;height:22px;margin-top:2px;accent-color:#C9A46A;flex:none}
+.actions{position:fixed;left:0;right:0;bottom:0;z-index:15;display:flex;gap:10px;justify-content:flex-end;padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom));background:rgba(10,8,6,.94);border-top:1px solid var(--line)}
+.actions .grow{flex:1}
+@media (min-width:900px){
+  .layout{display:grid;grid-template-columns:380px minmax(0,1fr)}
+  .pane-list{border-right:1px solid var(--line);height:calc(100vh - 59px);overflow:auto;position:sticky;top:59px}
+  .pane-edit{padding:24px 32px 110px;max-width:820px}
+  .pane-edit[hidden],.pane-list[hidden]{display:block!important}
+  .actions{left:380px}
+  #back{display:none}
+}
+</style>
+<script src="../../gp-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img src="../../gp-mark.svg" alt=""><span><b>GARDEN PLAZA</b> · новини</span></div>
+  <a class="btn btn-small" href="../">Заклади</a>
+</header>
+<main id="app"><p class="placeholder">Завантаження…</p></main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Сталі ---------- */
+  var BUCKET = 'tenants';
+  var NEWS_COLUMNS = 'id,kind,title,body,photo_url,unit_ids,valid_until,published,created_at';
+  var KINDS = [['news', 'Новина'], ['promo', 'Акція'], ['sale', 'Знижка'], ['rent', 'Оренда']];
+  var LIMITS = Object.freeze({ title: 120, body: 2000, units: 12, sourceBytes: 20 * 1024 * 1024 });
+  var PHOTO_SIDE = 1600;
+  var PHOTO_QUALITY = 0.85;
+  var PHOTO_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+  var SITE_BASE = '../../';
+
+  var app = document.getElementById('app');
+  var client = null;
+  // current: id новини, 'new' для нової або null, коли форма закрита
+  var state = Object.freeze({ news: [], units: [], current: null, photo: null, busy: false, flash: null });
+  function setState(patch) { state = Object.freeze(Object.assign({}, state, patch)); }
+
+  /* ---------- Допоміжне ---------- */
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+  function kindLabel(code) {
+    var found = KINDS.find(function (k) { return k[0] === code; });
+    return found ? found[1] : 'Новина';
+  }
+  // адреси з бази бувають повні (сховище) або відносні до кореня сайту (shops/…)
+  function assetUrl(src) { return /^https:\/\//.test(src) ? src : SITE_BASE + src; }
+  function formatDate(iso) {
+    var d = new Date(iso);
+    return isNaN(d) ? '' : d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+  function todayIso() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function isExpired(item) { return Boolean(item.valid_until) && item.valid_until < todayIso(); }
+
+  function friendlyError(err, context) {
+    console.error('[кабінет новин] ' + context + ':', err);
+    if (err && err.userMessage) return err.userMessage;
+    var message = String((err && (err.message || err.error_description || err.error)) || '');
+    var code = String((err && (err.code || err.statusCode || err.status)) || '');
+    if (err instanceof TypeError || /failed to fetch|networkerror|load failed/i.test(message)) return 'Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.';
+    if (/jwt expired|invalid jwt|refresh token|not authenticated|session/i.test(message)) return 'Час входу минув. Відкрийте «Заклади» й увійдіть знову.';
+    if (code === '42501' || code === '403' || /row-level security|permission denied|unauthorized/i.test(message)) return 'Цей обліковий запис не має прав адміністратора.';
+    if (code === '23514' || /check constraint/i.test(message)) return 'База не прийняла дані: перевірте заголовок, текст і дату.';
+    if (/payload too large|exceeded the maximum allowed size|413/i.test(message + code)) return 'Файл завеликий. Можна до 5 МБ.';
+    return 'Щось пішло не так. Спробуйте ще раз. Якщо повториться — напишіть розробнику.';
+  }
+
+  function showNotice(title, text, linkText) {
+    app.innerHTML = '<section class="notice"><h1>' + escapeHtml(title) + '</h1><p>' + escapeHtml(text) + '</p>' +
+      (linkText ? '<p><a class="btn btn-main" href="../">' + escapeHtml(linkText) + '</a></p>' : '') + '</section>';
+  }
+
+  /* ---------- Завантаження ---------- */
+  async function loadAll() {
+    var results = await Promise.all([
+      client.from('news').select(NEWS_COLUMNS).order('created_at', { ascending: false }),
+      client.from('units').select('unit_id,floor,name,vacant').order('unit_id')
+    ]);
+    if (results[0].error) throw results[0].error;
+    if (results[1].error) throw results[1].error;
+    setState({ news: results[0].data || [], units: results[1].data || [] });
+  }
+
+  function findNews(id) { return state.news.find(function (n) { return n.id === id; }) || null; }
+
+  /* ---------- Розмітка ---------- */
+  function renderShell() {
+    app.innerHTML = '<div class="layout">' +
+      '<section class="pane-list" id="pane-list" aria-label="Новини">' +
+        '<h1>Новини</h1><p class="lead">Новини, акції, знижки й оголошення про оренду. На сайті їх видно в розділі «Новини».</p>' +
+        '<button type="button" class="btn btn-main" id="add">+ Додати запис</button>' +
+        '<ul class="rows" id="rows"></ul>' +
+      '</section>' +
+      '<section class="pane-edit" id="pane-edit" hidden><p class="placeholder">Оберіть запис зі списку або додайте новий.</p></section>' +
+    '</div>';
+    document.getElementById('add').addEventListener('click', function () { openEditor('new', null); });
+    document.getElementById('rows').addEventListener('click', function (event) {
+      var row = event.target.closest('[data-id]');
+      if (row) openEditor(Number(row.getAttribute('data-id')), null);
+    });
+    renderRows();
+  }
+
+  function renderRows() {
+    var box = document.getElementById('rows');
+    if (!state.news.length) { box.innerHTML = '<li class="placeholder">Записів ще немає.</li>'; return; }
+    box.innerHTML = state.news.map(function (item) {
+      var status = !item.published ? '<span class="off">приховано</span>' : isExpired(item) ? '<span class="off">термін минув</span>' : 'на сайті';
+      var thumb = item.photo_url
+        ? '<img src="' + escapeHtml(assetUrl(item.photo_url)) + '" alt="" loading="lazy">'
+        : '<span class="ph" aria-hidden="true">' + escapeHtml(kindLabel(item.kind).charAt(0)) + '</span>';
+      return '<li><button type="button" class="row" data-id="' + item.id + '" aria-current="' + (state.current === item.id) + '">' + thumb +
+        '<span><b>' + escapeHtml(item.title) + '</b><small>' + escapeHtml(kindLabel(item.kind)) + ' · ' + escapeHtml(formatDate(item.created_at)) + ' · ' + status + '</small></span></button></li>';
+    }).join('');
+  }
+
+  function showPane(which) {
+    document.getElementById('pane-list').hidden = which === 'edit';
+    document.getElementById('pane-edit').hidden = which !== 'edit';
+    if (which === 'edit') window.scrollTo(0, 0);
+  }
+
+  function openEditor(id, flash) {
+    var item = id === 'new' ? null : findNews(id);
+    if (id !== 'new' && !item) return;
+    setState({ current: id, photo: item ? (item.photo_url || null) : null, flash: flash, busy: false });
+    renderEditor(item);
+    renderRows();
+    showPane('edit');
+  }
+
+  function unitChips(selected) {
+    return [1, 2, 3, 4].map(function (floor) {
+      var onFloor = state.units.filter(function (u) { return Number(u.floor) === floor; });
+      if (!onFloor.length) return '';
+      return '<p class="floor-cap">' + floor + ' поверх</p><div class="chips">' + onFloor.map(function (u) {
+        var label = (u.vacant ? 'Вільне' : u.name) + ' · ' + u.unit_id;
+        return '<label class="chip"><input type="checkbox" class="f-unit" value="' + escapeHtml(u.unit_id) + '"' +
+          (selected.indexOf(u.unit_id) !== -1 ? ' checked' : '') + '>' + escapeHtml(label) + '</label>';
+      }).join('') + '</div>';
+    }).join('');
+  }
+
+  function renderEditor(item) {
+    var edit = document.getElementById('pane-edit');
+    var kind = item && item.kind ? item.kind : 'news';
+    var flash = state.flash ? '<p class="msg msg-' + state.flash.type + '" role="status">' + escapeHtml(state.flash.text) + '</p>' : '';
+    edit.innerHTML =
+      '<p><button type="button" class="btn btn-small" id="back">← До списку</button></p>' +
+      '<h2>' + (state.current === 'new' ? 'Новий запис' : 'Редагування запису') + '</h2>' + flash +
+      '<form id="form" novalidate>' +
+        '<div class="field"><span class="label">Що це</span><div class="chips" role="radiogroup" aria-label="Тип запису">' +
+          KINDS.map(function (k) {
+            return '<label class="chip"><input type="radio" name="kind" value="' + k[0] + '"' + (k[0] === kind ? ' checked' : '') + '>' + k[1] + '</label>';
+          }).join('') + '</div>' +
+          '<span class="hint">«Оренда» — оголошення про вільне приміщення: відмітьте його нижче.</span></div>' +
+        '<div class="field"><label for="f-title">Заголовок <span class="counter" id="c-title"></span></label>' +
+          '<input type="text" id="f-title" maxlength="' + LIMITS.title + '" value="' + escapeHtml(item ? item.title : '') + '" placeholder="Наприклад: Знижки до −30% на зимову колекцію"></div>' +
+        '<div class="field"><label for="f-body">Текст <span class="counter" id="c-body"></span></label>' +
+          '<textarea id="f-body" maxlength="' + LIMITS.body + '" placeholder="Коротко: що, де, до якого числа.">' + escapeHtml(item ? item.body : '') + '</textarea></div>' +
+        '<div class="field"><span class="label">Фотографія</span><div class="photo-box" id="photo-box"></div>' +
+          '<span class="hint" id="photo-status">JPG, PNG або WEBP. Найкраще виглядає горизонтальне фото.</span></div>' +
+        '<div class="field"><span class="label">Заклади, яких це стосується</span>' + unitChips(item ? (item.unit_ids || []) : []) +
+          '<span class="hint">Можна не відмічати жодного. На сайті відмічені заклади будуть кнопками, що ведуть на план.</span></div>' +
+        '<div class="field"><label for="f-until">Діє до (необов\'язково)</label>' +
+          '<input type="date" id="f-until" value="' + escapeHtml(item && item.valid_until ? item.valid_until : '') + '">' +
+          '<span class="hint">Після цієї дати запис сам зникне з сайту. Для акцій і знижок краще вказати.</span></div>' +
+        '<div class="field"><label class="check"><input type="checkbox" id="f-published"' + (!item || item.published !== false ? ' checked' : '') + '>' +
+          '<span>Показувати на сайті<span class="hint">Зніміть галочку, щоб сховати запис, не видаляючи його.</span></span></label></div>' +
+        '<div class="actions">' + (state.current !== 'new' ? '<button type="button" class="btn btn-danger" id="delete">Видалити</button>' : '') +
+          '<span class="grow"></span><button type="submit" class="btn btn-main" id="save">Зберегти</button></div>' +
+      '</form>';
+    document.getElementById('back').addEventListener('click', function () { showPane('list'); });
+    document.getElementById('form').addEventListener('submit', onSave);
+    document.getElementById('form').addEventListener('input', updateCounters);
+    var del = document.getElementById('delete');
+    if (del) del.addEventListener('click', onDelete);
+    renderPhoto();
+    updateCounters();
+  }
+
+  function updateCounters() {
+    [['f-title', 'c-title', LIMITS.title], ['f-body', 'c-body', LIMITS.body]].forEach(function (pair) {
+      var length = document.getElementById(pair[0]).value.length;
+      var counter = document.getElementById(pair[1]);
+      counter.textContent = length + ' / ' + pair[2];
+      counter.classList.toggle('over', length > pair[2]);
+    });
+  }
+
+  function renderPhoto() {
+    var box = document.getElementById('photo-box');
+    box.innerHTML = (state.photo ? '<img src="' + escapeHtml(assetUrl(state.photo)) + '" alt="Фото запису">' : '') +
+      '<label class="btn btn-small">' + (state.photo ? 'Замінити фото' : 'Обрати фото') +
+      '<input type="file" id="f-photo" accept="image/png,image/jpeg,image/webp" hidden></label>' +
+      (state.photo ? '<button type="button" class="btn btn-small btn-danger" id="photo-remove">Прибрати</button>' : '');
+    document.getElementById('f-photo').addEventListener('change', function (event) {
+      var file = event.target.files && event.target.files[0];
+      if (file) onPhotoFile(file);
+    });
+    var remove = document.getElementById('photo-remove');
+    if (remove) remove.addEventListener('click', function () { setState({ photo: null }); renderPhoto(); });
+  }
+
+  function setPhotoStatus(text, isError) {
+    var status = document.getElementById('photo-status');
+    status.textContent = text;
+    status.style.color = isError ? 'var(--danger)' : '';
+  }
+
+  /* ---------- Фото ---------- */
+  function loadImage(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject({ userMessage: 'Не вдалося прочитати зображення. Спробуйте інший файл.' }); };
+      img.src = url;
+    });
+  }
+
+  // зменшує фото до PHOTO_SIDE по довшій стороні й стискає: у сховище йде вже невеликий файл
+  async function resizePhoto(file) {
+    var img = await loadImage(file);
+    var scale = Math.min(1, PHOTO_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+    var canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+    var ctx = canvas.getContext('2d');
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    var toBlob = function (type) { return new Promise(function (resolve) { canvas.toBlob(resolve, type, PHOTO_QUALITY); }); };
+    var blob = await toBlob('image/webp');
+    if (blob && blob.type === 'image/webp') return { blob: blob, ext: 'webp', type: 'image/webp' };
+    blob = await toBlob('image/jpeg');
+    if (!blob) throw { userMessage: 'Не вдалося обробити зображення.' };
+    return { blob: blob, ext: 'jpg', type: 'image/jpeg' };
+  }
+
+  function randomPart() {
+    var bytes = new Uint8Array(4);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+  }
+
+  async function onPhotoFile(file) {
+    if (PHOTO_TYPES.indexOf(file.type) === -1) { setPhotoStatus('Цей файл не підходить. Оберіть JPG, PNG або WEBP.', true); return; }
+    if (file.size > LIMITS.sourceBytes) { setPhotoStatus('Файл завеликий. Оберіть фото до 20 МБ.', true); return; }
+    setPhotoStatus('Завантажуємо фото…', false);
+    setState({ busy: true });
+    try {
+      var prepared = await resizePhoto(file);
+      var path = 'news/' + Date.now() + '-' + randomPart() + '.' + prepared.ext;
+      var up = await client.storage.from(BUCKET).upload(path, prepared.blob, { contentType: prepared.type, cacheControl: '31536000', upsert: false });
+      if (up.error) throw up.error;
+      setState({ photo: client.storage.from(BUCKET).getPublicUrl(path).data.publicUrl });
+      renderPhoto();
+      setPhotoStatus('Фото завантажено. Не забудьте натиснути «Зберегти».', false);
+    } catch (err) {
+      setPhotoStatus(friendlyError(err, 'завантаження фото'), true);
+    } finally {
+      setState({ busy: false });
+    }
+  }
+
+  /* ---------- Збереження й видалення ---------- */
+  function readForm() {
+    var form = document.getElementById('form');
+    return {
+      kind: (form.querySelector('input[name=kind]:checked') || {}).value || 'news',
+      title: document.getElementById('f-title').value.trim(),
+      body: document.getElementById('f-body').value.trim(),
+      photo_url: state.photo,
+      unit_ids: Array.from(form.querySelectorAll('.f-unit:checked')).map(function (i) { return i.value; }),
+      valid_until: document.getElementById('f-until').value || null,
+      published: document.getElementById('f-published').checked
+    };
+  }
+
+  function validate(draft) {
+    if (!draft.title) return 'Впишіть заголовок.';
+    if (draft.title.length > LIMITS.title || draft.body.length > LIMITS.body) return 'Заголовок або текст задовгий.';
+    if (draft.unit_ids.length > LIMITS.units) return 'Можна відмітити щонайбільше ' + LIMITS.units + ' закладів.';
+    return '';
+  }
+
+  // показує помилку над формою і лишає в полях те, що людина вже ввела
+  function showFormError(text, draft) {
+    setState({ flash: { type: 'error', text: text } });
+    renderEditor(draft);
+    window.scrollTo(0, 0);
+  }
+
+  async function onSave(event) {
+    event.preventDefault();
+    if (state.busy) return;
+    var draft = readForm();
+    var problem = validate(draft);
+    if (problem) { showFormError(problem, draft); return; }
+    var button = document.getElementById('save');
+    button.disabled = true;
+    button.textContent = 'Зберігаємо…';
+    setState({ busy: true });
+    try {
+      var isNew = state.current === 'new';
+      var res = isNew
+        ? await client.from('news').insert(draft).select(NEWS_COLUMNS)
+        : await client.from('news').update(draft).eq('id', state.current).select(NEWS_COLUMNS);
+      if (res.error) throw res.error;
+      var saved = res.data && res.data[0];
+      // якщо права не пустили — помилки немає, але й рядка у відповідь теж
+      if (!saved) throw { code: '42501' };
+      setState({ news: isNew ? [saved].concat(state.news) : state.news.map(function (n) { return n.id === saved.id ? saved : n; }) });
+      openEditor(saved.id, { type: 'ok', text: saved.published ? 'Збережено. Запис уже на сайті в розділі «Новини».' : 'Збережено. Запис приховано, на сайті його не видно.' });
+    } catch (err) {
+      setState({ busy: false });
+      showFormError(friendlyError(err, 'збереження новини'), draft);
+    }
+  }
+
+  async function onDelete() {
+    var item = findNews(state.current);
+    if (!item || state.busy) return;
+    if (!confirm('Видалити запис «' + item.title + '» назавжди? Повернути його не вийде.')) return;
+    setState({ busy: true });
+    try {
+      var res = await client.from('news').delete().eq('id', item.id).select('id');
+      if (res.error) throw res.error;
+      if (!res.data || !res.data.length) throw { code: '42501' };
+      setState({ news: state.news.filter(function (n) { return n.id !== item.id; }), current: null, busy: false });
+      document.getElementById('pane-edit').innerHTML = '<p class="msg msg-ok" role="status">Запис видалено.</p>';
+      renderRows();
+      showPane('list');
+    } catch (err) {
+      setState({ busy: false });
+      showFormError(friendlyError(err, 'видалення новини'), readForm());
+    }
+  }
+
+  /* ---------- Старт ---------- */
+  async function init() {
+    var cfg = window.GP_CONFIG || {};
+    if (!cfg.supabaseUrl || !cfg.supabaseKey || !window.supabase) {
+      showNotice('Кабінет ще не підключено до бази', 'Коли власник сайту впише адресу бази, тут з\'явиться редактор новин.');
+      return;
+    }
+    client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
+    try {
+      var session = await client.auth.getSession();
+      if (session.error) throw session.error;
+      if (!session.data.session) {
+        showNotice('Спершу увійдіть', 'Новини редагує адміністратор. Увійдіть у кабінет закладів і поверніться сюди.', 'Увійти');
+        return;
+      }
+      await loadAll();
+      renderShell();
+    } catch (err) {
+      showNotice('Не вдалося завантажити', friendlyError(err, 'запуск'), 'До кабінету закладів');
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

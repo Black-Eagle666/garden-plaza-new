@@ -615,6 +615,36 @@ section{padding:110px 0}
 @media (max-width:900px){.board{grid-template-columns:1fr}.card{border-left:0;border-top:1px solid rgba(201,164,106,.28)}}
 
 /* ═══════════ ДЕ ПОЇСТИ ═══════════ */
+/* ——— новини: записи з кабінету (новина, акція, знижка, оренда) ——— */
+.news{padding-bottom:0}
+.news-filter{display:flex;flex-wrap:wrap;gap:8px;margin:-16px 0 28px}
+.news-filter:empty{display:none}
+.news-filter button{padding:9px 18px;border-radius:99px;border:1px solid rgba(201,164,106,.3);background:none;color:#E8DFD1;font:500 14px/1 var(--sans);cursor:pointer}
+.news-filter button:hover{border-color:var(--gold)}
+.news-filter button[aria-pressed="true"]{background:linear-gradient(180deg,#EED39C,#C9A46A);border-color:#EED39C;color:var(--espresso)}
+.news-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.post{--k:var(--gold);display:flex;flex-direction:column;min-width:0;border:1px solid rgba(201,164,106,.2);border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#17120D,#0E0B08)}
+.post.k-promo{--k:var(--coral)}.post.k-sale{--k:var(--moss)}.post.k-rent{--k:#9CC7E8}
+.post img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;background:var(--roast)}
+.post-body{display:flex;flex-direction:column;gap:10px;padding:18px 20px 20px;flex:1}
+.post-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:12.5px;color:var(--muted)}
+.post-kind{padding:5px 10px;border-radius:99px;background:var(--k);color:#14100b;font:700 11px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase}
+.post h3{font:500 26px/1.12 var(--serif);color:#fff;overflow-wrap:anywhere}
+.post p{font-size:14.5px;line-height:1.55;color:#D9CDBB;overflow-wrap:anywhere}
+.post p.is-cut{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:5;line-clamp:5;overflow:hidden}
+.post-more{align-self:flex-start;padding:4px 0;border:0;background:none;color:var(--gold);font:500 13.5px/1.4 var(--sans);text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.post-until{font-size:13px;color:var(--k)}
+.post-units{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
+.post-units button{padding:8px 13px;border-radius:99px;border:1px solid rgba(201,164,106,.35);background:none;color:var(--gold-hi);font:500 13px/1 var(--sans);cursor:pointer}
+.post-units button:hover{background:rgba(201,164,106,.14);border-color:var(--gold)}
+@media (max-width:1000px){.news-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}}
+@media (max-width:640px){
+  .news-filter{margin:-8px calc(var(--gut) * -1) 20px;padding:0 var(--gut);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .news-filter::-webkit-scrollbar{display:none}
+  .news-filter button{flex:none}
+  .news-grid{grid-template-columns:1fr;gap:16px}
+  .post h3{font-size:23px}
+}
 .food{background:linear-gradient(180deg,var(--espresso) 0%,var(--espresso-2) 100%)}
 
 /* ═══════════ ВІДВІДУВАЧАМ ═══════════ */
@@ -826,6 +856,7 @@ footer a:hover{color:var(--gold-hi)}
     <a class="brand" href="#top" aria-label="Garden Plaza, на початок"><img src="gp-mark.svg" alt="" width="46" height="46"><span>GARDEN<br>PLAZA</span></a>
     <nav class="pillnav glass" aria-label="Розділи">
       <a class="is-on" href="#top" aria-current="page"><svg aria-hidden="true"><use href="#i-cube"/></svg>3D Тур</a>
+      <a href="#news" id="navNews" hidden>Новини</a>
       <a href="#map">Магазини</a>
       <a href="#food">Ресторани</a>
       <a href="#guests">Про ТЦ</a>
@@ -865,6 +896,17 @@ footer a:hover{color:var(--gold-hi)}
 </div>
 
 <main>
+<section class="news" id="news" aria-labelledby="news-title" hidden>
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="news-title">Новини</h2>
+      <p>Новини центру, акції й знижки закладів, вільні приміщення в оренду.</p>
+    </div>
+    <div class="news-filter" id="newsFilter" role="group" aria-label="Що показати"></div>
+    <div class="news-grid" id="newsGrid"></div>
+  </div>
+</section>
+
 <section id="map" aria-labelledby="map-title">
   <div class="wrap">
     <div class="sec-head">
@@ -1169,6 +1211,88 @@ footer a:hover{color:var(--gold-hi)}
       clearTimeout(timer);
     }
   }
+  // ——— новини з кабінету: новина, акція, знижка, оренда ———
+  const NEWS_KINDS = {news:"Новини", promo:"Акції", sale:"Знижки", rent:"Оренда"};
+  const NEWS_KIND_ONE = {news:"Новина", promo:"Акція", sale:"Знижка", rent:"Оренда"};
+  const NEWS_LIMIT = 30;
+  // текст довший за стільки знаків згортається до кількох рядків із кнопкою «Читати далі»
+  const NEWS_CUT_CHARS = 260;
+  let news = {items:[], kind:"all"};
+  const localDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const dayLabel = (iso) => {
+    const d = new Date(iso.length === 10 ? `${iso}T12:00:00` : iso);
+    return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("uk-UA", {day:"numeric", month:"long"});
+  };
+
+  // опубліковані записи, термін яких не минув; порожній список, якщо бази немає або вона не відповіла
+  async function loadNews() {
+    const cfg = window.GP_CONFIG || {};
+    if (!cfg.supabaseUrl || !cfg.supabaseKey) return [];
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), BASE_TIMEOUT_MS);
+    try {
+      const query = `select=id,kind,title,body,photo_url,unit_ids,valid_until,created_at&published=eq.true&order=created_at.desc&limit=${NEWS_LIMIT}`;
+      const res = await fetch(`${cfg.supabaseUrl}/rest/v1/news?${query}`, {headers:{apikey:cfg.supabaseKey}, signal:ctrl.signal});
+      if (!res.ok) throw new Error(`база відповіла ${res.status}`);
+      const today = localDay(new Date());
+      return (await res.json())
+        .filter((r) => r && typeof r.title === "string" && r.title && (!r.valid_until || r.valid_until >= today))
+        .map((r) => ({id:Number(r.id), kind:NEWS_KINDS[r.kind] ? r.kind : "news", title:escapeHtml(r.title),
+          body:escapeHtml(String(r.body || "")), photo:safeUrl(r.photo_url), units:Array.isArray(r.unit_ids) ? r.unit_ids.map(String) : [],
+          until:typeof r.valid_until === "string" ? r.valid_until : null, date:String(r.created_at || "")}));
+    } catch (err) {
+      console.warn("Новини з бази не завантажились, секцію не показуємо:", err);
+      return [];
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  // кнопки відмічених закладів ведуть на 3D-план (спільний обробник data-unit)
+  function newsUnitsHtml(item) {
+    const chips = item.units.map((id) => UNITS.find((u) => u.id === id)).filter(Boolean).map((u) =>
+      `<button type="button" data-unit="${u.id}">${u.vacant ? `Приміщення ${u.id}` : u.name} · ${u.f} поверх</button>`);
+    return chips.length ? `<div class="post-units">${chips.join("")}</div>` : "";
+  }
+
+  function newsCardHtml(item) {
+    const photo = item.photo ? `<img src="${item.photo}" alt="" loading="lazy" decoding="async" width="960" height="640">` : "";
+    const long = item.body.length > NEWS_CUT_CHARS;
+    const text = item.body ? `<p${long ? ' class="is-cut"' : ""}>${item.body.replace(/\n/g, "<br>")}</p>` : "";
+    const more = long ? `<button type="button" class="post-more" data-more aria-expanded="false">Читати далі</button>` : "";
+    const until = item.until ? `<span class="post-until">Діє до ${dayLabel(item.until)}</span>` : "";
+    return `<article class="post k-${item.kind}">${photo}<div class="post-body"><div class="post-meta"><span class="post-kind">${NEWS_KIND_ONE[item.kind]}</span><span>${dayLabel(item.date)}</span></div><h3>${item.title}</h3>${text}${more}${until}${newsUnitsHtml(item)}</div></article>`;
+  }
+
+  function renderNews() {
+    const section = $("#news");
+    const has = news.items.length > 0;
+    section.hidden = !has;
+    $("#navNews").hidden = !has;
+    if (!has) return;
+    const kinds = Object.keys(NEWS_KINDS).filter((k) => news.items.some((n) => n.kind === k));
+    // вибір типу показуємо, лише коли є з чого вибирати
+    $("#newsFilter").innerHTML = kinds.length > 1
+      ? [["all", "Усе"], ...kinds.map((k) => [k, NEWS_KINDS[k]])].map(([k, label]) =>
+          `<button type="button" data-news-kind="${k}" aria-pressed="${news.kind === k}">${label}</button>`).join("")
+      : "";
+    const shown = news.kind === "all" ? news.items : news.items.filter((n) => n.kind === news.kind);
+    $("#newsGrid").innerHTML = shown.map(newsCardHtml).join("");
+  }
+
+  function bindNews() {
+    $("#news").addEventListener("click", (e) => {
+      const kindBtn = e.target.closest("[data-news-kind]");
+      if (kindBtn) { news = {...news, kind:kindBtn.dataset.newsKind}; renderNews(); return; }
+      const more = e.target.closest("[data-more]");
+      if (!more) return;
+      const open = more.getAttribute("aria-expanded") !== "true";
+      more.setAttribute("aria-expanded", String(open));
+      more.textContent = open ? "Згорнути" : "Читати далі";
+      more.previousElementSibling.classList.toggle("is-cut", !open);
+    });
+  }
+
   // зони поза приміщеннями; координати в клітинках плану, y більший за висоту поверху — перед фасадом
   const PLATE_ZONES = [{id:"parking", f:1, x:2.4, y:5.85, w:9.6, h:3.3, name:"Паркінг", note:"1000 місць"}];
   // скільки закладів видно в каталозі на телефоні до кнопки «Показати всі»
@@ -2159,7 +2283,10 @@ footer a:hover{color:var(--gold-hi)}
     }
     const wantedUnit = new URLSearchParams(location.search).get("zaklad");
     if (UNITS.some((u) => u.id === wantedUnit)) showShop(wantedUnit);
-  });
+    // новини малюємо після закладів: у кнопках відмічених закладів мають бути вже назви з бази
+    return loadNews();
+  }).then((items) => { news = {...news, items}; renderNews(); });
+  bindNews();
   if ("ResizeObserver" in window) {
     new ResizeObserver(() => { if (cut.floor !== null) requestAnimationFrame(layoutPins); }).observe(cutStage);
   }
