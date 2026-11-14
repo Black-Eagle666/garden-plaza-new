@@ -807,9 +807,10 @@ input[aria-invalid=true]{border-color:var(--danger)}
     { id: 'wide', label: 'Горизонтальне 4:3', ratio: 4 / 3 },
     { id: 'tall', label: 'Вертикальне 3:4', ratio: 3 / 4 },
     { id: 'square', label: 'Квадрат', ratio: 1 },
-    { id: 'pano', label: 'Широке 16:9', ratio: 16 / 9 }
+    { id: 'pano', label: 'Широке 16:9', ratio: 16 / 9 },
+    { id: 'story', label: 'Високе 9:16', ratio: 9 / 16 }
   ];
-  var CROP = Object.freeze({ maxZoom: 4, frameMax: 560, frameMaxHeight: 0.5, margin: 56, outSide: 1600 });
+  var CROP = Object.freeze({ maxZoom: 4, frameMax: 560, frameMaxHeight: 0.42, margin: 56, outSide: 1600 });
 
   // Показує вікно обрізки. Повертає File з обрізаним фото, рядок 'original' («Без обрізки») або null («Скасувати»).
   function cropDialog(img, title, allowOriginal) {
