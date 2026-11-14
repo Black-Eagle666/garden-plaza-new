@@ -267,16 +267,15 @@ def place_page(place, places, data):
     description = about if len(about) <= 160 else about[:157].rsplit(" ", 1)[0] + "…"
     image = absolute(place["logo"] or (place["pics"][0] if place["pics"] else "og.jpg"))
 
-    phones = "".join(f'<a class="btn main" href="tel:+38{n}">{ICON_PHONE}{tel_label(n)}</a>' for n in place["phones"])
-    links = "".join(f'<a class="btn" href="{esc(l["href"])}" target="_blank" rel="noopener">{esc(l["label"])}</a>' for l in place["links"])
+    phones = "".join(f'<a class="btn main live" href="tel:+38{n}">{ICON_PHONE}{tel_label(n)}</a>' for n in place["phones"])
+    links = "".join(f'<a class="btn live" href="{esc(l["href"])}" target="_blank" rel="noopener">{esc(l["label"])}</a>' for l in place["links"])
     acts = (phones + links
             + f'<a class="btn" href="{up}?zaklad={esc(place["id"])}">{ICON_CUBE}Показати на 3D-плані</a>'
             + f'<a class="btn" href="{MAPS_URL}" target="_blank" rel="noopener">{ICON_PIN}Прокласти маршрут</a>')
-    pics = ""
-    if place["pics"]:
-        imgs = "".join(f'<img src="{esc(asset(p, up))}" alt="{esc(place["name"])}, фото {i + 1}" loading="lazy" decoding="async" width="640" height="480">'
-                       for i, p in enumerate(place["pics"]))
-        pics = f'<section><h2>Фото</h2><div class="pics">{imgs}</div></section>'
+    imgs = "".join(f'<img src="{esc(asset(p, up))}" alt="{esc(place["name"])}, фото {i + 1}" loading="lazy" decoding="async" width="640" height="480">'
+                   for i, p in enumerate(place["pics"]))
+    # секція є завжди (порожня схована): скрипт покаже її, якщо фото з'являться в базі
+    pics = f'<section data-live="pics"{"" if imgs else " hidden"}><h2>Фото</h2><div class="pics">{imgs}</div></section>'
     phones_text = ", ".join(tel_label(n) for n in place["phones"]) or "уточнюйте в закладі"
     neighbours = sorted((p for p in places.values() if p["floor"] == place["floor"] and p["slug"] != place["slug"]),
                         key=lambda p: p["name"].lower())
@@ -299,7 +298,7 @@ def place_page(place, places, data):
     return f"""{head_html(title, description, canonical, image, up, data, extra)}
 <body>
 {topbar_html(up, data)}
-<main class="wrap">
+<main class="wrap" data-unit="{esc(place["id"])}" data-slug="{esc(place["slug"])}" data-default-hours="{esc(data["default_hours"])}" data-mall-phone="{esc(data["mall_phone"])}">
   <nav class="crumbs" aria-label="Ви тут"><a href="{up}">Головна</a> <span>›</span> <a href="{up}zaklady/">Заклади</a> <span>›</span> {FLOOR_NAMES[place["floor"]]}</nav>
   <article class="hero">
     {logo_html(place, data, up)}
@@ -307,26 +306,147 @@ def place_page(place, places, data):
       <span class="tag" style="--c:{place["color"]}"><i></i>{esc(place["cat"])}</span>
       <h1>{esc(place["name"])}</h1>
       <p class="where">{FLOOR_NAMES[place["floor"]]}, приміщення {esc(rooms(place))} · ТЦ Garden Plaza New</p>
-      <p class="hrs">Графік: {esc(place["hours"])}</p>
+      <p class="hrs">Графік: <span data-live="hours">{esc(place["hours"])}</span></p>
     </div>
   </article>
   <div class="acts">{acts}</div>
-  <section><h2>Про заклад</h2><p class="about">{esc(about)}</p></section>
+  <section><h2>Про заклад</h2><p class="about" data-live="about">{esc(about)}</p></section>
   {pics}
   <section><h2>Як знайти</h2>
     <dl class="facts">
       <dt>Поверх</dt><dd>{FLOOR_NAMES[place["floor"]]}</dd>
       <dt>Приміщення</dt><dd>{esc(rooms(place))}</dd>
-      <dt>Графік</dt><dd>{esc(place["hours"])}</dd>
-      <dt>Телефон</dt><dd>{esc(phones_text)}</dd>
+      <dt>Графік</dt><dd data-live="hours">{esc(place["hours"])}</dd>
+      <dt>Телефон</dt><dd data-live="phones">{esc(phones_text)}</dd>
       <dt>Адреса</dt><dd>ТЦ Garden Plaza New, {ADDRESS}</dd>
     </dl>
   </section>
   {more}
 </main>
 {footer_html(up, data)}
+<script src="{up}gp-config.js"></script>
+<script src="../live.js" defer></script>
 </body>
 </html>
+"""
+
+
+# Сторінки закладів — готові файли, які перезбираються з бази лише кілька разів на добу.
+# Цей скрипт при відкритті сторінки бере свіжий запис закладу з бази й оновлює назву, опис, графік,
+# телефони, посилання, логотип і фото — тож зміни з кабінету видно одразу. Якщо база не відповіла
+# або в приміщенні вже інший заклад (інша адреса сторінки), сторінка лишається як є.
+LIVE_JS = r"""(function () {
+  'use strict';
+  var cfg = window.GP_CONFIG || {};
+  var main = document.querySelector('main[data-unit]');
+  if (!main || !cfg.supabaseUrl || !cfg.supabaseKey || !window.fetch) return;
+  var UP = '../../';
+  var TIMEOUT_MS = 5000;
+  var ICON_PHONE = __ICON_PHONE__;
+  var COLUMNS = 'unit_id,vacant,slug,name,about,hours,phones,links,logo_url,photos';
+
+  function safeUrl(s) { return typeof s === 'string' && /^(https:\/\/|shops\/)[^"'<>\s]+$/.test(s) ? s : null; }
+  function assetUrl(s) { return /^https:\/\//.test(s) ? s : UP + s; }
+  function telLabel(n) {
+    return n.indexOf('0800') === 0 ? '0 800 ' + n.slice(4, 7) + ' ' + n.slice(7)
+      : '(' + n.slice(0, 3) + ') ' + n.slice(3, 6) + '-' + n.slice(6, 8) + '-' + n.slice(8);
+  }
+  function setText(selector, text) {
+    document.querySelectorAll(selector).forEach(function (el) { el.textContent = text; });
+  }
+
+  function applyButtons(phones, links) {
+    var box = document.querySelector('.acts');
+    if (!box) return;
+    box.querySelectorAll('.live').forEach(function (el) { el.remove(); });
+    var first = box.firstChild;
+    phones.forEach(function (n) {
+      var a = document.createElement('a');
+      a.className = 'btn main live';
+      a.href = 'tel:+38' + n;
+      a.innerHTML = ICON_PHONE;
+      a.appendChild(document.createTextNode(telLabel(n)));
+      box.insertBefore(a, first);
+    });
+    links.forEach(function (l) {
+      var a = document.createElement('a');
+      a.className = 'btn live';
+      a.href = l.href;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = l.label;
+      box.insertBefore(a, first);
+    });
+  }
+
+  function applyLogo(url, name) {
+    var box = document.querySelector('article.hero .logo');
+    if (!box || !url) return;
+    var img = document.createElement('img');
+    img.src = assetUrl(url);
+    img.alt = 'Логотип ' + name;
+    img.width = 160;
+    img.height = 160;
+    box.className = 'logo';
+    box.removeAttribute('aria-hidden');
+    box.removeAttribute('role');
+    box.removeAttribute('aria-label');
+    box.replaceChildren(img);
+  }
+
+  function applyPhotos(photos, name) {
+    var section = document.querySelector('[data-live="pics"]');
+    if (!section) return;
+    var box = section.querySelector('.pics');
+    box.replaceChildren.apply(box, photos.map(function (src, i) {
+      var img = document.createElement('img');
+      img.src = assetUrl(src);
+      img.alt = name + ', фото ' + (i + 1);
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.width = 640;
+      img.height = 480;
+      return img;
+    }));
+    section.hidden = photos.length === 0;
+  }
+
+  function apply(row) {
+    var name = String(row.name || '').trim();
+    if (!name) return;
+    var hours = String(row.hours || '').trim() || main.dataset.defaultHours;
+    var phones = (Array.isArray(row.phones) ? row.phones : []).filter(function (n) { return /^0\d{9}$/.test(n); });
+    if (!phones.length) phones = [main.dataset.mallPhone];
+    var links = (Array.isArray(row.links) ? row.links : []).filter(function (l) { return l && /^https?:\/\//.test(l.href || ''); })
+      .map(function (l) { return { href: String(l.href), label: String(l.label || l.href) }; });
+    var photos = (Array.isArray(row.photos) ? row.photos : []).map(safeUrl).filter(Boolean);
+    var h1 = document.querySelector('article.hero h1');
+    if (h1 && h1.textContent !== name) {
+      document.title = document.title.replace(h1.textContent, name);
+      h1.textContent = name;
+    }
+    setText('[data-live="about"]', String(row.about || '').trim() || name + ' у ТЦ Garden Plaza New.');
+    setText('[data-live="hours"]', hours);
+    setText('[data-live="phones"]', phones.map(telLabel).join(', '));
+    applyButtons(phones, links);
+    applyLogo(safeUrl(row.logo_url), name);
+    applyPhotos(photos, name);
+  }
+
+  var ctrl = 'AbortController' in window ? new AbortController() : null;
+  var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, TIMEOUT_MS);
+  fetch(cfg.supabaseUrl + '/rest/v1/units?unit_id=eq.' + encodeURIComponent(main.dataset.unit) + '&select=' + COLUMNS,
+      { headers: { apikey: cfg.supabaseKey }, signal: ctrl ? ctrl.signal : undefined })
+    .then(function (res) { if (!res.ok) throw new Error('база відповіла ' + res.status); return res.json(); })
+    .then(function (rows) {
+      var row = rows && rows[0];
+      // вільне приміщення або вже інший заклад: ця сторінка про попереднього орендаря, її не чіпаємо
+      if (!row || row.vacant || row.slug !== main.dataset.slug) return;
+      apply(row);
+    })
+    .catch(function (err) { console.warn('Свіжі дані закладу не завантажились, показуємо збережені:', err); })
+    .then(function () { clearTimeout(timer); });
+})();
 """
 
 
@@ -476,6 +596,7 @@ def main():
         page.parent.mkdir(parents=True, exist_ok=True)
         page.write_text(place_page(place, places, data), encoding="utf-8")
     (out / "index.html").write_text(all_places_page(places, data), encoding="utf-8")
+    (out / "live.js").write_text(LIVE_JS.replace("__ICON_PHONE__", json.dumps(ICON_PHONE)), encoding="utf-8")
     (site / "sitemap.xml").write_text(sitemap_xml(places), encoding="utf-8")
     print(f"сторінок закладів: {len(places)}")
     for slug, p in places.items():
