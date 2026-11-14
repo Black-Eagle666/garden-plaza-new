@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ТЦ Garden Plaza New, Нересниця: магазини, ресторан, готель</title>
-<meta name="description" content="Торговий центр Garden Plaza New у Нересниці, вул. Грушевського, 30: магазини, ресторан Garden Plaza, готель. 3D-тур, мапа чотирьох поверхів, ресторан, готель, спортзал, Apple, паркінг на 1000 місць, щодня 10:00–22:00. Телефон (068) 535-00-99.">
+<meta name="description" content="Торговий центр Garden Plaza New у Нересниці, вул. Грушевського, 30: магазини, ресторан Garden Plaza, готель. 3D-тур, мапа чотирьох поверхів, ресторан, готель, спортзал, Apple, паркінг на 120 місць, щодня 10:00–22:00. Телефон (068) 535-00-99.">
 <meta property="og:title" content="ТЦ Garden Plaza New, Нересниця">
 <meta property="og:description" content="Магазини, ресторан і готель в одному місці на вулиці Грушевського.">
 <meta property="og:image" content="og.jpg">
@@ -895,7 +895,7 @@ footer a:hover{color:var(--gold-hi)}
   <div class="quick reveal" style="--d:1.2s">
     <a class="glass" href="#food" data-show-floor="3" data-show="3.01"><i><svg aria-hidden="true"><use href="#i-food"/></svg></i>Ресторани<br>та кафе</a>
     <a class="glass" href="#guests" data-show-floor="4" data-show="4.01"><i><svg aria-hidden="true"><use href="#i-bed"/></svg></i>Готель<br>на 4 поверсі</a>
-    <a class="glass" href="#guests" data-show-floor="1" data-show="parking"><i><svg aria-hidden="true"><use href="#i-park"/></svg></i>Паркінг<br>на 1000 місць</a>
+    <a class="glass" href="#guests" data-show-floor="1" data-show="parking"><i><svg aria-hidden="true"><use href="#i-park"/></svg></i>Паркінг<br>на 120 місць</a>
   </div>
 
   <div class="tagline reveal" style="--d:1.3s" aria-hidden="true"><svg><use href="#i-lotus"/></svg><span>Більше, ніж покупки</span></div>
@@ -953,7 +953,7 @@ footer a:hover{color:var(--gold-hi)}
     <div class="info">
       <div class="info-row">
         <svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="2" y="2" width="26" height="26" rx="4"/><path d="M11 22V8h5a4 4 0 0 1 0 8h-5"/></svg>
-        <h3>Паркінг на 1000 місць</h3><p>Біля входу, безкоштовний для відвідувачів центру, ресторану й готелю.</p>
+        <h3>Паркінг на 120 місць</h3><p>Біля входу, безкоштовний для відвідувачів центру, ресторану й готелю. Є 2 місця для електромобілів і 2 місця для людей з інвалідністю.</p>
       </div>
       <div class="info-row">
         <svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 26V12l11-7 11 7v14"/><path d="M11 26v-8h8v8"/></svg>
@@ -989,7 +989,7 @@ footer a:hover{color:var(--gold-hi)}
           <p style="color:var(--muted);margin-top:8px">Тячівський район, Закарпаття</p>
         </div>
         <div>
-          <p style="font-size:13px;margin-bottom:6px"><span class="fill">ЗАПОВНИТИ: перевірити графік</span></p>
+          <p style="font-size:13px;margin-bottom:6px;color:var(--muted)">Графік роботи</p>
           <table class="hours" id="hours" aria-label="Графік роботи"><tbody></tbody></table>
         </div>
         <div class="btns">
@@ -1010,7 +1010,7 @@ footer a:hover{color:var(--gold-hi)}
     <div class="lease">
       <div>
         <h2 id="lease-title">Відкрийте свій магазин у Garden Plaza New</h2>
-        <p style="margin-top:18px">Вільні приміщення від <span class="fill">ЗАПОВНИТИ</span> м². Покажемо площі й розповімо про умови за одну зустріч.</p>
+        <p style="margin-top:18px">Покажемо площі й розповімо про умови за одну зустріч.</p>
         <div class="btns" style="margin-top:28px">
           <a class="btn" href="tel:+380685350099">Зателефонувати щодо оренди</a>
           <a class="btn ghost" href="https://www.instagram.com/garden_plaza_new/" target="_blank" rel="noopener">Написати в Instagram</a>
@@ -1308,7 +1308,7 @@ footer a:hover{color:var(--gold-hi)}
   }
 
   // зони поза приміщеннями; координати в клітинках плану, y більший за висоту поверху — перед фасадом
-  const PLATE_ZONES = [{id:"parking", f:1, x:2.4, y:5.85, w:9.6, h:3.3, name:"Паркінг", note:"1000 місць"}];
+  const PLATE_ZONES = [{id:"parking", f:1, x:2.4, y:5.85, w:9.6, h:3.3, name:"Паркінг", note:"120 місць"}];
   // скільки закладів видно в каталозі на телефоні до кнопки «Показати всі»
   const LIST_PREVIEW = 6;
 
@@ -1552,7 +1552,7 @@ footer a:hover{color:var(--gold-hi)}
     const zone = PLATE_ZONES.find((zn) => zn.id === id);
     if (zone) {
       return {name:zone.name, tag:"Відвідувачам", color:"var(--gold)", where:`${zone.note}, перед входом`, hours:"цілодобово",
-        about:"Безкоштовний паркінг біля входу для відвідувачів центру, ресторану й готелю.", phones:[MALL_PHONE], logo:null, pics:[], links:SHOP_LINKS[id] || []};
+        about:"Безкоштовний паркінг на 120 місць біля входу для відвідувачів центру, ресторану й готелю. Є 2 місця для електромобілів і 2 місця для людей з інвалідністю.", phones:[MALL_PHONE], logo:null, pics:[], links:SHOP_LINKS[id] || []};
     }
     if (!unit) return null;
     return {id:unit.id, slug:unit.slug, name:unit.name, tag:CATS[unit.cat].name, color:cssVar(CATS[unit.cat].c), where:`${unit.f} поверх, приміщення ${unit.id}`,

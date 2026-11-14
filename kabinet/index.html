@@ -137,6 +137,8 @@ input[aria-invalid=true]{border-color:var(--danger)}
   .photos{grid-template-columns:repeat(4,minmax(0,1fr))}
   .link-row .pair{grid-template-columns:200px 1fr}
 }
+/* на вузькому екрані в шапці лишається знак і кнопки: назва поруч не вміщається */
+@media (max-width:520px){.brand span{display:none}.top .btn-small{padding:6px 12px}}
 </style>
 <script src="../gp-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -144,6 +146,7 @@ input[aria-invalid=true]{border-color:var(--danger)}
 <body>
 <header class="top">
   <div class="brand"><img src="../gp-mark.svg" alt=""><span><b>GARDEN PLAZA</b> · кабінет</span></div>
+  <a class="btn btn-small" href="../" target="_blank" rel="noopener">На сайт ↗</a>
   <a class="btn btn-small" href="novyny/">Новини</a>
   <button type="button" class="btn btn-small" id="logout" hidden>Вийти</button>
 </header>
