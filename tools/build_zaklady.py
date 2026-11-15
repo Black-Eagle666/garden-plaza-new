@@ -560,6 +560,23 @@ footer a{color:var(--gold-hi);text-decoration:none}
 .wm-img img{display:block;width:auto;height:15px;max-width:100%}
 .wm-mid img{height:20px}
 .wm-tall img{height:30px}
+.wm-kids img{height:38px}
+.wm-goddes img{height:22px}
+.wm-zima img{height:26px}
+.wm-brand img{height:24px}
+.wm-sharm img{height:22px}
+.wm-faina img{height:22px}
+.wm-astell img{height:20px}
+.wm-imperia img{height:15px}
+.wm-butik img{height:26px}
+.wm-apteka img{height:17px}
+.wm-zhasmin img{height:17px}
+.wm-gentleman img{height:30px}
+.wm-kylym img{height:26px}
+.wm-lady img{height:20px}
+.wm-versal img{height:17px}
+.wm-credoimg img{height:34px}
+.wm-furt img{height:14px}
 .wm-up img{height:28px;max-width:100%;object-fit:contain}
 .wm-hotel{font:500 12px var(--serif);color:var(--gold-hi);letter-spacing:.18em}
 .wm-plain{font:600 14px/1.15 var(--serif);letter-spacing:.1em;text-transform:uppercase;color:var(--gold-hi);white-space:normal;text-align:center}

@@ -7,12 +7,15 @@
 <meta name="description" content="Торговий центр Garden Plaza New у Нересниці, вул. Грушевського, 30: магазини, ресторан Garden Plaza, готель. 3D-тур, мапа чотирьох поверхів, ресторан, готель, спортзал, Apple, паркінг на 120 місць, щодня 10:00–22:00. Телефон (068) 535-00-99.">
 <meta property="og:title" content="ТЦ Garden Plaza New, Нересниця">
 <meta property="og:description" content="Магазини, ресторан і готель в одному місці на вулиці Грушевського.">
-<meta property="og:image" content="og.jpg">
+<meta property="og:image" content="https://black-eagle666.github.io/garden-plaza-new/og.jpg">
+<meta property="og:url" content="https://black-eagle666.github.io/garden-plaza-new/">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://black-eagle666.github.io/garden-plaza-new/">
 <meta name="theme-color" content="#07080C">
 <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preload" as="image" href="mall.webp" imagesrcset="mall-m.webp 1200w, mall.webp 2400w" imagesizes="(max-width:1100px) 100vw, 177svh">
+<link rel="preload" as="image" href="mall.webp" imagesrcset="mall-m.webp 1200w, mall.webp 2400w" imagesizes="(max-width:1100px) 100vw, 95vw">
 <link rel="preload" as="font" type="font/woff2" href="fonts/geist-normal-cyrillic.woff2" crossorigin>
 <style>
 @font-face{font-family:'Geist';font-style:normal;font-weight:300 700;font-display:swap;src:url(fonts/geist-normal-cyrillic.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
@@ -51,22 +54,14 @@ p{margin:0}
 /* ═══════════ ПЕРШИЙ ЕКРАН: 3D-ТУР ═══════════ */
 .hero{position:relative;height:100vh;height:100svh;min-height:680px;overflow:hidden;background:#07080C;isolation:isolate}
 .scene{position:absolute;top:50%;left:50%;width:max(100%, calc(100svh * 1.7684));aspect-ratio:2688/1520;transform:translate(-50%,-50%);z-index:0}
-.zoom{position:absolute;inset:0;transform-origin:var(--zx,60%) var(--zy,45%);transition:transform 1.8s cubic-bezier(.45,0,.2,1)}
+.zoom{position:absolute;inset:0}
 .zoom img{width:100%;height:100%;display:block}
 .shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:
-  linear-gradient(90deg,rgba(6,5,4,.5) 0%,rgba(6,5,4,.18) 16%,transparent 30%),
-  linear-gradient(0deg,rgba(6,5,4,.92) 0%,rgba(6,5,4,.35) 24%,transparent 38%),
+  linear-gradient(90deg,rgba(6,5,4,.28) 0%,rgba(6,5,4,.08) 14%,transparent 26%),
+  linear-gradient(0deg,rgba(6,5,4,.86) 0%,rgba(6,5,4,.22) 20%,transparent 30%),
   linear-gradient(180deg,rgba(6,5,4,.75) 0%,transparent 15%)}
 .glass{background:rgba(14,11,8,.66);border:1px solid rgba(201,164,106,.30);border-radius:14px;-webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2)}
 
-.tip{position:absolute;left:var(--x);top:var(--y);z-index:2;display:flex;align-items:center;gap:12px;padding:10px 14px 10px 10px;transform:translate(30px,-50%);transition:left .9s cubic-bezier(.45,0,.2,1),top .9s cubic-bezier(.45,0,.2,1),opacity .3s;white-space:nowrap}
-.tip.left{transform:translate(calc(-100% - 30px),-50%)}
-.tip .ic{width:42px;height:42px;border-radius:10px;background:rgba(201,164,106,.16);border:1px solid rgba(201,164,106,.4);display:grid;place-items:center;color:var(--gold-hi)}
-.tip .ic svg{width:22px;height:22px}
-.tip b{display:block;font:600 16px/1.15 var(--sans);color:#fff}
-.tip small{display:block;font-size:12px;color:var(--muted);margin:2px 0 6px}
-.tip a{display:inline-block;font:600 11px/1 var(--sans);text-decoration:none;color:var(--espresso);background:var(--gold);padding:6px 12px;border-radius:99px}
-.tip a:hover{background:var(--gold-hi)}
 
 .hhead{position:absolute;top:0;left:0;right:0;z-index:10;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;padding:20px clamp(20px,2.8vw,44px)}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;justify-self:start}
@@ -173,7 +168,6 @@ p{margin:0}
 .tagline span{font:400 clamp(20px,1.8vw,30px)/1 var(--sans);background:linear-gradient(180deg,#F6DEA8,#C9A46A);-webkit-background-clip:text;background-clip:text;color:transparent;transform:rotate(-4deg);padding-bottom:12px;white-space:nowrap}
 
 /* план поверху: будівля гасне, на її місці розгортається об'ємний план */
-.hero.is-open .tip{opacity:0;pointer-events:none}
 
 .cutaway{position:absolute;z-index:4;left:clamp(20px,2.8vw,44px);right:calc(clamp(16px,1.4vw,26px) + clamp(152px,10.8vw,182px) + 14px);top:13%;bottom:4.5%;display:flex;flex-direction:column;visibility:hidden;pointer-events:none;transition:visibility 0s .5s}
 .hero.is-open .cutaway{visibility:visible;pointer-events:auto;transition-delay:0s}
@@ -332,8 +326,20 @@ p{margin:0}
 
 /* ——— великий екран ——— */
 @media (min-width:1100.02px){
+  /* будівля цілком: фото вписане у вільне місце між шапкою, стрічкою закладів і стовпчиком поверхів.
+     .915 і .58 — частка ширини й висоти кадру, яку займає будівля; .025 і .19 — її лівий і верхній край */
+  .hero{container-type:inline-size}
+  .scene{--col:calc(clamp(16px,1.4vw,26px) + clamp(152px,10.8vw,182px) + 14px);--free-w:calc(100cqw - var(--col) - 20px);--free-h:calc(max(100svh,680px) - 95px - 4.5svh - 246px);
+    --sw:min(calc(var(--free-w) / .915),calc(var(--free-h) / .328));--sh:calc(var(--sw) / 1.7684)}
+  .hero::before{content:"";position:absolute;inset:-48px;z-index:0;background:url(mall-m.webp) center/cover;filter:blur(30px) brightness(.62) saturate(1.05);transition:opacity .4s}
+  .hero.is-open::before{opacity:0}
+  .scene{top:calc(95px + (var(--free-h) - var(--sh) * .58) / 2 - var(--sh) * .19);left:calc(20px + (var(--free-w) - var(--sw) * .915) / 2 - var(--sw) * .025);width:var(--sw);transform:none;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 93%,transparent 100%),linear-gradient(180deg,transparent 0,#000 12%,#000 84%,transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 93%,transparent 100%),linear-gradient(180deg,transparent 0,#000 12%,#000 84%,transparent 100%);
+    -webkit-mask-composite:source-in;mask-composite:intersect}
+  .tagline{bottom:auto;top:104px}
   .shops,.tagline{transition:opacity .4s}
-  .hero.is-open .shops,.hero.is-open .tagline{animation:none;opacity:0;transform:none;pointer-events:none}
+  .hero.is-open .shops,.hero.is-open .tagline{animation:none;opacity:0;transform:none;pointer-events:none;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
   .scene{transition:opacity .8s ease}
   .hero.is-open .scene{opacity:0}
   .hcopy{transition:opacity .4s ease,visibility 0s}
@@ -456,8 +462,6 @@ p{margin:0}
   .scene::after{bottom:0;height:84px;background:linear-gradient(0deg,#07080C,rgba(7,8,12,0))}
   .zoom{position:relative;inset:auto}
   .zoom img{height:auto}
-  .tip b{font-size:14px}
-  .tip .ic{width:34px;height:34px}
 
   .floorsel{position:relative;order:2;right:auto;top:auto;width:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px max(16px,var(--sar)) 0 max(16px,var(--sal))}
   .floorsel button{grid-template-columns:24px 1fr 8px;align-content:center;min-height:62px;background:rgba(26,20,15,.74);-webkit-backdrop-filter:none;backdrop-filter:none}
@@ -510,7 +514,6 @@ p{margin:0}
 @media (max-width:640px){
   .scene{padding-top:calc(54px + env(safe-area-inset-top))}
   .zoom{width:110vw;margin-left:-6vw}
-  .tip{display:none}
   .floorsel{grid-template-columns:repeat(2,1fr)}
   .quick a{flex-direction:column;align-items:flex-start;gap:9px;padding:12px}
   .cut-stage{height:max(250px,min(94vw,62vh,480px));height:max(250px,min(94vw,62dvh,480px))}
@@ -541,8 +544,9 @@ p{margin:0}
 
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .zoom,.tip,.cutaway,.cut-stage{transition:none}
-  *,*::before,*::after{animation-duration:1ms!important;animation-delay:0s!important;animation-iteration-count:1!important}
+  .zoom,.cutaway,.cut-stage{transition:none}
+  *,*::before,*::after{animation-duration:1ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
+  .track{scroll-behavior:auto}
 }
 
 /* ═══════════ МАПА ═══════════ */
@@ -729,6 +733,10 @@ footer a:hover{color:var(--gold-hi)}
 @media (max-width:1100px){
   section{padding:84px 0}
   footer{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+  /* на дотикових екранах зони натискання не менші за 40px */
+  .cats button,.news-filter button,.card .back{min-height:40px}
+  .post-units button{min-height:36px}
+  footer a{display:inline-block;padding:9px 0}
   .tabbar{position:fixed;z-index:40;left:50%;bottom:calc(10px + env(safe-area-inset-bottom));width:min(calc(100% - 20px),440px);transform:translateX(-50%);display:grid;grid-template-columns:repeat(5,1fr);align-items:end;padding:7px 6px 6px;border-radius:22px;border:1px solid rgba(201,164,106,.28);background:rgba(16,12,8,.88);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);box-shadow:0 12px 32px rgba(0,0,0,.55);transition:transform .3s ease,opacity .3s ease}
   .tabbar.is-away{transform:translate(-50%,160%);opacity:0;pointer-events:none}
   .tabbar a,.tabbar button{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;min-height:46px;padding:4px 2px 2px;border:0;background:none;color:var(--muted);font:500 10.5px/1 var(--sans);text-decoration:none;cursor:pointer;transition:color .2s}
@@ -811,8 +819,7 @@ footer a:hover{color:var(--gold-hi)}
 <div class="hero" id="top">
   <div class="scene">
     <div class="zoom" id="zoom">
-      <img src="mall.webp" srcset="mall-m.webp 1200w, mall.webp 2400w" sizes="(max-width:1100px) 100vw, 177svh" alt="Торговий центр Garden Plaza увечері: скляний фасад із підсвіткою, головний вхід і супермаркет ALMA" width="2400" height="1357" fetchpriority="high">
-      <div class="tip glass" id="tip" aria-live="polite"></div>
+      <img src="mall.webp" srcset="mall-m.webp 1200w, mall.webp 2400w" sizes="(max-width:1100px) 100vw, 95vw" alt="Торговий центр Garden Plaza: скляний фасад, головний вхід і супермаркет ALMA на тлі гір" width="2400" height="1357" fetchpriority="high">
     </div>
   </div>
   <div class="shade"></div>
@@ -1185,6 +1192,10 @@ footer a:hover{color:var(--gold-hi)}
   const safeUrl = (s) => (typeof s === "string" && /^(https:\/\/|shops\/)[^"'<>\s]+$/.test(s) ? s : null);
 
   // рядок таблиці units → заклад у форматі сайту. Текст із бази вставляється в HTML, тож екрануємо його тут
+  const SLUG_RE = /^[a-z0-9-]+$/;
+  const PHONE_RE = /^0\d{9}$/;
+  // назва закладу як звичайний текст: для textContent, aria-label і пошуку
+  const plainName = (u) => u.text || u.name;
   function fromBase(base, row) {
     const own = BUILTIN.get(base.id);
     if (row.vacant) {
@@ -1193,13 +1204,17 @@ footer a:hover{color:var(--gold-hi)}
     }
     const cat = CATS[row.cat] ? row.cat : "shop";
     const photos = (row.photos || []).map(safeUrl).filter(Boolean);
-    const sameTenant = own.slug === row.slug;
-    return {...base, slug:row.slug, vacant:false, name:escapeHtml(row.name), cat, about:escapeHtml(row.about || ""),
-      hours:row.hours ? escapeHtml(row.hours) : undefined, phones:(row.phones || []).length ? row.phones : undefined,
+    const slug = SLUG_RE.test(row.slug || "") ? row.slug : undefined;
+    const rawName = String(row.name || "").trim() || base.name;
+    const phones = (Array.isArray(row.phones) ? row.phones : []).filter((n) => PHONE_RE.test(n));
+    const sameTenant = own.slug === slug;
+    // name — уже екранована для вставки в розмітку; text — та сама назва як звичайний текст (підписи, пошук, aria)
+    return {...base, slug, vacant:false, name:escapeHtml(rawName), text:rawName, cat, about:escapeHtml(row.about || ""),
+      ...(row.hours ? {hours:escapeHtml(String(row.hours))} : {}), phones:phones.length ? phones : undefined,
       links:(row.links || []).filter((l) => /^https?:\/\//.test(l.href || "")).map((l) => ({href:escapeHtml(l.href), label:escapeHtml(l.label || l.href)})),
       logo:safeUrl(row.logo_url), wordmark:safeUrl(row.wordmark_url), pics:photos,
       thumb:(sameTenant && own.thumb && sameList(photos, own.pics) ? own.thumb : null) || safeUrl(row.logo_url) || photos[0] || null,
-      tags:sameTenant ? own.tags : `${row.name} ${CATS[cat].name} ${row.slug.replace(/-/g, " ")}`};
+      tags:sameTenant ? own.tags : `${rawName} ${CATS[cat].name} ${(slug || "").replace(/-/g, " ")}`};
   }
 
   // заклади з бази; null, якщо бази не налаштовано або вона не відповіла — тоді лишаються вбудовані
@@ -1212,7 +1227,12 @@ footer a:hover{color:var(--gold-hi)}
       const res = await fetch(`${cfg.supabaseUrl}/rest/v1/units?select=*`, {headers:{apikey:cfg.supabaseKey}, signal:ctrl.signal});
       if (!res.ok) throw new Error(`база відповіла ${res.status}`);
       const byId = new Map((await res.json()).map((r) => [r.unit_id, r]));
-      return UNITS_BASE.map((u) => (byId.has(u.id) ? fromBase(u, byId.get(u.id)) : BUILTIN.get(u.id)));
+      // зіпсований рядок не має валити решту: для нього лишається вбудований заклад
+      return UNITS_BASE.map((u) => {
+        if (!byId.has(u.id)) return BUILTIN.get(u.id);
+        try { return fromBase(u, byId.get(u.id)); }
+        catch (err) { console.warn(`Заклад ${u.id} з бази пропущено:`, err); return BUILTIN.get(u.id); }
+      });
     } catch (err) {
       console.warn("Заклади з бази не завантажились, показуємо вбудовані:", err);
       return null;
@@ -1332,7 +1352,7 @@ footer a:hover{color:var(--gold-hi)}
   const byName = (a, b) => a.name.localeCompare(b.name, "uk");
   const icon = (id) => `<svg aria-hidden="true"><use href="#${id}"/></svg>`;
 
-  const heroEl = $("#top"), zoom = $("#zoom"), tip = $("#tip"), tabbar = $("#tabbar");
+  const heroEl = $("#top"), zoom = $("#zoom"), tabbar = $("#tabbar");
   const cutaway = $("#cutaway"), cutStage = $("#cutStage"), plate = $("#plate");
 
   // ——— каталог: пошук, категорії, 2D-план ———
@@ -1344,7 +1364,7 @@ footer a:hover{color:var(--gold-hi)}
   const matches = (u, s = state) => {
     if (s.cat && u.cat !== s.cat) return false;
     if (!s.query) return true;
-    const hay = norm(`${u.name} ${u.tags} ${u.id}`);
+    const hay = norm(`${plainName(u)} ${u.tags} ${u.id}`);
     return norm(s.query).split(/\s+/).every((w) => hay.includes(w));
   };
   const isFiltering = (s = state) => Boolean(s.cat || s.query);
@@ -1482,7 +1502,7 @@ footer a:hover{color:var(--gold-hi)}
 
   function unitNode(u) {
     const x = u.x*CELL, y = u.y*CELL, w = u.w*CELL, h = u.h*CELL;
-    const g = svgEl("g", {class:"unit", tabindex:0, role:"button", "aria-label":`${u.name}, ${u.id}`, style:`--c:${cssVar(CATS[u.cat].c)}`});
+    const g = svgEl("g", {class:"unit", tabindex:0, role:"button", "aria-label":`${plainName(u)}, ${u.id}`, style:`--c:${cssVar(CATS[u.cat].c)}`});
     if (isFiltering() && !matches(u)) g.classList.add("dim");
     if (state.selected === u.id) g.classList.add("on");
     const outline = u.shape
@@ -1492,7 +1512,7 @@ footer a:hover{color:var(--gold-hi)}
     no.textContent = u.id;
     const small = w < PLAN_NAME_SM.narrowW;
     const nf = small ? PLAN_NAME_SM : PLAN_NAME;
-    const lines = nameLines(u.name, Math.max(1, Math.floor((w - 2 * nf.inset) / nf.charWidth)));
+    const lines = nameLines(plainName(u), Math.max(1, Math.floor((w - 2 * nf.inset) / nf.charWidth)));
     const nm = svgEl("text", {class:small ? "u-name sm" : "u-name", x:x+nf.inset, y:y+h-nf.bottom});
     lines.forEach((line, i) => {
       const row = svgEl("tspan", {x:x+nf.inset, dy:i === 0 ? -(lines.length - 1) * nf.line : nf.line});
@@ -1614,7 +1634,7 @@ footer a:hover{color:var(--gold-hi)}
     // екранному читачеві повідомляємо коротко, а не перечитуємо весь список після кожної літери
     const found = UNITS.filter((x) => matches(x)).length;
     const listStatus = isFiltering() ? `Знайдено закладів: ${found}` : "";
-    $("#cardStatus").textContent = u ? `${u.name}: ${u.f} поверх, приміщення ${u.id}` : listStatus;
+    $("#cardStatus").textContent = u ? `${plainName(u)}: ${u.f} поверх, приміщення ${u.id}` : listStatus;
   }
 
   function render() { renderFloors(); renderPlan(); renderCats(); renderCard(); }
@@ -1634,14 +1654,25 @@ footer a:hover{color:var(--gold-hi)}
   const WEEK = [
     {d:"Щодня, без вихідних", days:[0,1,2,3,4,5,6], open:10, close:22}
   ];
-  const now = new Date();
-  const today = WEEK.find((r) => r.days.includes(now.getDay()));
+  // день тижня й година в Нересниці (київський час), а не на годиннику відвідувача
+  function mallClock() {
+    const local = new Date();
+    try {
+      const parts = Object.fromEntries(new Intl.DateTimeFormat("en-GB", {timeZone:"Europe/Kiev", weekday:"short", hour:"2-digit", minute:"2-digit", hourCycle:"h23"})
+        .formatToParts(local).map((part) => [part.type, part.value]));
+      const day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(parts.weekday);
+      if (day >= 0) return {day, hour:Number(parts.hour) % 24 + Number(parts.minute) / 60};
+    } catch (err) { console.warn("Київський час недоступний, беремо місцевий:", err); }
+    return {day:local.getDay(), hour:local.getHours() + local.getMinutes() / 60};
+  }
+  const clock = mallClock();
+  const today = WEEK.find((r) => r.days.includes(clock.day));
   const hoursTable = $("#hours");
   hoursTable.classList.toggle("multi", WEEK.length > 1);
   hoursTable.querySelector("tbody").innerHTML = WEEK.map((r) =>
     `<tr class="${r === today ? "today" : ""}"><td>${r.d}</td><td>${r.open}:00–${r.close}:00</td></tr>`).join("");
 
-  const hour = now.getHours() + now.getMinutes() / 60;
+  const hour = clock.hour;
   const isOpen = hour >= today.open && hour < today.close;
   const openTitle = isOpen ? `Зараз відчинено, до ${today.close}:00` : `Зараз зачинено, відчинимо о ${today.open}:00`;
   const chip = $("#hoursChip");
@@ -1655,14 +1686,6 @@ footer a:hover{color:var(--gold-hi)}
   statusPill.querySelector("small").textContent = statusTail;
   statusPill.setAttribute("aria-label", `${statusHead} ${statusTail}. Графік і контакти`);
 
-  // показує заклад на 2D-плані каталогу (посилання «Перейти» на фото будівлі)
-  function openUnit(id) {
-    const unit = UNITS.find((x) => x.id === id);
-    if (!unit) return;
-    setState({floor:unit.f, selected:unit.id, cat:null});
-    $("#map").scrollIntoView({behavior:scrollMode()});
-  }
-
   // ——— перший екран: поверхи на будівлі ———
   // x, y — точка на картинці mall.webp у відсотках; unit — приміщення на мапі нижче
   const HERO_FLOORS = {
@@ -1672,7 +1695,6 @@ footer a:hover{color:var(--gold-hi)}
     1:{label:"Магазини й послуги", icon:"i-bag", x:58, y:69, title:"Копійочка", unit:"1.01"}
   };
   const HERO_ORDER = [4, 3, 2, 1];
-  const TIP_FLIP_X = 72;
   const POPULAR = [
     {unit:"3.01", cls:"wm-gp", html:"Garden<br>Plaza", label:"Ресторан Garden Plaza"},
     {unit:"3.03", cls:"wm-mezey", html:'<svg viewBox="0 0 24 28" aria-hidden="true"><use href="#i-apple"/></svg><span>Mezey Shop</span>', label:"Mezey Shop"},
@@ -1700,7 +1722,8 @@ footer a:hover{color:var(--gold-hi)}
     {unit:"1.01", cls:"wm-img wm-mid", html:'<img src="shops/logo/1.01-wide.webp" alt="" width="544" height="120" decoding="async">', label:"Копійочка"},
     {unit:"1.12", cls:"wm-img wm-tall", html:'<img src="shops/logo/zolotyi-vik.svg" alt="" width="100" height="40" decoding="async">', label:"Золотий вік"},
     {unit:"1.04", cls:"wm-img wm-mid", html:'<img src="shops/logo/prostor.svg" alt="" width="195" height="32" decoding="async">', label:"PROSTOR"},
-    {unit:"1.09", cls:"wm-img wm-tall", html:'<img src="shops/logo/alma-wide.webp" alt="" width="437" height="139" decoding="async">', label:"ALMA"}
+    {unit:"1.09", cls:"wm-img wm-tall", html:'<img src="shops/logo/alma-wide.webp" alt="" width="437" height="139" decoding="async">', label:"ALMA"},
+    {unit:"1.13", cls:"wm-img wm-tall", html:'<img src="shops/logo/shafron-wide.webp" alt="" width="769" height="187" decoding="async">', label:"Шафрон"}
   ];
   let hero = {floor:4};
 
@@ -1714,15 +1737,8 @@ footer a:hover{color:var(--gold-hi)}
 
   function setHeroFloor(f) {
     hero = {...hero, floor:f};
-    const h = HERO_FLOORS[f];
     $$("#floorsel [data-floor], #cutFloors [data-floor]").forEach((el) =>
       el.setAttribute("aria-pressed", String(Number(el.dataset.floor) === f)));
-    tip.style.setProperty("--x", `${h.x}%`);
-    tip.style.setProperty("--y", `${h.y}%`);
-    tip.classList.toggle("left", h.x > TIP_FLIP_X);
-    tip.innerHTML = `<span class="ic">${icon(h.icon)}</span><span><b>${h.title}</b><small>${f} поверх · ${h.label}</small><a href="#map" data-go="${h.unit}">Перейти</a></span>`;
-    zoom.style.setProperty("--zx", `${h.x}%`);
-    zoom.style.setProperty("--zy", `${h.y}%`);
   }
 
   // ——— 3D-план поверху ———
@@ -1951,7 +1967,13 @@ footer a:hover{color:var(--gold-hi)}
     $("#cutTitle").textContent = `${f} поверх`;
     const count = UNITS.filter((u) => u.f === f).length;
     const pad = String(f).padStart(2, "0");
-    $("#cutFloors").innerHTML = CUT_FLOORS.map((n) => floorBtnHtml(n)).join("");
+    const floorsBox = $("#cutFloors");
+    const floorsHadFocus = floorsBox.contains(document.activeElement);
+    floorsBox.innerHTML = CUT_FLOORS.map((n) => floorBtnHtml(n)).join("");
+    if (floorsHadFocus) {
+      const current = floorsBox.querySelector('[aria-pressed="true"]');
+      if (current) current.focus({preventScroll:true});
+    }
     $("#cutEyebrow").textContent = `Garden Plaza / поверх ${pad}`;
     $("#cutName").textContent = HERO_FLOORS[f].label;
     $("#cutScheme").textContent = `Схема поверху ${pad}`;
@@ -1972,8 +1994,11 @@ footer a:hover{color:var(--gold-hi)}
       cutaway.scrollTop = 0;
       ensurePlanEntry();
       if (wasClosed) $("#cutClose").focus({preventScroll:true});
-    } else if (scrollY > heroEl.offsetHeight * .25) {
-      heroEl.scrollIntoView({behavior:scrollMode()});
+    } else {
+      if (scrollY > heroEl.offsetHeight * .25) heroEl.scrollIntoView({behavior:scrollMode()});
+      // на великому екрані шапки плану з хрестиком немає: фокус іде на кнопку відкритого поверху
+      const current = floorsBox.querySelector('[aria-pressed="true"]');
+      if (wasClosed && current) current.focus({preventScroll:true});
     }
     if (cut.hl) requestAnimationFrame(() => centerTile(cut.hl));
   }
@@ -2074,6 +2099,7 @@ footer a:hover{color:var(--gold-hi)}
 
   function bindTouchSpin() {
     cutStage.addEventListener("touchstart", (e) => {
+      spinJustEnded = false;
       spin = null;
       pinch = null;
       if (cut.floor === null || isUnfolding() || e.target.closest(".cut-zoom")) return;
@@ -2217,10 +2243,6 @@ footer a:hover{color:var(--gold-hi)}
       const track = $("#track");
       track.scrollBy({left:Number(b.dataset.dir) * track.clientWidth * .6});
     }));
-    tip.addEventListener("click", (e) => {
-      const a = e.target.closest("a[data-go]");
-      if (a) { e.preventDefault(); openUnit(a.dataset.go); }
-    });
 
     const card = $("#card");
     card.addEventListener("click", (e) => {
@@ -2289,19 +2311,26 @@ footer a:hover{color:var(--gold-hi)}
   render();
   // ?zaklad=1.09 — перехід зі сторінки закладу: одразу показуємо його на 3D-плані
   // спершу сторінка малюється з вбудованих даних, а щойно відповість база — перемальовується з її даних
-  loadBaseUnits().then((units) => {
+  // після перезавантаження сторінки в історії міг лишитися крок відкритого плану, якого вже немає
+  if (history.state && history.state.plan) history.replaceState(null, "");
+  const wantedUnit = new URLSearchParams(location.search).get("zaklad");
+  if (UNITS.some((u) => u.id === wantedUnit)) showShop(wantedUnit);
+  // заклади й новини вантажимо разом; новини малюємо після закладів, щоб у кнопках були вже назви з бази
+  Promise.all([loadBaseUnits(), loadNews()]).then(([units, items]) => {
     if (units) {
       UNITS = units;
       buildHero();
       render();
-      if (cut.floor !== null) openCut(cut.floor, cut.hl);
+      // відкритий план оновлюємо, лише якщо його ще не крутили й не збільшували: інакше ракурс скинувся б
+      const planTouched = view.zoom !== 1 || view.px !== 0 || view.py !== 0 || plate.style.getPropertyValue("--rz") !== "";
+      if (cut.floor !== null && !planTouched) openCut(cut.floor, cut.hl);
     }
-    const wantedUnit = new URLSearchParams(location.search).get("zaklad");
-    if (UNITS.some((u) => u.id === wantedUnit)) showShop(wantedUnit);
-    // новини малюємо після закладів: у кнопках відмічених закладів мають бути вже назви з бази
-    return loadNews();
-  }).then((items) => { news = {...news, items}; renderNews(); });
+    news = {...news, items};
+    renderNews();
+  }).catch((err) => console.warn("Дані з кабінету не завантажились:", err));
   bindNews();
+  matchMedia("(max-width:640px)").addEventListener("change", () => requestAnimationFrame(fitPlanLogos));
+  addEventListener("load", fitPlanLogos);
   if ("ResizeObserver" in window) {
     new ResizeObserver(() => { if (cut.floor !== null) requestAnimationFrame(layoutPins); }).observe(cutStage);
   }
