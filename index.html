@@ -488,6 +488,10 @@ p{margin:0}
   .scene::before{top:0;height:calc(150px + env(safe-area-inset-top));background:linear-gradient(180deg,#07080C 0,#07080C 30%,rgba(7,8,12,0) 100%)}
   .scene::after{bottom:0;height:84px;background:linear-gradient(0deg,#07080C,rgba(7,8,12,0))}
   .zoom{position:relative;inset:auto;aspect-ratio:2688/1520}
+  /* кнопки поверхів і стрічку закладів малює скрипт у кінці сторінки: тримаємо під них місце, щоб на повільному
+     зв'язку решта сторінки не стрибала вниз, коли вони з'являться */
+  .floorsel{min-height:62px}
+  #track{min-height:168px}
 
   .floorsel{position:relative;order:2;right:auto;top:auto;width:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px max(16px,var(--sar)) 0 max(16px,var(--sal))}
   .floorsel button{grid-template-columns:24px 1fr 8px;align-content:center;min-height:62px;background:rgba(26,20,15,.74);-webkit-backdrop-filter:none;backdrop-filter:none}
@@ -540,6 +544,7 @@ p{margin:0}
 @media (max-width:640px){
   .scene{padding-top:calc(54px + env(safe-area-inset-top))}
   .zoom{width:110vw;margin-left:-6vw}
+  .floorsel{min-height:140px}
   .floorsel{grid-template-columns:repeat(2,1fr)}
   .quick a{flex-direction:column;align-items:flex-start;gap:9px;padding:12px}
   .cut-stage{height:max(250px,min(94vw,62vh,480px));height:max(250px,min(94vw,62dvh,480px))}
