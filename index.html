@@ -191,6 +191,7 @@ p{margin:0}
 .wm-versal img{height:17px}
 .wm-credoimg img{height:34px}
 .wm-furt img{height:30px}
+.wm-rest img{height:46px}
 /* широкий логотип із кабінету: невідомих пропорцій, тож обмежуємо і висоту, і ширину */
 .wm-up img{height:28px;max-width:100%;object-fit:contain}
 .wm-hotel{font:500 12px var(--serif);color:var(--gold-hi);letter-spacing:.18em}
@@ -201,8 +202,6 @@ p{margin:0}
 .quick i{flex:none;width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:rgba(201,164,106,.16);color:var(--gold-hi)}
 .quick svg{width:18px;height:18px}
 
-.tagline{position:absolute;z-index:2;left:clamp(14px,1.6vw,30px);bottom:calc(4.5% + 232px);display:flex;align-items:flex-end;pointer-events:none}
-.tagline span{font:400 clamp(20px,1.8vw,30px)/1 var(--sans);background:linear-gradient(180deg,#F6DEA8,#C9A46A);-webkit-background-clip:text;background-clip:text;color:transparent;transform:rotate(-4deg);padding-bottom:12px;white-space:nowrap}
 
 /* план поверху: будівля гасне, на її місці розгортається об'ємний план */
 
@@ -281,6 +280,12 @@ p{margin:0}
 .zone::before{content:"";position:absolute;inset:0;border:1px dashed var(--gold-lo);background:repeating-linear-gradient(90deg,rgba(201,164,106,.16) 0 1px,transparent 1px calc(var(--u) * .5)),rgba(201,164,106,.05);animation:pinin .5s ease 1.6s both}
 .zone:focus-visible::before{border-color:var(--gold-hi)}
 
+/* логотип закладу лежить на верхній грані блока; розмір — від самої грані (cqw/cqh). Назва стоїть над блоком на ніжці */
+.blk .top{container-type:size}
+.face{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.face img{width:min(66cqw,66cqh);aspect-ratio:1;object-fit:cover;border-radius:14%;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
+.blk.shaped .face{inset:auto;left:var(--fx,var(--lx,50%));top:var(--fy,var(--ly,50%));transform:translate(-50%,-50%)}
+.blk.shaped .face img{width:20cqw}
 /* підпис стоїть вертикально над блоком; --stem (висота ніжки) і --dx (зсув від краю) рахує layoutPins */
 .plate .lbl{position:absolute;left:var(--lx,50%);top:var(--ly,50%);width:0;height:0;transform:translateZ(var(--h)) rotateZ(var(--rz)) rotateX(calc(var(--rx) * -1))}
 .pin{position:absolute;left:0;bottom:var(--stem,14px);transform:translateX(calc(-50% + var(--dx,0px)));padding:5px 11px;border-radius:99px;border:1px solid var(--c);background:rgba(14,11,8,.92);font:600 12px/1 var(--sans);color:#fff;white-space:nowrap;animation:pinin .4s ease both;animation-delay:calc(1.7s + var(--i) * 70ms)}
@@ -363,9 +368,8 @@ p{margin:0}
 
 /* ——— великий екран ——— */
 @media (min-width:1100.02px){
-  .tagline{bottom:auto;top:104px}
-  .shops,.tagline{transition:opacity .4s}
-  .hero.is-open .shops,.hero.is-open .tagline{animation:none;opacity:0;transform:none;pointer-events:none;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
+  .shops{transition:opacity .4s}
+  .hero.is-open .shops{animation:none;opacity:0;transform:none;pointer-events:none;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
   .scene{transition:opacity .8s ease}
   .hero.is-open .scene{opacity:0}
   .hcopy{transition:opacity .4s ease,visibility 0s}
@@ -456,7 +460,7 @@ p{margin:0}
   .cut-info .pics:has(> img:only-child){grid-template-columns:1fr}
   .cut-info .pics img:only-child{aspect-ratio:16/9}
 }
-@media (max-height:760px) and (min-width:1100.02px){.tagline{display:none}.hcopy{top:14%}}
+@media (max-height:760px) and (min-width:1100.02px){.hcopy{top:14%}}
 @media (max-width:1280px){.pillnav a{padding:9px 14px}.hours-chip{display:none}}
 
 /* ——— планшет і телефон: фото зверху, план відкривається на весь екран ——— */
@@ -464,7 +468,7 @@ p{margin:0}
   html.plan-lock,html.plan-lock body{overflow:hidden}
   .hero{height:auto;min-height:0;overflow:visible;padding:0 0 22px;display:flex;flex-direction:column}
   .hero.is-open{z-index:60}
-  .shade,.tagline,.pillnav,.arrow,.hright .pill-btn:not(.call-btn){display:none}
+  .shade,.pillnav,.arrow,.hright .pill-btn:not(.call-btn){display:none}
   .hcopy{position:absolute;left:0;top:0;width:1px;height:1px;max-width:none;padding:0;overflow:hidden;clip-path:inset(50%)}
   .hero .reveal{animation-delay:calc(var(--d,0s) * .3)}
 
@@ -941,7 +945,6 @@ footer a:hover{color:var(--gold-hi)}
     <a class="glass" href="#guests" data-show-floor="1" data-show="parking"><i><svg aria-hidden="true"><use href="#i-park"/></svg></i>Паркінг<br>на 120 місць</a>
   </div>
 
-  <div class="tagline reveal" style="--d:1.3s" aria-hidden="true"><span>Більше, ніж покупки</span></div>
 </div>
 
 <main>
@@ -1130,8 +1133,8 @@ footer a:hover{color:var(--gold-hi)}
     {id:"2.08",slug:"astel",f:2,x:0,y:1.14,w:2.42,h:2.42,cat:"shop",name:"Astell",about:"Магазин жіночого одягу Astell.",tags:"astell astel астел астелл одяг жіночий куртки пуховики"},
     {id:"2.09",slug:"la-butik",f:2,x:4.54,y:0,w:3.63,h:1.77,cat:"fashion",name:"La Butik",about:"Магазин взуття La Butik.",tags:"la butik ла бутік бутик взуття обув кросівки туфлі черевики"},
 
-    {id:"3.01",slug:"restoran-garden-plaza",f:3,x:3.6,y:0,w:5,h:3,cat:"food",name:"Garden Plaza",about:"Ресторан: кухня й бар, бронювання столу, доставка. Меню з цінами на gardenplaza.com.ua.",tags:"ресторан їжа обід доставка garden plaza бар"},
-    {id:"3.02",slug:"gym-maxi",f:3,x:0,y:6,w:9.75,h:4.9,shape:[[0,6],[3.55,6],[3.55,9],[9.75,9],[9.75,10.9],[0,10.9]],label:[3.2,9.95],cat:"fun",name:"GYM MAXI",about:"Спортзал GYM MAXI.",tags:"gym maxi джим максі спорт спортзал тренажерний зал фітнес бокс мма стретчинг тренер"},
+    {id:"3.01",slug:"restoran-garden-plaza",f:3,x:3.6,y:0,w:5,h:3,cat:"food",name:"Ресторан Garden Plaza",about:"Ресторан: кухня й бар, бронювання столу, доставка. Меню з цінами на gardenplaza.com.ua.",tags:"ресторан їжа обід доставка garden plaza бар"},
+    {id:"3.02",slug:"gym-maxi",f:3,x:0,y:6,w:9.75,h:4.9,shape:[[0,6],[3.55,6],[3.55,9],[9.75,9],[9.75,10.9],[0,10.9]],label:[3.2,9.95],logoAt:[1.75,7.9],cat:"fun",name:"GYM MAXI",about:"Спортзал GYM MAXI.",tags:"gym maxi джим максі спорт спортзал тренажерний зал фітнес бокс мма стретчинг тренер"},
     {id:"3.03",slug:"mezey-shop",f:3,x:9.75,y:4.45,w:2.25,h:1.7,cat:"tech",name:"Mezey Shop",about:"Техніка Apple.",tags:"mezey shop мезей apple епл айфон iphone macbook ipad airpods техніка телефон ремонт"},
     {id:"3.04",slug:"tiffany-beauty-salon",f:3,x:9.75,y:7.75,w:2.25,h:3.15,cat:"services",name:"Tiffany Beauty Salon",about:"Салон краси Tiffany.",tags:"tiffany тіффані тифані салон краси перукарня стрижка фарбування зачіска макіяж манікюр педикюр брови вії косметологія масаж"},
     {id:"3.05",slug:"monotaxi",f:3,x:9.75,y:1.25,w:2.25,h:1.5,cat:"services",name:"MonoTaxi",about:"Служба таксі MonoTaxi.",tags:"monotaxi mono taxi монотаксі таксі офіс доставка тверезий водій"},
@@ -1175,7 +1178,7 @@ footer a:hover{color:var(--gold-hi)}
     "2.07":{about:"Магазин жіночого одягу «Шарм» на другому поверсі, праворуч уздовж стіни.", logo:"shops/logo/sharm-sq.svg", pics:["shops/2.07-1.webp","shops/2.07-2.webp"]},
     "2.08":{about:"Магазин жіночого одягу Astell на другому поверсі, ліворуч між IMPERIA GARDIN і «Джентельменом».", logo:"shops/logo/astell-sq.svg", pics:["shops/2.08-1.webp"]},
     "2.09":{about:"Магазин взуття La Butik на другому поверсі, навпроти ескалаторів: чоловіче й жіноче взуття, кросівки, туфлі.", logo:"shops/logo/2.09.webp", pics:["shops/2.09-1.webp"]},
-    "3.01":{about:"Ресторан Garden Plaza: європейська й закарпатська кухня, власний бар, літня тераса з краєвидом на гори. Бронювання столів, банкети, доставка по Нересниці та селах поруч.", phone:"0685350099", hours:"10:00–23:00", pics:["shops/3.01-1.webp","shops/3.01-2.webp","shops/3.01-3.webp","shops/3.01-4.webp","shops/3.01-5.webp","shops/3.01-6.webp","shops/3.01-7.webp","shops/3.01-8.webp"]},
+    "3.01":{logo:"shops/logo/3.01.webp", about:"Ресторан Garden Plaza: європейська й закарпатська кухня, власний бар, літня тераса з краєвидом на гори. Бронювання столів, банкети, доставка по Нересниці та селах поруч.", phone:"0685350099", hours:"10:00–23:00", pics:["shops/3.01-1.webp","shops/3.01-2.webp","shops/3.01-3.webp","shops/3.01-4.webp","shops/3.01-5.webp","shops/3.01-6.webp","shops/3.01-7.webp","shops/3.01-8.webp"]},
     "3.02":{about:"Спортзал GYM MAXI: бігові доріжки, вільна вага й тренажери. Персональні заняття з тренером і групові з боксу, ММА, фітнесу та стретчингу. У святкові дні зал працює з 12:00 до 22:00.", phones:["0975350099"], hours:"Пн–Сб 8:00–22:00, Нд 13:00–20:00", logo:"shops/logo/3.02.webp", pics:["shops/3.02-1.webp"]},
     "3.03":{about:"Mezey Shop: нова та вживана техніка Apple — iPhone, iPad, MacBook, AirPods і фірмові аксесуари. Ремонт техніки будь-якої складності.", phones:["0968477627"], hours:"Пн–Сб 9:00–18:00, Нд вихідний", logo:"shops/logo/3.03.webp", pics:["shops/3.03-1.webp","shops/3.03-2.webp","shops/3.03-3.webp"]},
     "3.04":{about:"Салон краси Tiffany: фарбування й догляд за волоссям, стрижки, зачіски та макіяж, манікюр і педикюр, брови й вії, косметологія та масаж. Майстра обираєте самі.", phones:[], hours:"уточнюйте в салоні", logo:"shops/logo/3.04.webp"},
@@ -1724,7 +1727,7 @@ footer a:hover{color:var(--gold-hi)}
   };
   const HERO_ORDER = [4, 3, 2, 1];
   const POPULAR = [
-    {unit:"3.01", cls:"wm-gp", html:"Garden<br>Plaza", label:"Ресторан Garden Plaza"},
+    {unit:"3.01", cls:"wm-img wm-rest", html:'<img src="shops/logo/3.01-wide.webp" alt="" width="231" height="251" loading="lazy" decoding="async">', label:"Ресторан Garden Plaza"},
     {unit:"3.03", cls:"wm-mezey", html:'<svg viewBox="0 0 24 28" aria-hidden="true"><use href="#i-apple"/></svg><span>Mezey Shop</span>', label:"Mezey Shop"},
     {unit:"2.01", cls:"wm-img wm-gentleman", html:'<img src="shops/logo/2.01-wide.webp" alt="" width="354" height="100" loading="lazy" decoding="async">', label:"Джентельмен"},
     {unit:"2.05", cls:"wm-img wm-credoimg", html:'<img src="shops/logo/credo.webp" alt="" width="551" height="150" loading="lazy" decoding="async">', label:"КредоКлінік"},
@@ -1802,13 +1805,21 @@ footer a:hover{color:var(--gold-hi)}
     }).join("");
   }
 
+  // логотип закладу, що лежить на верхній грані блока 3D-плану (назва — на ніжці над блоком)
+  function faceHtml(u) {
+    if (u.vacant || !u.logo) return "";
+    // logoAt — де в приміщенні складної форми лежить логотип (клітинки плану); без нього — там, де підпис
+    const spot = u.logoAt ? ` style="--fx:${(u.logoAt[0] - u.x) / u.w * 100}%;--fy:${(u.logoAt[1] - u.y) / u.h * 100}%"` : "";
+    return `<span class="face" aria-hidden="true"${spot}><img src="${u.logo}" alt="" loading="lazy" decoding="async"></span>`;
+  }
+
   function plateHtml(f) {
     const marks = PLATE_MARKS[f].map(([x, y, t, kind]) => `<span class="mk${kind ? ` ${kind}` : ""}" style="left:${cells(x)};top:${cells(y)}">${t}</span>`).join("");
     const rooms = PLAN_ROOMS.filter((r) => r.f === f).map((r) =>
       `<span class="room${r.esc ? ` esc ${r.esc}` : ""}" style="--i:8;left:${cells(r.x)};top:${cells(r.y)};width:${cells(r.w)};height:${cells(r.h)}">${r.esc ? `<span class="lane" style="--lf:${Math.min(r.w * ESC_PLATE_FONT.perCell, ESC_PLATE_FONT.max)}">${ESC_LABEL[r.esc]}</span>` : r.flat ? "" : `<span class="lbl"><span class="pin">${r.name}</span></span>`}</span>`).join("");
     const blocks = UNITS.filter((u) => u.f === f).map((u, i) => {
       const style = `--c:${cssVar(CATS[u.cat].c)};--i:${i};left:calc(${cells(u.x)} + 3px);top:calc(${cells(u.y)} + 3px);width:calc(${cells(u.w)} - 6px);height:calc(${cells(u.h)} - 6px)${labelSpot(u)}${u.shape ? `;--bw:${u.w};--bh:${u.h}` : ""}`;
-      const top = u.shape ? `<i class="top poly">${shapeSvg(u, "glow")}${shapeSvg(u, "")}</i>` : `<i class="top"></i>`;
+      const top = u.shape ? `<i class="top poly">${shapeSvg(u, "glow")}${shapeSvg(u, "")}${faceHtml(u)}</i>` : `<i class="top">${faceHtml(u)}</i>`;
       return `<div class="blk${u.shape ? " shaped" : ""}" role="button" tabindex="0" data-cut-unit="${u.id}" aria-label="${u.name}, приміщення ${u.id}" style="${style}">${u.shape ? shapeWalls(u) : '<i class="ws"></i><i class="wf"></i><i class="wb"></i><i class="we"></i>'}${top}<span class="lbl"><span class="pin">${u.name}<small>${u.id}</small></span></span></div>`;
     }).join("");
     const zones = PLATE_ZONES.filter((zn) => zn.f === f).map((zn) =>
