@@ -54,7 +54,7 @@ p{margin:0}
 .zoom{position:absolute;inset:0;transform-origin:var(--zx,60%) var(--zy,45%);transition:transform 1.8s cubic-bezier(.45,0,.2,1)}
 .zoom img{width:100%;height:100%;display:block}
 .shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:
-  linear-gradient(90deg,rgba(6,5,4,.95) 0%,rgba(6,5,4,.78) 20%,rgba(6,5,4,.25) 38%,transparent 52%),
+  linear-gradient(90deg,rgba(6,5,4,.5) 0%,rgba(6,5,4,.18) 16%,transparent 30%),
   linear-gradient(0deg,rgba(6,5,4,.92) 0%,rgba(6,5,4,.35) 24%,transparent 38%),
   linear-gradient(180deg,rgba(6,5,4,.75) 0%,transparent 15%)}
 .glass{background:rgba(14,11,8,.66);border:1px solid rgba(201,164,106,.30);border-radius:14px;-webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2)}
@@ -509,7 +509,7 @@ p{margin:0}
 /* ——— телефон ——— */
 @media (max-width:640px){
   .scene{padding-top:calc(54px + env(safe-area-inset-top))}
-  .zoom{width:128vw;margin-left:-26vw}
+  .zoom{width:110vw;margin-left:-6vw}
   .tip{display:none}
   .floorsel{grid-template-columns:repeat(2,1fr)}
   .quick a{flex-direction:column;align-items:flex-start;gap:9px;padding:12px}
@@ -811,7 +811,7 @@ footer a:hover{color:var(--gold-hi)}
 <div class="hero" id="top">
   <div class="scene">
     <div class="zoom" id="zoom">
-      <img src="mall.webp" srcset="mall-m.webp 1200w, mall.webp 2400w" sizes="(max-width:1100px) 100vw, 177svh" alt="Торговий центр Garden Plaza увечері: чотири поверхи вітрин і тераса ресторану" width="2400" height="1357" fetchpriority="high">
+      <img src="mall.webp" srcset="mall-m.webp 1200w, mall.webp 2400w" sizes="(max-width:1100px) 100vw, 177svh" alt="Торговий центр Garden Plaza увечері: скляний фасад із підсвіткою, головний вхід і супермаркет ALMA" width="2400" height="1357" fetchpriority="high">
       <div class="tip glass" id="tip" aria-live="polite"></div>
     </div>
   </div>
@@ -1666,10 +1666,10 @@ footer a:hover{color:var(--gold-hi)}
   // ——— перший екран: поверхи на будівлі ———
   // x, y — точка на картинці mall.webp у відсотках; unit — приміщення на мапі нижче
   const HERO_FLOORS = {
-    4:{label:"Готель", icon:"i-bed", x:66, y:28, title:"Готель", unit:"4.01"},
-    3:{label:"Ресторан, спорт, діти, краса", icon:"i-food", x:58, y:41, title:"Ресторан Garden Plaza", unit:"3.01"},
-    2:{label:"Одяг, клініка, штори", icon:"i-hanger", x:84, y:54, title:"Джентельмен", unit:"2.01"},
-    1:{label:"Магазини й послуги", icon:"i-bag", x:44, y:68, title:"Копійочка", unit:"1.01"}
+    4:{label:"Готель", icon:"i-bed", x:42, y:27, title:"Готель", unit:"4.01"},
+    3:{label:"Ресторан, спорт, діти, краса", icon:"i-food", x:66, y:37, title:"Ресторан Garden Plaza", unit:"3.01"},
+    2:{label:"Одяг, клініка, штори", icon:"i-hanger", x:80, y:53, title:"Джентельмен", unit:"2.01"},
+    1:{label:"Магазини й послуги", icon:"i-bag", x:58, y:69, title:"Копійочка", unit:"1.01"}
   };
   const HERO_ORDER = [4, 3, 2, 1];
   const TIP_FLIP_X = 72;
