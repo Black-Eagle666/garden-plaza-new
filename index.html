@@ -15,7 +15,43 @@
 <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preload" as="image" href="mall.webp" imagesrcset="mall-m.webp 1200w, mall.webp 2400w" imagesizes="(max-width:1100px) 100vw, 95vw">
+<script>
+// День чи вечір у Нересниці: від цього залежить фото будівлі на першому екрані (і статус «відчинено» нижче).
+// Перевірити вручну: ?sky=day або ?sky=night у адресі.
+(function () {
+  // приблизний схід і захід сонця за київським часом для кожного місяця (січень…грудень), години
+  var SUN = [[7.5,16.6],[6.8,17.4],[6.2,18.4],[6.0,19.7],[5.2,20.4],[4.9,20.9],[5.1,20.7],[5.8,20.0],[6.5,19.0],[7.2,17.9],[7.0,16.3],[7.5,16.0]];
+  var DUSK_LEAD = 0.4; // вечірнє фото вмикаємо трохи раніше заходу, коли вже сутеніє
+  var PHOTOS = {
+    day:{src:"mall.webp", small:"mall-m.webp", alt:"Торговий центр Garden Plaza: скляний фасад, головний вхід і супермаркет ALMA на тлі гір"},
+    night:{src:"mall-night.webp", small:"mall-night-m.webp", alt:"Торговий центр Garden Plaza увечері: скляний фасад із підсвіткою, головний вхід і супермаркет ALMA"}
+  };
+  var SIZES = "(max-width:1100px) 100vw, 177svh";
+  function mallClock() {
+    var local = new Date();
+    try {
+      var parts = {};
+      new Intl.DateTimeFormat("en-GB", {timeZone:"Europe/Kiev", weekday:"short", month:"numeric", hour:"2-digit", minute:"2-digit", hourCycle:"h23"})
+        .formatToParts(local).forEach(function (part) { parts[part.type] = part.value; });
+      var day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(parts.weekday);
+      var month = Number(parts.month) - 1;
+      if (day >= 0 && month >= 0 && month < 12) return {day:day, month:month, hour:Number(parts.hour) % 24 + Number(parts.minute) / 60};
+    } catch (err) { console.warn("Київський час недоступний, беремо місцевий:", err); }
+    return {day:local.getDay(), month:local.getMonth(), hour:local.getHours() + local.getMinutes() / 60};
+  }
+  var clock = mallClock();
+  var sun = SUN[clock.month];
+  var forced = (/[?&]sky=(day|night)\b/.exec(location.search) || [])[1];
+  var sky = forced || (clock.hour < sun[0] || clock.hour >= sun[1] - DUSK_LEAD ? "night" : "day");
+  var photo = PHOTOS[sky];
+  window.GP_MALL = {clock:clock, sky:sky, photo:photo, srcset:photo.small + " 1200w, " + photo.src + " 2400w", sizes:SIZES};
+  var link = document.createElement("link");
+  link.rel = "preload"; link.as = "image"; link.href = photo.src;
+  link.setAttribute("imagesrcset", window.GP_MALL.srcset);
+  link.setAttribute("imagesizes", SIZES);
+  document.head.appendChild(link);
+})();
+</script>
 <link rel="preload" as="font" type="font/woff2" href="fonts/geist-normal-cyrillic.woff2" crossorigin>
 <style>
 @font-face{font-family:'Geist';font-style:normal;font-weight:300 700;font-display:swap;src:url(fonts/geist-normal-cyrillic.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
@@ -326,17 +362,6 @@ p{margin:0}
 
 /* ——— великий екран ——— */
 @media (min-width:1100.02px){
-  /* будівля цілком: фото вписане у вільне місце між шапкою, стрічкою закладів і стовпчиком поверхів.
-     .915 і .58 — частка ширини й висоти кадру, яку займає будівля; .025 і .19 — її лівий і верхній край */
-  .hero{container-type:inline-size}
-  .scene{--col:calc(clamp(16px,1.4vw,26px) + clamp(152px,10.8vw,182px) + 14px);--free-w:calc(100cqw - var(--col) - 20px);--free-h:calc(max(100svh,680px) - 95px - 4.5svh - 246px);
-    --sw:min(calc(var(--free-w) / .915),calc(var(--free-h) / .328));--sh:calc(var(--sw) / 1.7684)}
-  .hero::before{content:"";position:absolute;inset:-48px;z-index:0;background:url(mall-m.webp) center/cover;filter:blur(30px) brightness(.62) saturate(1.05);transition:opacity .4s}
-  .hero.is-open::before{opacity:0}
-  .scene{top:calc(95px + (var(--free-h) - var(--sh) * .58) / 2 - var(--sh) * .19);left:calc(20px + (var(--free-w) - var(--sw) * .915) / 2 - var(--sw) * .025);width:var(--sw);transform:none;
-    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 93%,transparent 100%),linear-gradient(180deg,transparent 0,#000 12%,#000 84%,transparent 100%);
-    mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 93%,transparent 100%),linear-gradient(180deg,transparent 0,#000 12%,#000 84%,transparent 100%);
-    -webkit-mask-composite:source-in;mask-composite:intersect}
   .tagline{bottom:auto;top:104px}
   .shops,.tagline{transition:opacity .4s}
   .hero.is-open .shops,.hero.is-open .tagline{animation:none;opacity:0;transform:none;pointer-events:none;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
@@ -819,7 +844,14 @@ footer a:hover{color:var(--gold-hi)}
 <div class="hero" id="top">
   <div class="scene">
     <div class="zoom" id="zoom">
-      <img src="mall.webp" srcset="mall-m.webp 1200w, mall.webp 2400w" sizes="(max-width:1100px) 100vw, 95vw" alt="Торговий центр Garden Plaza: скляний фасад, головний вхід і супермаркет ALMA на тлі гір" width="2400" height="1357" fetchpriority="high">
+      <img id="mallImg" alt="" width="2400" height="1357" fetchpriority="high">
+      <script>
+        (function () {
+          var img = document.getElementById("mallImg"), mall = window.GP_MALL;
+          img.sizes = mall.sizes; img.srcset = mall.srcset; img.src = mall.photo.src; img.alt = mall.photo.alt;
+        })();
+      </script>
+      <noscript><img src="mall.webp" alt="Торговий центр Garden Plaza: скляний фасад, головний вхід і супермаркет ALMA на тлі гір" width="2400" height="1357"></noscript>
     </div>
   </div>
   <div class="shade"></div>
@@ -1654,18 +1686,8 @@ footer a:hover{color:var(--gold-hi)}
   const WEEK = [
     {d:"Щодня, без вихідних", days:[0,1,2,3,4,5,6], open:10, close:22}
   ];
-  // день тижня й година в Нересниці (київський час), а не на годиннику відвідувача
-  function mallClock() {
-    const local = new Date();
-    try {
-      const parts = Object.fromEntries(new Intl.DateTimeFormat("en-GB", {timeZone:"Europe/Kiev", weekday:"short", hour:"2-digit", minute:"2-digit", hourCycle:"h23"})
-        .formatToParts(local).map((part) => [part.type, part.value]));
-      const day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(parts.weekday);
-      if (day >= 0) return {day, hour:Number(parts.hour) % 24 + Number(parts.minute) / 60};
-    } catch (err) { console.warn("Київський час недоступний, беремо місцевий:", err); }
-    return {day:local.getDay(), hour:local.getHours() + local.getMinutes() / 60};
-  }
-  const clock = mallClock();
+  // день тижня й година в Нересниці (київський час): рахує скрипт у шапці, він же обирає фото
+  const clock = window.GP_MALL.clock;
   const today = WEEK.find((r) => r.days.includes(clock.day));
   const hoursTable = $("#hours");
   hoursTable.classList.toggle("multi", WEEK.length > 1);
