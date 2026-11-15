@@ -190,7 +190,7 @@ p{margin:0}
 .wm-lady img{height:20px}
 .wm-versal img{height:17px}
 .wm-credoimg img{height:34px}
-.wm-furt img{height:14px}
+.wm-furt img{height:30px}
 /* широкий логотип із кабінету: невідомих пропорцій, тож обмежуємо і висоту, і ширину */
 .wm-up img{height:28px;max-width:100%;object-fit:contain}
 .wm-hotel{font:500 12px var(--serif);color:var(--gold-hi);letter-spacing:.18em}
@@ -202,7 +202,6 @@ p{margin:0}
 .quick svg{width:18px;height:18px}
 
 .tagline{position:absolute;z-index:2;left:clamp(14px,1.6vw,30px);bottom:calc(4.5% + 232px);display:flex;align-items:flex-end;pointer-events:none}
-.tagline svg{width:clamp(80px,7vw,110px);height:auto;color:rgba(201,164,106,.22);margin-right:-34px}
 .tagline span{font:400 clamp(20px,1.8vw,30px)/1 var(--sans);background:linear-gradient(180deg,#F6DEA8,#C9A46A);-webkit-background-clip:text;background-clip:text;color:transparent;transform:rotate(-4deg);padding-bottom:12px;white-space:nowrap}
 
 /* план поверху: будівля гасне, на її місці розгортається об'ємний план */
@@ -823,7 +822,6 @@ footer a:hover{color:var(--gold-hi)}
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <symbol id="i-lotus" viewBox="0 0 64 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M32 4c7.5 9 7.5 22 0 32-7.5-10-7.5-23 0-32z"/><path d="M32 36c-2-11 4-21 15-25 2 12-4 22-15 25z"/><path d="M32 36c2-11-4-21-15-25-2 12 4 22 15 25z"/><path d="M32 38c4-9 14-14 26-12-4 10-14 14-26 12z"/><path d="M32 38c-4-9-14-14-26-12 4 10 14 14 26 12z"/><path d="M16 43h32"/></g></symbol>
     <symbol id="i-cube" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M12 2.5 3.5 7v10l8.5 4.5 8.5-4.5V7zM3.5 7l8.5 4.5L20.5 7M12 11.5v10"/></symbol>
     <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></g></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></g></symbol>
@@ -943,7 +941,7 @@ footer a:hover{color:var(--gold-hi)}
     <a class="glass" href="#guests" data-show-floor="1" data-show="parking"><i><svg aria-hidden="true"><use href="#i-park"/></svg></i>Паркінг<br>на 120 місць</a>
   </div>
 
-  <div class="tagline reveal" style="--d:1.3s" aria-hidden="true"><svg><use href="#i-lotus"/></svg><span>Більше, ніж покупки</span></div>
+  <div class="tagline reveal" style="--d:1.3s" aria-hidden="true"><span>Більше, ніж покупки</span></div>
 </div>
 
 <main>
@@ -1745,7 +1743,7 @@ footer a:hover{color:var(--gold-hi)}
     {unit:"1.07", cls:"wm-img wm-kylym", html:'<img src="shops/logo/kylymovyi-dim.webp" alt="" width="457" height="127" loading="lazy" decoding="async">', label:"Килимовий дім"},
     {unit:"1.06", cls:"wm-img wm-lady", html:'<img src="shops/logo/lady-boutique.webp" alt="" width="534" height="90" loading="lazy" decoding="async">', label:"Lady Boutique"},
     {unit:"1.08", cls:"wm-img wm-versal", html:'<img src="shops/logo/versal.webp" alt="" width="514" height="77" loading="lazy" decoding="async">', label:"Версаль"},
-    {unit:"1.10", also:["1.14"], cls:"wm-img wm-furt", html:'<img src="shops/logo/furt-service.webp" alt="" width="620" height="59" loading="lazy" decoding="async">', label:"Фурт сервіс"},
+    {unit:"1.10", also:["1.14"], cls:"wm-img wm-furt", html:'<img src="shops/logo/furt-service.webp" alt="" width="508" height="120" loading="lazy" decoding="async">', label:"Фурт сервіс"},
     {unit:"3.04", cls:"wm-tiffany", html:"TIFFANY<small>Beauty Salon</small>", label:"Tiffany Beauty Salon"},
     {unit:"3.05", cls:"wm-img", html:'<img src="shops/logo/monotaxi.webp" alt="" width="388" height="50" loading="lazy" decoding="async">', label:"MonoTaxi"},
     {unit:"4.01", cls:"wm-hotel", html:"ГОТЕЛЬ"},
