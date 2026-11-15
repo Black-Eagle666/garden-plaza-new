@@ -224,6 +224,9 @@ p{margin:0}
 /* план крутиться перетягуванням; на телефоні вертикальний рух пальця лишається прокруткою вікна */
 .cut-stage{position:relative;overflow:hidden;cursor:grab;touch-action:pan-y;-webkit-user-select:none;user-select:none}
 /* масштаб плану: кнопки в правому нижньому куті сцени */
+.cut-names-m{position:absolute;left:10px;top:10px;z-index:5;min-height:36px;padding:8px 13px;border-radius:99px;border:1px solid rgba(201,164,106,.45);background:rgba(14,11,8,.86);color:#E8DFD1;font:600 12px/1 var(--sans);cursor:pointer;white-space:nowrap;opacity:0;transition:opacity .4s}
+.hero.is-open .cut-names-m{opacity:1;transition-delay:1.2s}
+.cut-names-m[aria-pressed="true"]{background:rgba(201,164,106,.22);border-color:var(--gold);color:#fff}
 .cut-zoom{position:absolute;right:10px;bottom:10px;z-index:5;display:flex;flex-direction:column;gap:6px;opacity:0;transition:opacity .4s}
 .hero.is-open .cut-zoom{opacity:1;transition-delay:1.2s}
 .cut-zoom button{width:38px;height:38px;padding:0;border-radius:50%;border:1px solid rgba(201,164,106,.45);background:rgba(14,11,8,.86);color:var(--gold-hi);display:grid;place-items:center;cursor:pointer;transition:background .2s}
@@ -285,7 +288,7 @@ p{margin:0}
 .face{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
 .face img{width:min(66cqw,66cqh);aspect-ratio:1;object-fit:cover;border-radius:14%;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
 .blk.shaped .face{inset:auto;left:var(--fx,var(--lx,50%));top:var(--fy,var(--ly,50%));transform:translate(-50%,-50%)}
-.blk.shaped .face img{width:20cqw}
+.blk.shaped .face img{width:var(--fw,12cqw)}
 /* підпис стоїть вертикально над блоком; --stem (висота ніжки) і --dx (зсув від краю) рахує layoutPins */
 .plate .lbl{position:absolute;left:var(--lx,50%);top:var(--ly,50%);width:0;height:0;transform:translateZ(var(--h)) rotateZ(var(--rz)) rotateX(calc(var(--rx) * -1))}
 .pin{position:absolute;left:0;bottom:var(--stem,14px);transform:translateX(calc(-50% + var(--dx,0px)));padding:5px 11px;border-radius:99px;border:1px solid var(--c);background:rgba(14,11,8,.92);font:600 12px/1 var(--sans);color:#fff;white-space:nowrap;animation:pinin .4s ease both;animation-delay:calc(1.7s + var(--i) * 70ms)}
@@ -419,6 +422,7 @@ p{margin:0}
   .cut-zoom{right:16px;bottom:16px;align-items:center;gap:4px;padding:6px;border-radius:99px;border:1px solid rgba(201,164,106,.3);background:rgba(14,11,8,.8)}
   .cut-zoom button{width:34px;height:34px}
   .cut-zoom [data-zoom="reset"]{display:none}
+  .cut-names-m{display:none}
   .cut-pct{display:block;font:500 10.5px/1 var(--sans);color:var(--muted);padding:3px 0}
   .cut-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 22px;border-top:1px solid rgba(201,164,106,.16)}
   .cut-hint,.cutaway.has-info .cut-hint{display:block;max-width:none;margin:0;font:500 10.5px/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;text-align:left;color:var(--muted)}
@@ -886,6 +890,7 @@ footer a:hover{color:var(--gold-hi)}
         </div>
       </div>
       <div class="cut-stage" id="cutStage"><div class="plate" id="plate"></div>
+      <button class="cut-names-m" type="button" id="cutNamesM" aria-pressed="false">Приховати назви</button>
       <div class="cut-zoom" role="group" aria-label="Масштаб плану">
         <button type="button" data-zoom="in" aria-label="Збільшити план"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 5v14M5 12h14"/></svg></button>
         <span class="cut-pct" id="cutPct" aria-hidden="true">100%</span>
@@ -1134,7 +1139,7 @@ footer a:hover{color:var(--gold-hi)}
     {id:"2.09",slug:"la-butik",f:2,x:4.54,y:0,w:3.63,h:1.77,cat:"fashion",name:"La Butik",about:"Магазин взуття La Butik.",tags:"la butik ла бутік бутик взуття обув кросівки туфлі черевики"},
 
     {id:"3.01",slug:"restoran-garden-plaza",f:3,x:3.6,y:0,w:5,h:3,cat:"food",name:"Ресторан Garden Plaza",about:"Ресторан: кухня й бар, бронювання столу, доставка. Меню з цінами на gardenplaza.com.ua.",tags:"ресторан їжа обід доставка garden plaza бар"},
-    {id:"3.02",slug:"gym-maxi",f:3,x:0,y:6,w:9.75,h:4.9,shape:[[0,6],[3.55,6],[3.55,9],[9.75,9],[9.75,10.9],[0,10.9]],label:[3.2,9.95],logoAt:[1.75,7.9],cat:"fun",name:"GYM MAXI",about:"Спортзал GYM MAXI.",tags:"gym maxi джим максі спорт спортзал тренажерний зал фітнес бокс мма стретчинг тренер"},
+    {id:"3.02",slug:"gym-maxi",f:3,x:0,y:6,w:9.75,h:4.9,shape:[[0,6],[3.55,6],[3.55,9],[9.75,9],[9.75,10.9],[0,10.9]],label:[3.2,9.95],logoAt:[1.75,7.9],logoW:1.95,cat:"fun",name:"GYM MAXI",about:"Спортзал GYM MAXI.",tags:"gym maxi джим максі спорт спортзал тренажерний зал фітнес бокс мма стретчинг тренер"},
     {id:"3.03",slug:"mezey-shop",f:3,x:9.75,y:4.45,w:2.25,h:1.7,cat:"tech",name:"Mezey Shop",about:"Техніка Apple.",tags:"mezey shop мезей apple епл айфон iphone macbook ipad airpods техніка телефон ремонт"},
     {id:"3.04",slug:"tiffany-beauty-salon",f:3,x:9.75,y:7.75,w:2.25,h:3.15,cat:"services",name:"Tiffany Beauty Salon",about:"Салон краси Tiffany.",tags:"tiffany тіффані тифані салон краси перукарня стрижка фарбування зачіска макіяж манікюр педикюр брови вії косметологія масаж"},
     {id:"3.05",slug:"monotaxi",f:3,x:9.75,y:1.25,w:2.25,h:1.5,cat:"services",name:"MonoTaxi",about:"Служба таксі MonoTaxi.",tags:"monotaxi mono taxi монотаксі таксі офіс доставка тверезий водій"},
@@ -1748,7 +1753,7 @@ footer a:hover{color:var(--gold-hi)}
     {unit:"1.08", cls:"wm-img wm-versal", html:'<img src="shops/logo/versal.webp" alt="" width="514" height="77" loading="lazy" decoding="async">', label:"Версаль"},
     {unit:"1.10", also:["1.14"], cls:"wm-img wm-furt", html:'<img src="shops/logo/furt-service.webp" alt="" width="508" height="120" loading="lazy" decoding="async">', label:"Фурт сервіс"},
     {unit:"3.04", cls:"wm-tiffany", html:"TIFFANY<small>Beauty Salon</small>", label:"Tiffany Beauty Salon"},
-    {unit:"3.05", cls:"wm-img", html:'<img src="shops/logo/monotaxi.webp" alt="" width="388" height="50" loading="lazy" decoding="async">', label:"MonoTaxi"},
+    {unit:"3.05", cls:"wm-img wm-mid", html:'<img src="shops/logo/monotaxi.webp" alt="" width="500" height="74" loading="lazy" decoding="async">', label:"MonoTaxi"},
     {unit:"4.01", cls:"wm-hotel", html:"ГОТЕЛЬ"},
     {unit:"1.01", cls:"wm-img wm-mid", html:'<img src="shops/logo/1.01-wide.webp" alt="" width="544" height="120" loading="lazy" decoding="async">', label:"Копійочка"},
     {unit:"1.12", cls:"wm-img wm-tall", html:'<img src="shops/logo/zolotyi-vik.svg" alt="" width="100" height="40" loading="lazy" decoding="async">', label:"Золотий вік"},
@@ -1808,8 +1813,13 @@ footer a:hover{color:var(--gold-hi)}
   // логотип закладу, що лежить на верхній грані блока 3D-плану (назва — на ніжці над блоком)
   function faceHtml(u) {
     if (u.vacant || !u.logo) return "";
-    // logoAt — де в приміщенні складної форми лежить логотип (клітинки плану); без нього — там, де підпис
-    const spot = u.logoAt ? ` style="--fx:${(u.logoAt[0] - u.x) / u.w * 100}%;--fy:${(u.logoAt[1] - u.y) / u.h * 100}%"` : "";
+    // logoAt — де в приміщенні складної форми лежить логотип (клітинки плану); без нього — там, де підпис.
+    // logoW — ширина логотипа в клітинках; без неї — типова для блоків складної форми
+    const vars = [
+      ...(u.logoAt ? [`--fx:${(u.logoAt[0] - u.x) / u.w * 100}%`, `--fy:${(u.logoAt[1] - u.y) / u.h * 100}%`] : []),
+      ...(u.logoW ? [`--fw:${u.logoW / u.w * 100}cqw`] : [])
+    ];
+    const spot = vars.length ? ` style="${vars.join(";")}"` : "";
     return `<span class="face" aria-hidden="true"${spot}><img src="${u.logo}" alt="" loading="lazy" decoding="async"></span>`;
   }
 
@@ -2112,7 +2122,7 @@ footer a:hover{color:var(--gold-hi)}
   function bindPointerSpin() {
     const own = (e) => spin && e.pointerId === spin.id;
     cutStage.addEventListener("pointerdown", (e) => {
-      if (e.pointerType === "touch" || e.button !== 0 || cut.floor === null || isUnfolding() || e.target.closest(".cut-zoom")) return;
+      if (e.pointerType === "touch" || e.button !== 0 || cut.floor === null || isUnfolding() || e.target.closest(".cut-zoom, .cut-names-m")) return;
       startSpin(e.pointerId, e.clientX, e.clientY, true);
     });
     cutStage.addEventListener("pointermove", (e) => {
@@ -2141,7 +2151,7 @@ footer a:hover{color:var(--gold-hi)}
       spinJustEnded = false;
       spin = null;
       pinch = null;
-      if (cut.floor === null || isUnfolding() || e.target.closest(".cut-zoom")) return;
+      if (cut.floor === null || isUnfolding() || e.target.closest(".cut-zoom, .cut-names-m")) return;
       if (e.touches.length === 2) {
         pinch = {gap:touchGap(e), at:stagePoint(touchMid(e)), view};
         return;
@@ -2270,13 +2280,18 @@ footer a:hover{color:var(--gold-hi)}
     $("#cutClose").addEventListener("click", () => closeCut());
     $("#cutClose2").addEventListener("click", () => closeCut());
     $("#cutReset").addEventListener("click", () => { if (cut.floor === null) return; resetView(); queuePins(); });
-    $("#cutNames").addEventListener("click", (e) => {
+    // «Приховати назви»: одна кнопка в шапці плану на великому екрані, друга — на самому плані на телефоні
+    const nameToggles = $$("#cutNames, #cutNamesM");
+    const toggleNames = () => {
       const hide = !cutaway.classList.contains("no-names");
       cutaway.classList.toggle("no-names", hide);
-      e.currentTarget.setAttribute("aria-pressed", String(hide));
-      e.currentTarget.textContent = hide ? "Показати назви" : "Приховати назви";
+      nameToggles.forEach((b) => {
+        b.setAttribute("aria-pressed", String(hide));
+        b.textContent = hide ? "Показати назви" : "Приховати назви";
+      });
       if (!hide) queuePins();
-    });
+    };
+    nameToggles.forEach((b) => b.addEventListener("click", toggleNames));
     $("#tabPlan").addEventListener("click", () => showFloor(cut.last));
     $$(".shop-row .arrow").forEach((b) => b.addEventListener("click", () => {
       const track = $("#track");
