@@ -1,4 +1,4 @@
-# Сторінки закладів (zaklady/) перезбираються з бази кабінету й заливаються на сайт, якщо щось змінилось.
+# Сторінки закладів (zaklady/) перезбираються з бази кабінету й потрапляють на сайт, якщо щось змінилось.
 # Головна сторінка бере заклади з бази сама й одразу; цей розклад потрібен лише для окремих сторінок закладів.
 name: Сторінки закладів з бази
 
@@ -17,9 +17,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
 
@@ -31,7 +28,6 @@ jobs:
         run: python3 tools/build_zaklady.py . --from-base
 
       - name: Залити, якщо щось змінилось
-        id: publish
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -46,11 +42,5 @@ jobs:
           else
             git commit -m "chore: сторінки закладів з бази кабінету"
           fi
+          # після push Cloudflare сам збирає й заливає сайт (Workers Builds, репозиторій підключено до воркера tc-garden-plaza)
           git push
-          echo "changed=true" >> "$GITHUB_OUTPUT"
-
-      # Основний сайт — на Cloudflare (tcgardenplaza.com.ua). Крок працює, коли в репозиторії є секрети
-      # CLOUDFLARE_API_TOKEN і CLOUDFLARE_ACCOUNT_ID; без них нові сторінки заливає ./cloudflare/deploy.sh з комп'ютера.
-      - name: Залити на Cloudflare
-        if: ${{ steps.publish.outputs.changed == 'true' && env.CLOUDFLARE_API_TOKEN != '' }}
-        run: bash cloudflare/deploy.sh
