@@ -185,13 +185,21 @@ input[aria-invalid=true]{border-color:var(--danger)}
   var IMAGE_QUALITY = 0.85;
   var SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
   var ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
+  // Магазин входить за логіном (адреса сторінки закладу); у базі це пошта на службовому домені.
+  var LOGIN_DOMAIN = 'shop.gardenplaza.com.ua';
+  var ACCESS_FUNCTION = 'gp-access';
+  // Поля, які магазин бачить, але не міняє: їх веде адміністратор ТЦ.
+  var OWNER_LOCKED_FIELDS = ['f-name', 'f-cat', 'f-slug'];
 
   var app = document.getElementById('app');
   var logoutBtn = document.getElementById('logout');
   var client = null;
 
   // Увесь стан — незмінний об'єкт, який щоразу замінюється новим.
-  var state = Object.freeze({ units: [], search: '', currentId: null, media: null, slugTouched: false, snapshot: '', busy: 0, flash: null });
+  // role: 'admin' — адміністратор ТЦ, 'owner' — магазин (бачить лише ownIds), 'none' — без доступу.
+  // access: {номер приміщення: логін магазину}; issued: щойно виданий логін і пароль (показуємо один раз).
+  var EMPTY_SESSION = Object.freeze({ units: [], currentId: null, media: null, snapshot: '', flash: null, role: 'none', ownIds: [], access: {}, issued: null });
+  var state = Object.freeze(Object.assign({ search: '', slugTouched: false, busy: 0 }, EMPTY_SESSION));
   function setState(patch) { state = Object.freeze(Object.assign({}, state, patch)); }
 
   /* ---------- Допоміжне ---------- */
@@ -302,12 +310,12 @@ input[aria-invalid=true]{border-color:var(--danger)}
     if (err instanceof TypeError || /failed to fetch|networkerror|load failed|network request failed/i.test(message) || (err && err.name === 'AuthRetryableFetchError')) {
       return 'Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.';
     }
-    if (/invalid login credentials|invalid_credentials/i.test(message + code)) return 'Неправильна пошта або пароль.';
-    if (/email not confirmed/i.test(message)) return 'Цю пошту ще не підтверджено. Зверніться до власника кабінету.';
+    if (/invalid login credentials|invalid_credentials/i.test(message + code)) return 'Неправильний логін або пароль.';
+    if (/email not confirmed/i.test(message)) return 'Цей обліковий запис ще не підтверджено. Зверніться до адміністрації ТЦ.';
     if (code === '429' || /rate limit|too many/i.test(message)) return 'Забагато спроб. Зачекайте кілька хвилин і спробуйте знову.';
     if (/jwt expired|invalid jwt|refresh token|not authenticated|session/i.test(message)) return 'Час входу минув. Вийдіть і увійдіть знову.';
     if (code === '42501' || code === '403' || /row-level security|permission denied|unauthorized/i.test(message)) {
-      return 'Цей обліковий запис не має прав адміністратора.';
+      return 'Цей обліковий запис не має прав на цю дію.';
     }
     if (code === '23514' || /check constraint/i.test(message)) return 'База не прийняла дані: перевірте, що назва й адреса сторінки заповнені правильно.';
     if (/payload too large|exceeded the maximum allowed size|413/i.test(message + code)) return 'Файл завеликий. Можна до 5 МБ.';
@@ -326,11 +334,11 @@ input[aria-invalid=true]{border-color:var(--danger)}
     app.innerHTML =
       '<section class="login">' +
         '<h1>Вхід до кабінету</h1>' +
-        '<p class="lead">Тут можна змінити заклади торгового центру на сайті.</p>' +
+        '<p class="lead">Тут заклади торгового центру змінюють свою сторінку на сайті й додають новини.</p>' +
         '<form class="card" id="login-form" novalidate>' +
           (errorText ? '<div class="msg msg-error" role="alert">' + escapeHtml(errorText) + '</div>' : '') +
-          '<div class="field"><label for="login-email">Пошта</label>' +
-            '<input type="email" id="login-email" autocomplete="username" inputmode="email" required></div>' +
+          '<div class="field"><label for="login-email">Логін або пошта</label>' +
+            '<input type="text" id="login-email" autocomplete="username" autocapitalize="off" spellcheck="false" required></div>' +
           '<div class="field"><label for="login-pass">Пароль</label>' +
             '<input type="password" id="login-pass" autocomplete="current-password" required></div>' +
           '<button type="submit" class="btn btn-main" style="width:100%">Увійти</button>' +
@@ -344,12 +352,12 @@ input[aria-invalid=true]{border-color:var(--danger)}
     var form = event.currentTarget;
     var email = form.querySelector('#login-email').value.trim();
     var password = form.querySelector('#login-pass').value;
-    if (!email || !password) { renderLogin('Впишіть пошту й пароль.'); return; }
+    if (!email || !password) { renderLogin('Впишіть логін і пароль.'); return; }
     var button = form.querySelector('button[type=submit]');
     button.disabled = true;
     button.textContent = 'Входимо…';
     try {
-      var res = await client.auth.signInWithPassword({ email: email, password: password });
+      var res = await client.auth.signInWithPassword({ email: loginToEmail(email), password: password });
       if (res.error) throw res.error;
       await openCabinet();
     } catch (err) {
@@ -357,6 +365,12 @@ input[aria-invalid=true]{border-color:var(--danger)}
       var emailInput = document.getElementById('login-email');
       if (emailInput) emailInput.value = email;
     }
+  }
+
+  // Логін магазину без «@» перетворюємо на службову пошту; справжню пошту лишаємо як є.
+  function loginToEmail(login) {
+    var value = String(login || '').trim().toLowerCase();
+    return value.indexOf('@') === -1 ? value + '@' + LOGIN_DOMAIN : value;
   }
 
   async function signOut() {
@@ -367,15 +381,32 @@ input[aria-invalid=true]{border-color:var(--danger)}
     } catch (err) {
       friendlyError(err, 'вихід');
     }
-    setState({ units: [], currentId: null, media: null, snapshot: '', flash: null });
+    setState(EMPTY_SESSION);
     renderLogin();
   }
 
   /* ---------- Кабінет: завантаження й список ---------- */
+  // Хто увійшов: адміністратор, магазин (і які приміщення його) чи обліковий запис без доступу.
+  async function loadAccess() {
+    var results = await Promise.all([
+      client.auth.getUser(),
+      client.rpc('gp_is_admin'),
+      client.from('gp_unit_owners').select('user_id,unit_id,login')
+    ]);
+    results.forEach(function (r) { if (r.error) throw r.error; });
+    var userId = results[0].data && results[0].data.user ? results[0].data.user.id : null;
+    var rows = results[2].data || [];
+    var ownIds = rows.filter(function (r) { return r.user_id === userId; }).map(function (r) { return r.unit_id; });
+    var access = rows.reduce(function (map, r) { var next = Object.assign({}, map); next[r.unit_id] = r.login; return next; }, {});
+    var role = results[1].data === true ? 'admin' : ownIds.length ? 'owner' : 'none';
+    setState({ role: role, ownIds: ownIds, access: access, issued: null });
+  }
+
   async function loadUnits() {
     var res = await client.from('units').select(UNIT_COLUMNS).order('unit_id');
     if (res.error) throw res.error;
     var units = (res.data || []).slice().sort(function (a, b) { return compareUnitIds(a.unit_id, b.unit_id); });
+    if (state.role === 'owner') units = units.filter(function (u) { return state.ownIds.indexOf(u.unit_id) !== -1; });
     setState({ units: units });
   }
 
@@ -383,17 +414,23 @@ input[aria-invalid=true]{border-color:var(--danger)}
     logoutBtn.hidden = false;
     app.innerHTML = '<p class="placeholder">Завантажуємо приміщення…</p>';
     try {
-      await loadUnits();
+      await loadAccess();
+      if (state.role !== 'none') await loadUnits();
     } catch (err) {
       app.innerHTML = '<section class="notice"><h1>Не вдалося завантажити</h1><p>' + escapeHtml(friendlyError(err, 'список приміщень')) +
         '</p><p><button type="button" class="btn" id="retry">Спробувати ще раз</button></p></section>';
       document.getElementById('retry').addEventListener('click', openCabinet);
       return;
     }
+    if (state.role === 'none') {
+      app.innerHTML = '<section class="notice"><h1>Немає доступу</h1><p>Цей обліковий запис не має доступу до жодного закладу. Зверніться до адміністрації торгового центру.</p></section>';
+      return;
+    }
+    var isOwner = state.role === 'owner';
     app.innerHTML =
       '<div class="layout">' +
         '<section class="pane-list" id="pane-list" aria-label="Приміщення">' +
-          '<div class="search"><label class="sr-only" for="search">Пошук за назвою</label>' +
+          '<div class="search"' + (isOwner ? ' hidden' : '') + '><label class="sr-only" for="search">Пошук за назвою</label>' +
           '<input type="search" id="search" placeholder="Пошук за назвою або номером" autocomplete="off"></div>' +
           '<div id="list"></div>' +
         '</section>' +
@@ -404,6 +441,8 @@ input[aria-invalid=true]{border-color:var(--danger)}
     search.addEventListener('input', function () { setState({ search: search.value }); renderList(); });
     document.getElementById('list').addEventListener('click', onListClick);
     renderList();
+    // у магазину один заклад — одразу відкриваємо його форму
+    if (isOwner && state.units.length === 1) openFresh(state.units[0].unit_id);
   }
 
   function renderList() {
@@ -562,7 +601,12 @@ input[aria-invalid=true]{border-color:var(--danger)}
         '<div class="status" id="photos-status" role="status"></div>' +
       '</div>' +
 
-      (vacant ? '' :
+      (vacant || state.role !== 'admin' ? '' :
+        '<div class="section"><h2>Доступ магазину</h2>' +
+          '<p class="hint" style="margin:0 0 12px">Магазин зі своїм логіном і паролем міняє лише цю сторінку (без назви, категорії й адреси) та додає свої новини.</p>' +
+          '<div id="access-box"></div></div>') +
+
+      (vacant || state.role !== 'admin' ? '' :
         '<div class="section danger-zone"><h2>Заклад закрився?</h2>' +
           '<p>Приміщення стане вільним, а на сайті з\'явиться напис «Оренда». Усі дані закладу буде стерто.</p>' +
           '<button type="button" class="btn btn-danger" data-action="vacate">Звільнити приміщення</button></div>') +
@@ -579,10 +623,65 @@ input[aria-invalid=true]{border-color:var(--danger)}
     form.addEventListener('input', onEditorInput);
     form.addEventListener('change', onEditorChange);
     form.addEventListener('focusout', onEditorBlur);
+    if (state.role === 'owner') lockOwnerFields();
     renderMedia();
+    renderAccess();
     updateSlugInfo();
     updateCounters();
     updateAddButtons();
+  }
+
+  function lockOwnerFields() {
+    OWNER_LOCKED_FIELDS.forEach(function (id) {
+      var input = document.getElementById(id);
+      if (input) input.disabled = true;
+    });
+    var slug = document.getElementById('f-slug');
+    if (slug) slug.insertAdjacentHTML('afterend', '<span class="hint">Назву, категорію й адресу сторінки змінює адміністрація торгового центру.</span>');
+  }
+
+  /* ---------- Доступ магазину (лише адміністратор) ---------- */
+  function renderAccess() {
+    var box = document.getElementById('access-box');
+    if (!box) return;
+    var login = state.access[state.currentId] || '';
+    var issued = state.issued && state.issued.unit_id === state.currentId ? state.issued : null;
+    var creds = issued
+      ? '<div class="msg msg-ok" role="status">Передайте власнику закладу:<br>Адреса: <b>' + escapeHtml(SITE_URL + 'kabinet/') + '</b><br>' +
+          'Логін: <b>' + escapeHtml(issued.login) + '</b><br>Пароль: <b>' + escapeHtml(issued.password) + '</b><br>' +
+          'Пароль видно лише зараз — запишіть його. Забули — натисніть «Новий пароль».</div>'
+      : '';
+    box.innerHTML = creds +
+      (login
+        ? '<p style="margin:0 0 12px">Доступ видано. Логін: <b>' + escapeHtml(login) + '</b></p>' +
+          '<div class="row"><button type="button" class="btn btn-small" data-action="access-grant">Новий пароль</button> ' +
+          '<button type="button" class="btn btn-small btn-danger" data-action="access-revoke">Забрати доступ</button></div>'
+        : '<p style="margin:0 0 12px">Доступу ще немає.</p>' +
+          '<button type="button" class="btn btn-small" data-action="access-grant">Дати доступ</button>') +
+      '<div class="status" id="access-status" role="status"></div>';
+  }
+
+  async function changeAccess(action) {
+    var unitId = state.currentId;
+    var unit = findUnit(unitId);
+    if (!unit || state.role !== 'admin') return;
+    var hasAccess = !!state.access[unitId];
+    if (action === 'revoke' && !confirm('Забрати доступ у закладу „' + (unit.name || '') + '“? Його логін і пароль перестануть працювати.')) return;
+    if (action === 'grant' && hasAccess && !confirm('Видати новий пароль? Старий пароль закладу перестане працювати.')) return;
+    setStatus('access-status', action === 'grant' ? 'Готуємо логін і пароль…' : 'Забираємо доступ…', false);
+    try {
+      var res = await client.functions.invoke(ACCESS_FUNCTION, { body: { action: action, unit_id: unitId } });
+      if (res.error) throw res.error;
+      var data = res.data || {};
+      if (!data.ok) throw new Error(data.error || 'access failed');
+      var access = Object.assign({}, state.access);
+      if (action === 'grant') access[unitId] = data.login; else delete access[unitId];
+      setState({ access: access, issued: action === 'grant' ? { unit_id: unitId, login: data.login, password: data.password } : null });
+      if (state.currentId === unitId) renderAccess();
+    } catch (err) {
+      console.error('[кабінет] доступ магазину:', err);
+      setStatus('access-status', 'Не вдалося змінити доступ. Якщо ви щойно міняли назву чи адресу закладу — спершу збережіть. Потім спробуйте ще раз.', true);
+    }
   }
 
   function fieldText(id, label, value, max, placeholder) {
@@ -1006,6 +1105,8 @@ input[aria-invalid=true]{border-color:var(--danger)}
       renderPhotos();
     }
     else if (action === 'vacate') onVacate();
+    else if (action === 'access-grant') changeAccess('grant');
+    else if (action === 'access-revoke') changeAccess('revoke');
   }
 
   function addRow(containerId, html, max, rowSelector, focusSelector) {
@@ -1198,6 +1299,14 @@ input[aria-invalid=true]{border-color:var(--danger)}
     return saved;
   }
 
+  // Магазин зберігає лише свої поля: назву, категорію, адресу й «вільне» база від нього не прийме.
+  function ownerPayload(payload) {
+    return {
+      about: payload.about, hours: payload.hours, phones: payload.phones, links: payload.links,
+      logo_url: payload.logo_url, wordmark_url: payload.wordmark_url, photos: payload.photos
+    };
+  }
+
   async function onSave(event) {
     event.preventDefault();
     if (state.busy > 0) return;
@@ -1213,7 +1322,7 @@ input[aria-invalid=true]{border-color:var(--danger)}
     save.disabled = true;
     save.textContent = 'Зберігаємо…';
     try {
-      var saved = await updateUnit(unitId, result.payload);
+      var saved = await updateUnit(unitId, state.role === 'owner' ? ownerPayload(result.payload) : result.payload);
       setState({ snapshot: '' });
       openUnit(unitId, { type: 'ok', text: 'Збережено. Головна сторінка вже оновилась, сторінка закладу оновиться протягом кількох годин.', slug: saved.slug });
       showFlash(state.flash);
@@ -1260,7 +1369,7 @@ input[aria-invalid=true]{border-color:var(--danger)}
       logoutBtn.addEventListener('click', signOut);
       client.auth.onAuthStateChange(function (eventName) {
         if (eventName !== 'SIGNED_OUT' || logoutBtn.hidden) return;
-        setState({ units: [], currentId: null, media: null, snapshot: '', flash: null });
+        setState(EMPTY_SESSION);
         renderLogin('Ви вийшли з кабінету. Увійдіть знову.');
       });
       var res = await client.auth.getSession();

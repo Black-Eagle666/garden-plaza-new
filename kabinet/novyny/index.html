@@ -102,6 +102,8 @@ textarea{min-height:170px;resize:vertical}
   var BUCKET = 'tenants';
   var NEWS_COLUMNS = 'id,kind,title,body,photo_url,unit_ids,valid_until,published,created_at';
   var KINDS = [['news', 'Новина'], ['promo', 'Акція'], ['sale', 'Знижка'], ['rent', 'Оренда']];
+  // «Оренда» — оголошення торгового центру, магазинам цей тип недоступний
+  var ADMIN_ONLY_KINDS = ['rent'];
   var LIMITS = Object.freeze({ title: 120, body: 2000, units: 40, sourceBytes: 20 * 1024 * 1024 });
   var PHOTO_SIDE = 1600;
   var PHOTO_QUALITY = 0.85;
@@ -111,7 +113,8 @@ textarea{min-height:170px;resize:vertical}
   var app = document.getElementById('app');
   var client = null;
   // current: id новини, 'new' для нової або null, коли форма закрита
-  var state = Object.freeze({ news: [], units: [], current: null, photo: null, busy: false, flash: null });
+  // role: 'admin' — адміністратор ТЦ, 'owner' — магазин (лише заклади з ownIds і записи про них), 'none' — без доступу
+  var state = Object.freeze({ news: [], units: [], current: null, photo: null, busy: false, flash: null, role: 'none', ownIds: [] });
   function setState(patch) { state = Object.freeze(Object.assign({}, state, patch)); }
 
   /* ---------- Допоміжне ---------- */
@@ -143,7 +146,7 @@ textarea{min-height:170px;resize:vertical}
     var code = String((err && (err.code || err.statusCode || err.status)) || '');
     if (err instanceof TypeError || /failed to fetch|networkerror|load failed/i.test(message)) return 'Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.';
     if (/jwt expired|invalid jwt|refresh token|not authenticated|session/i.test(message)) return 'Час входу минув. Відкрийте «Заклади» й увійдіть знову.';
-    if (code === '42501' || code === '403' || /row-level security|permission denied|unauthorized/i.test(message)) return 'Цей обліковий запис не має прав адміністратора.';
+    if (code === '42501' || code === '403' || /row-level security|permission denied|unauthorized/i.test(message)) return 'Цей обліковий запис не має прав на цю дію. Магазин може додавати записи лише про свій заклад.';
     if (code === '23514' || /check constraint/i.test(message)) return 'База не прийняла дані: перевірте заголовок, текст і дату.';
     if (/payload too large|exceeded the maximum allowed size|413/i.test(message + code)) return 'Файл завеликий. Можна до 5 МБ.';
     return 'Щось пішло не так. Спробуйте ще раз. Якщо повториться — напишіть розробнику.';
@@ -155,6 +158,30 @@ textarea{min-height:170px;resize:vertical}
   }
 
   /* ---------- Завантаження ---------- */
+  // Хто увійшов: адміністратор, магазин (і які приміщення його) чи обліковий запис без доступу.
+  async function loadAccess() {
+    var results = await Promise.all([
+      client.auth.getUser(),
+      client.rpc('gp_is_admin'),
+      client.from('gp_unit_owners').select('user_id,unit_id')
+    ]);
+    results.forEach(function (r) { if (r.error) throw r.error; });
+    var userId = results[0].data && results[0].data.user ? results[0].data.user.id : null;
+    var ownIds = (results[2].data || []).filter(function (r) { return r.user_id === userId; }).map(function (r) { return r.unit_id; });
+    setState({ role: results[1].data === true ? 'admin' : ownIds.length ? 'owner' : 'none', ownIds: ownIds });
+  }
+
+  function isOwner() { return state.role === 'owner'; }
+  function isOwnUnit(id) { return state.ownIds.indexOf(id) !== -1; }
+  // запис магазину — той, де відмічено лише його заклади
+  function isOwnNews(item) {
+    var ids = Array.isArray(item.unit_ids) ? item.unit_ids : [];
+    return ids.length > 0 && ids.every(isOwnUnit);
+  }
+  function availableKinds() {
+    return isOwner() ? KINDS.filter(function (k) { return ADMIN_ONLY_KINDS.indexOf(k[0]) === -1; }) : KINDS;
+  }
+
   async function loadAll() {
     var results = await Promise.all([
       client.from('news').select(NEWS_COLUMNS).order('created_at', { ascending: false }),
@@ -162,7 +189,10 @@ textarea{min-height:170px;resize:vertical}
     ]);
     if (results[0].error) throw results[0].error;
     if (results[1].error) throw results[1].error;
-    setState({ news: results[0].data || [], units: results[1].data || [] });
+    var news = results[0].data || [], units = results[1].data || [];
+    setState(isOwner()
+      ? { news: news.filter(isOwnNews), units: units.filter(function (u) { return isOwnUnit(u.unit_id); }) }
+      : { news: news, units: units });
   }
 
   function findNews(id) { return state.news.find(function (n) { return n.id === id; }) || null; }
@@ -171,7 +201,9 @@ textarea{min-height:170px;resize:vertical}
   function renderShell() {
     app.innerHTML = '<div class="layout">' +
       '<section class="pane-list" id="pane-list" aria-label="Новини">' +
-        '<h1>Новини</h1><p class="lead">Новини, акції, знижки й оголошення про оренду. На сайті їх видно в розділі «Новини».</p>' +
+        '<h1>Новини</h1><p class="lead">' + (isOwner()
+          ? 'Новини, акції та знижки вашого закладу. На сайті їх видно одразу — в розділі «Новини».'
+          : 'Новини, акції, знижки й оголошення про оренду. На сайті їх видно в розділі «Новини».') + '</p>' +
         '<button type="button" class="btn btn-main" id="add">+ Додати запис</button>' +
         '<ul class="rows" id="rows"></ul>' +
       '</section>' +
@@ -234,20 +266,22 @@ textarea{min-height:170px;resize:vertical}
       '<h2>' + (state.current === 'new' ? 'Новий запис' : 'Редагування запису') + '</h2>' + flash +
       '<form id="form" novalidate>' +
         '<div class="field"><span class="label">Що це</span><div class="chips" role="radiogroup" aria-label="Тип запису">' +
-          KINDS.map(function (k) {
+          availableKinds().map(function (k) {
             return '<label class="chip"><input type="radio" name="kind" value="' + k[0] + '"' + (k[0] === kind ? ' checked' : '') + '>' + k[1] + '</label>';
           }).join('') + '</div>' +
-          '<span class="hint">«Оренда» — оголошення про вільне приміщення: відмітьте його нижче.</span></div>' +
+          (isOwner() ? '' : '<span class="hint">«Оренда» — оголошення про вільне приміщення: відмітьте його нижче.</span>') + '</div>' +
         '<div class="field"><label for="f-title">Заголовок <span class="counter" id="c-title"></span></label>' +
           '<input type="text" id="f-title" maxlength="' + LIMITS.title + '" value="' + escapeHtml(item ? item.title : '') + '" placeholder="Наприклад: Знижки до −30% на зимову колекцію"></div>' +
         '<div class="field"><label for="f-body">Текст <span class="counter" id="c-body"></span></label>' +
           '<textarea id="f-body" maxlength="' + LIMITS.body + '" placeholder="Коротко: що, де, до якого числа.">' + escapeHtml(item ? item.body : '') + '</textarea></div>' +
         '<div class="field"><span class="label">Фотографія</span><div class="photo-box" id="photo-box"></div>' +
           '<span class="hint" id="photo-status">JPG, PNG або WEBP. Найкраще виглядає горизонтальне фото.</span></div>' +
-        '<div class="field"><span class="label">Заклади, яких це стосується</span>' +
-          '<div class="chips"><button type="button" class="btn btn-small" id="units-all">Відмітити всі</button>' +
-          '<button type="button" class="btn btn-small" id="units-none">Зняти всі</button></div>' + unitChips(item ? (item.unit_ids || []) : []) +
-          '<span class="hint">Можна не відмічати жодного або відмітити всі. На сайті відмічені заклади будуть кнопками, що ведуть на план; якщо відмічено всі — одна кнопка «Усі заклади центру».</span></div>' +
+        '<div class="field"><span class="label">' + (isOwner() ? 'Ваш заклад' : 'Заклади, яких це стосується') + '</span>' +
+          '<div class="chips"' + (isOwner() ? ' hidden' : '') + '><button type="button" class="btn btn-small" id="units-all">Відмітити всі</button>' +
+          '<button type="button" class="btn btn-small" id="units-none">Зняти всі</button></div>' + unitChips(item ? (item.unit_ids || []) : (isOwner() ? state.ownIds : [])) +
+          '<span class="hint">' + (isOwner()
+            ? 'Запис буде показано біля вашого закладу: на сайті це кнопка, що веде на план.'
+            : 'Можна не відмічати жодного або відмітити всі. На сайті відмічені заклади будуть кнопками, що ведуть на план; якщо відмічено всі — одна кнопка «Усі заклади центру».') + '</span></div>' +
         '<div class="field"><label for="f-until">Діє до (необов\'язково)</label>' +
           '<input type="date" id="f-until" value="' + escapeHtml(item && item.valid_until ? item.valid_until : '') + '">' +
           '<span class="hint">Після цієї дати запис сам зникне з сайту. Для акцій і знижок краще вказати.</span></div>' +
@@ -346,7 +380,9 @@ textarea{min-height:170px;resize:vertical}
     setState({ busy: true });
     try {
       var prepared = await resizePhoto(file);
-      var path = 'news/' + Date.now() + '-' + randomPart() + '.' + prepared.ext;
+      // магазин може класти файли лише в теку свого приміщення
+      var folder = isOwner() ? state.ownIds[0] + '/news-' : 'news/';
+      var path = folder + Date.now() + '-' + randomPart() + '.' + prepared.ext;
       var up = await client.storage.from(BUCKET).upload(path, prepared.blob, { contentType: prepared.type, cacheControl: '31536000', upsert: false });
       if (up.error) throw up.error;
       setState({ photo: client.storage.from(BUCKET).getPublicUrl(path).data.publicUrl });
@@ -377,6 +413,7 @@ textarea{min-height:170px;resize:vertical}
     if (!draft.title) return 'Впишіть заголовок.';
     if (draft.title.length > LIMITS.title || draft.body.length > LIMITS.body) return 'Заголовок або текст задовгий.';
     if (draft.unit_ids.length > LIMITS.units) return 'Можна відмітити щонайбільше ' + LIMITS.units + ' закладів.';
+    if (isOwner() && !draft.unit_ids.length) return 'Відмітьте свій заклад.';
     return '';
   }
 
@@ -445,7 +482,12 @@ textarea{min-height:170px;resize:vertical}
       var session = await client.auth.getSession();
       if (session.error) throw session.error;
       if (!session.data.session) {
-        showNotice('Спершу увійдіть', 'Новини редагує адміністратор. Увійдіть у кабінет закладів і поверніться сюди.', 'Увійти');
+        showNotice('Спершу увійдіть', 'Увійдіть у кабінет закладів і поверніться сюди.', 'Увійти');
+        return;
+      }
+      await loadAccess();
+      if (state.role === 'none') {
+        showNotice('Немає доступу', 'Цей обліковий запис не має доступу до жодного закладу. Зверніться до адміністрації торгового центру.', 'До кабінету закладів');
         return;
       }
       await loadAll();
