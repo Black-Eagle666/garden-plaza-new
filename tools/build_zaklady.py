@@ -17,7 +17,7 @@ import sys
 import urllib.request
 from pathlib import Path
 
-BASE_URL = "https://black-eagle666.github.io/garden-plaza-new/"
+BASE_URL = "https://tcgardenplaza.com.ua/"
 ADDRESS = "вул. Грушевського, 30, с. Нересниця"
 MAPS_URL = "https://www.google.com/maps/search/?api=1&query=48.1196052,23.7721827"
 FLOOR_NAMES = {1: "1 поверх", 2: "2 поверх", 3: "3 поверх", 4: "4 поверх"}

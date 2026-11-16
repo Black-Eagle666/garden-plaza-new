@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /kabinet/
+
+Sitemap: https://tcgardenplaza.com.ua/sitemap.xml

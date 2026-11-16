@@ -1,0 +1,9 @@
+{
+  // ТЦ Garden Plaza New — статичний сайт. Заливати лише через cloudflare/deploy.sh:
+  // він збирає чисту копію публічних файлів у тимчасовій теці й запускає wrangler звідти.
+  "name": "tc-garden-plaza",
+  "compatibility_date": "2026-11-01",
+  "assets": { "directory": "./public" },
+  "workers_dev": true,
+  "observability": { "enabled": true }
+}
