@@ -40,6 +40,16 @@ button,input,select,textarea{font:inherit;color:inherit}
 .msg-error{color:#F6C3B5;border-color:rgba(229,138,114,.5);background:rgba(229,138,114,.08)}
 .msg-ok{color:#D6EBCD;border-color:rgba(159,203,142,.5);background:rgba(159,203,142,.08)}
 .layout{display:block}
+/* розділи кабінету в лівій колонці: «Заклад» і «Новини й акції» */
+.side-nav{display:grid;gap:8px;margin:0 0 16px;padding:0 0 16px;border-bottom:1px solid var(--line)}
+.side-link{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--cream);text-decoration:none;min-height:64px}
+.side-link:hover{border-color:var(--line-strong)}
+.side-link[aria-current=page]{border-color:var(--gold);background:var(--panel-2)}
+.side-link svg{flex:none;width:26px;height:26px;fill:none;stroke:var(--gold-light);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.side-link span{display:flex;flex-direction:column;min-width:0}
+.side-link b{font-weight:600;font-size:16px}
+.side-link small{color:var(--muted);font-size:13px}
+.side-link i{margin-left:auto;font-style:normal;color:var(--gold-light);font-size:18px}
 .pane-list{padding:16px}
 .pane-edit{padding:16px 16px 110px}
 .pane-list h1{font-family:var(--serif);font-weight:500;font-size:30px;margin:0 0 4px}
@@ -104,6 +114,8 @@ textarea{min-height:170px;resize:vertical}
   var KINDS = [['news', 'Новина'], ['promo', 'Акція'], ['sale', 'Знижка'], ['rent', 'Оренда']];
   // «Оренда» — оголошення торгового центру, магазинам цей тип недоступний
   var ADMIN_ONLY_KINDS = ['rent'];
+  var ICON_SHOP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 5.5 4h13L20 9.5M4 9.5V20h16V9.5M4 9.5h16M9.5 20v-5.5h5V20"/></svg>';
+  var ICON_NEWS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h11v14H7a2 2 0 0 1-2-2zM16 9h3v8a2 2 0 0 1-2 2M8 9h5M8 12.5h5M8 16h3"/></svg>';
   var LIMITS = Object.freeze({ title: 120, body: 2000, units: 40, sourceBytes: 20 * 1024 * 1024 });
   var PHOTO_SIDE = 1600;
   var PHOTO_QUALITY = 0.85;
@@ -201,6 +213,12 @@ textarea{min-height:170px;resize:vertical}
   function renderShell() {
     app.innerHTML = '<div class="layout">' +
       '<section class="pane-list" id="pane-list" aria-label="Новини">' +
+        '<nav class="side-nav" aria-label="Розділи кабінету">' +
+          '<a class="side-link" href="../">' + ICON_SHOP + '<span><b>' + (isOwner() ? 'Мій заклад' : 'Заклади') + '</b>' +
+            '<small>Опис, графік, телефони, логотип і фото</small></span><i aria-hidden="true">→</i></a>' +
+          '<a class="side-link" href="./" aria-current="page">' + ICON_NEWS + '<span><b>Новини й акції</b>' +
+            '<small>Додати новину, акцію чи знижку на сайт</small></span></a>' +
+        '</nav>' +
         '<h1>Новини</h1><p class="lead">' + (isOwner()
           ? 'Новини, акції та знижки вашого закладу. На сайті їх видно одразу — в розділі «Новини».'
           : 'Новини, акції, знижки й оголошення про оренду. На сайті їх видно в розділі «Новини».') + '</p>' +

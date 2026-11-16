@@ -75,6 +75,18 @@ input[aria-invalid=true]{border-color:var(--danger)}
 .counter.over{color:var(--danger)}
 
 /* Розкладка кабінету */
+/* розділи кабінету в лівій колонці: «Заклад» і «Новини й акції» */
+.side-nav{display:grid;gap:8px;margin:0 0 16px;padding:0 0 16px;border-bottom:1px solid var(--line)}
+.side-link{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--cream);text-decoration:none;min-height:64px}
+.side-link:hover{border-color:var(--line-strong)}
+.side-link[aria-current=page]{border-color:var(--gold);background:var(--panel-2)}
+.side-link svg{flex:none;width:26px;height:26px;fill:none;stroke:var(--gold-light);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.side-link span{display:flex;flex-direction:column;min-width:0}
+.side-link b{font-weight:600;font-size:16px}
+.side-link small{color:var(--muted);font-size:13px}
+.side-link i{margin-left:auto;font-style:normal;color:var(--gold-light);font-size:18px}
+/* на телефоні форма закладу закриває ліву колонку — тому посилання на новини є і в самій формі */
+.news-cta{margin:0 0 16px}
 .layout{display:block}
 .pane-list{padding:16px}
 .pane-edit{padding:16px 16px 110px}
@@ -149,6 +161,7 @@ input[aria-invalid=true]{border-color:var(--danger)}
   .bar{left:361px;justify-content:flex-start;padding-left:32px}
   .bar .btn{flex:0 0 auto;min-width:180px}
   .back-btn{display:none!important}
+  .news-cta{display:none}
   .photos{grid-template-columns:repeat(4,minmax(0,1fr))}
   .link-row .pair{grid-template-columns:200px 1fr}
 }
@@ -190,6 +203,8 @@ input[aria-invalid=true]{border-color:var(--danger)}
   var ACCESS_FUNCTION = 'gp-access';
   // Поля, які магазин бачить, але не міняє: їх веде адміністратор ТЦ.
   var OWNER_LOCKED_FIELDS = ['f-name', 'f-cat', 'f-slug'];
+  var ICON_SHOP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 5.5 4h13L20 9.5M4 9.5V20h16V9.5M4 9.5h16M9.5 20v-5.5h5V20"/></svg>';
+  var ICON_NEWS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h11v14H7a2 2 0 0 1-2-2zM16 9h3v8a2 2 0 0 1-2 2M8 9h5M8 12.5h5M8 16h3"/></svg>';
 
   var app = document.getElementById('app');
   var logoutBtn = document.getElementById('logout');
@@ -430,6 +445,12 @@ input[aria-invalid=true]{border-color:var(--danger)}
     app.innerHTML =
       '<div class="layout">' +
         '<section class="pane-list" id="pane-list" aria-label="Приміщення">' +
+          '<nav class="side-nav" aria-label="Розділи кабінету">' +
+            '<a class="side-link" href="./" aria-current="page">' + ICON_SHOP + '<span><b>' + (isOwner ? 'Мій заклад' : 'Заклади') + '</b>' +
+              '<small>Опис, графік, телефони, логотип і фото</small></span></a>' +
+            '<a class="side-link" href="novyny/">' + ICON_NEWS + '<span><b>Новини й акції</b>' +
+              '<small>Додати новину, акцію чи знижку на сайт</small></span><i aria-hidden="true">→</i></a>' +
+          '</nav>' +
           '<div class="search"' + (isOwner ? ' hidden' : '') + '><label class="sr-only" for="search">Пошук за назвою</label>' +
           '<input type="search" id="search" placeholder="Пошук за назвою або номером" autocomplete="off"></div>' +
           '<div id="list"></div>' +
@@ -557,6 +578,8 @@ input[aria-invalid=true]{border-color:var(--danger)}
         '<p>Приміщення ' + escapeHtml(unit.unit_id) + ' · ' + escapeHtml(unit.floor) + ' поверх' + (vacant ? ' · зараз вільне' : '') + '</p></div>' +
       '</div>' +
       '<div id="flash">' + flash + '</div>' +
+      '<a class="side-link news-cta" href="novyny/">' + ICON_NEWS + '<span><b>Новини й акції</b>' +
+        '<small>Додати новину, акцію чи знижку на сайт</small></span><i aria-hidden="true">→</i></a>' +
 
       '<div class="section"><h2>Основне</h2>' +
         fieldText('f-name', 'Назва закладу', name, LIMITS.name, 'Наприклад: Копійочка') +
