@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Заливає сайт на Cloudflare: бере закомічені файли (git archive HEAD), лишає тільки публічні
 # й запускає wrangler із тимчасової теки — щоб не зачепити чужі налаштування й не залити службове.
-# На комп'ютері: ./cloudflare/deploy.sh після коміту. У GitHub Actions: потрібні CLOUDFLARE_API_TOKEN і CLOUDFLARE_ACCOUNT_ID.
+# На комп'ютері: ./cloudflare/deploy.sh після коміту. Cloudflare сам запускає цей скрипт після кожного git push
+# (Workers Builds, команда заливки: bash cloudflare/deploy.sh) — так на сайт потрапляють і сторінки закладів від розкладу.
 set -euo pipefail
 
 # службові файли й теки, яким не місце на сайті
@@ -23,7 +24,8 @@ if [ ! -f "$STAGE/public/index.html" ]; then
 fi
 
 cd "$STAGE"
-if [ -n "${CI:-}" ]; then
+# у збірці Cloudflare (WORKERS_CI) чи GitHub (CI) беремо wrangler з мережі, на комп'ютері — уже встановлений
+if [ -n "${CI:-}${WORKERS_CI:-}" ]; then
   npx --yes wrangler@4 deploy
 else
   npx --prefix "$HOME/Documents/fitnessmama-platform" wrangler deploy
