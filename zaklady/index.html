@@ -69,6 +69,7 @@ h2{margin:0 0 14px;font:500 32px/1.1 var(--serif)}
 .about{margin:0;max-width:64ch;font-size:16.5px;line-height:1.7;color:#D9CDBB}
 /* фото показуємо цілими, у їхньому власному форматі (4:3, 16:9, 9:16…): однакова висота, ширина — за пропорцією */
 .pics{display:flex;flex-wrap:wrap;gap:10px}
+.vids{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;max-width:900px}
 .pics img{display:block;height:300px;width:auto;max-width:100%;object-fit:contain;border-radius:14px;border:1px solid rgba(201,164,106,.25);background:#1A140F}
 .facts{display:grid;grid-template-columns:max-content 1fr;gap:10px 22px;margin:0;padding:18px 20px;border-radius:16px;border:1px solid rgba(201,164,106,.18);background:rgba(20,16,12,.7)}
 .facts dt{color:var(--muted)}

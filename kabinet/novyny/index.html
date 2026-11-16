@@ -77,6 +77,9 @@ textarea{min-height:170px;resize:vertical}
 .chip:has(input:checked){background:linear-gradient(135deg,#EED39C,#C9A46A);color:#1A130A;border-color:transparent;font-weight:600}
 .floor-cap{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
 .photo-box{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.video-box{display:grid;gap:12px;max-width:420px}
+.video-box .pair{display:flex;gap:8px;align-items:center}
+.video-box .pair input{flex:1;min-width:0}
 .photo-box img{width:200px;max-width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
 .check{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
 .check input{width:22px;height:22px;margin-top:2px;accent-color:#C9A46A;flex:none}
@@ -94,6 +97,7 @@ textarea{min-height:170px;resize:vertical}
 @media (max-width:520px){.brand span{display:none}.top .btn-small{padding:6px 12px}}
 </style>
 <script src="../../gp-config.js"></script>
+<script src="../../gp-video.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
@@ -110,7 +114,12 @@ textarea{min-height:170px;resize:vertical}
 
   /* ---------- Сталі ---------- */
   var BUCKET = 'tenants';
-  var NEWS_COLUMNS = 'id,kind,title,body,photo_url,unit_ids,valid_until,published,created_at';
+  var NEWS_COLUMNS = 'id,kind,title,body,photo_url,video_url,unit_ids,valid_until,published,created_at';
+  // Відеофайли лежать в окремому сховищі: там дозволено відео й більший розмір, ніж для картинок.
+  var VIDEO_BUCKET = 'videos';
+  var VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm'];
+  var VIDEO_MAX_BYTES = 50 * 1024 * 1024;
+  var BYTES_IN_MB = 1024 * 1024;
   var KINDS = [['news', 'Новина'], ['promo', 'Акція'], ['sale', 'Знижка'], ['rent', 'Оренда']];
   // «Оренда» — оголошення торгового центру, магазинам цей тип недоступний
   var ADMIN_ONLY_KINDS = ['rent'];
@@ -126,7 +135,7 @@ textarea{min-height:170px;resize:vertical}
   var client = null;
   // current: id новини, 'new' для нової або null, коли форма закрита
   // role: 'admin' — адміністратор ТЦ, 'owner' — магазин (лише заклади з ownIds і записи про них), 'none' — без доступу
-  var state = Object.freeze({ news: [], units: [], current: null, photo: null, busy: false, flash: null, role: 'none', ownIds: [] });
+  var state = Object.freeze({ news: [], units: [], current: null, photo: null, video: null, busy: false, flash: null, role: 'none', ownIds: [] });
   function setState(patch) { state = Object.freeze(Object.assign({}, state, patch)); }
 
   /* ---------- Допоміжне ---------- */
@@ -257,7 +266,7 @@ textarea{min-height:170px;resize:vertical}
   function openEditor(id, flash) {
     var item = id === 'new' ? null : findNews(id);
     if (id !== 'new' && !item) return;
-    setState({ current: id, photo: item ? (item.photo_url || null) : null, flash: flash, busy: false });
+    setState({ current: id, photo: item ? (item.photo_url || null) : null, video: item ? (item.video_url || null) : null, flash: flash, busy: false });
     renderEditor(item);
     renderRows();
     showPane('edit');
@@ -294,6 +303,8 @@ textarea{min-height:170px;resize:vertical}
           '<textarea id="f-body" maxlength="' + LIMITS.body + '" placeholder="Коротко: що, де, до якого числа.">' + escapeHtml(item ? item.body : '') + '</textarea></div>' +
         '<div class="field"><span class="label">Фотографія</span><div class="photo-box" id="photo-box"></div>' +
           '<span class="hint" id="photo-status">JPG, PNG або WEBP. Найкраще виглядає горизонтальне фото.</span></div>' +
+        '<div class="field"><span class="label">Відео (необов\'язково)</span><div class="video-box" id="video-box"></div>' +
+          '<span class="hint" id="video-status">Файл до ' + (VIDEO_MAX_BYTES / BYTES_IN_MB) + ' МБ (приблизно хвилина з телефону) або посилання на YouTube. Якщо є і фото, і відео — на сайті буде відео.</span></div>' +
         '<div class="field"><span class="label">' + (isOwner() ? 'Ваш заклад' : 'Заклади, яких це стосується') + '</span>' +
           '<div class="chips"' + (isOwner() ? ' hidden' : '') + '><button type="button" class="btn btn-small" id="units-all">Відмітити всі</button>' +
           '<button type="button" class="btn btn-small" id="units-none">Зняти всі</button></div>' + unitChips(item ? (item.unit_ids || []) : (isOwner() ? state.ownIds : [])) +
@@ -316,6 +327,7 @@ textarea{min-height:170px;resize:vertical}
     var del = document.getElementById('delete');
     if (del) del.addEventListener('click', onDelete);
     renderPhoto();
+    renderVideo();
     updateCounters();
   }
 
@@ -348,6 +360,76 @@ textarea{min-height:170px;resize:vertical}
     });
     var remove = document.getElementById('photo-remove');
     if (remove) remove.addEventListener('click', function () { setState({ photo: null }); renderPhoto(); });
+  }
+
+  /* ---------- Відео ---------- */
+  function renderVideo() {
+    var box = document.getElementById('video-box');
+    if (!box) return;
+    if (state.video) {
+      box.innerHTML = window.GPVideo.html(state.video, 'Відео запису') +
+        '<div><button type="button" class="btn btn-small btn-danger" id="video-remove">Прибрати відео</button></div>';
+      document.getElementById('video-remove').addEventListener('click', function () { setState({ video: null }); renderVideo(); });
+      return;
+    }
+    box.innerHTML =
+      '<div><label class="btn btn-small">Обрати відео<input type="file" id="f-video" accept="video/mp4,video/quicktime,video/webm" hidden></label></div>' +
+      '<div class="pair"><input type="url" id="f-youtube" placeholder="або посилання на YouTube" inputmode="url" autocapitalize="off" spellcheck="false" aria-label="Посилання на YouTube">' +
+      '<button type="button" class="btn btn-small" id="youtube-add">Додати</button></div>';
+    document.getElementById('f-video').addEventListener('change', function (event) {
+      var file = event.target.files && event.target.files[0];
+      if (file) onVideoFile(file);
+    });
+    document.getElementById('youtube-add').addEventListener('click', addYoutubeLink);
+    document.getElementById('f-youtube').addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') { event.preventDefault(); addYoutubeLink(); }
+    });
+  }
+
+  function setVideoStatus(text, isError) {
+    var status = document.getElementById('video-status');
+    status.textContent = text;
+    status.style.color = isError ? 'var(--danger)' : '';
+  }
+
+  function addYoutubeLink() {
+    var raw = document.getElementById('f-youtube').value.trim();
+    if (!raw) return;
+    var video = window.GPVideo.parse(raw);
+    if (!video || video.kind !== 'youtube') {
+      setVideoStatus('Це не схоже на посилання YouTube. Відкрийте відео на YouTube, натисніть «Поділитися» й скопіюйте посилання.', true);
+      return;
+    }
+    setState({ video: window.GPVideo.normalize(raw) });
+    renderVideo();
+    setVideoStatus('Відео додано. Не забудьте натиснути «Зберегти».', false);
+  }
+
+  async function onVideoFile(file) {
+    if (VIDEO_TYPES.indexOf(file.type) === -1) { setVideoStatus('Цей файл не підходить. Оберіть відео з галереї телефона (MP4 або MOV).', true); return; }
+    if (file.size > VIDEO_MAX_BYTES) {
+      setVideoStatus('Відео завелике: ' + Math.round(file.size / BYTES_IN_MB) + ' МБ, а можна до ' + (VIDEO_MAX_BYTES / BYTES_IN_MB) +
+        ' МБ. Обріжте його або викладіть на YouTube і додайте посилання.', true);
+      return;
+    }
+    setVideoStatus('Завантажуємо відео… Це може тривати хвилину, не закривайте сторінку.', false);
+    setState({ busy: true });
+    try {
+      // магазин може класти файли лише в теку свого приміщення; MOV з айфона зберігаємо як MP4 — так його відтворюють усі браузери
+      var isWebm = file.type === 'video/webm';
+      var folder = isOwner() ? state.ownIds[0] + '/news-' : 'news/';
+      var path = folder + Date.now() + '-' + randomPart() + (isWebm ? '.webm' : '.mp4');
+      var up = await client.storage.from(VIDEO_BUCKET).upload(path, file, { contentType: isWebm ? 'video/webm' : 'video/mp4', cacheControl: '31536000', upsert: false });
+      if (up.error) throw up.error;
+      setState({ video: client.storage.from(VIDEO_BUCKET).getPublicUrl(path).data.publicUrl });
+      renderVideo();
+      setVideoStatus('Відео завантажено. Не забудьте натиснути «Зберегти».', false);
+    } catch (err) {
+      console.error('[кабінет новин] завантаження відео:', err);
+      setVideoStatus('Не вдалося завантажити відео. Перевірте інтернет і спробуйте ще раз; якщо не допоможе — викладіть його на YouTube і додайте посилання.', true);
+    } finally {
+      setState({ busy: false });
+    }
   }
 
   function setPhotoStatus(text, isError) {
@@ -421,6 +503,7 @@ textarea{min-height:170px;resize:vertical}
       title: document.getElementById('f-title').value.trim(),
       body: document.getElementById('f-body').value.trim(),
       photo_url: state.photo,
+      video_url: state.video,
       unit_ids: Array.from(form.querySelectorAll('.f-unit:checked')).map(function (i) { return i.value; }),
       valid_until: document.getElementById('f-until').value || null,
       published: document.getElementById('f-published').checked

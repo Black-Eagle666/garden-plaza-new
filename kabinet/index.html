@@ -122,6 +122,10 @@ input[aria-invalid=true]{border-color:var(--danger)}
 .media-prev.wide{width:200px;height:72px}
 .media-btns{display:flex;gap:8px;flex-wrap:wrap}
 .photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 12px}
+.videos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 12px}
+.videos:empty{display:none}
+.video-item{position:relative;min-width:0}
+.video-item .icon-btn{position:absolute;top:6px;right:6px;background:rgba(10,8,6,.85)}
 .photo{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#000}
 .photo img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
 .photo{position:relative}
@@ -169,6 +173,7 @@ input[aria-invalid=true]{border-color:var(--danger)}
 @media (max-width:520px){.brand span{display:none}.top .btn-small{padding:6px 12px}}
 </style>
 <script src="../gp-config.js"></script>
+<script src="../gp-video.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
@@ -187,13 +192,17 @@ input[aria-invalid=true]{border-color:var(--danger)}
   /* ---------- Сталі ---------- */
   var SITE_URL = 'https://tcgardenplaza.com.ua/';
   var BUCKET = 'tenants';
-  var UNIT_COLUMNS = 'unit_id,floor,vacant,slug,name,cat,about,hours,phones,links,logo_url,wordmark_url,photos,updated_at';
+  var UNIT_COLUMNS = 'unit_id,floor,vacant,slug,name,cat,about,hours,phones,links,logo_url,wordmark_url,photos,videos,updated_at';
+  // Відеофайли лежать в окремому сховищі: там дозволено відео й більший розмір, ніж для картинок.
+  var VIDEO_BUCKET = 'videos';
+  var VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm'];
+  var BYTES_IN_MB = 1024 * 1024;
   var CATEGORIES = [
     ['grocery', 'Продукти'], ['fashion', 'Одяг і взуття'], ['kids', 'Дітям'], ['tech', 'Техніка'],
     ['home', 'Дім і готель'], ['services', 'Послуги'], ['food', 'Їжа'], ['fun', 'Спорт'],
     ['beauty', 'Краса і прикраси'], ['shop', 'Магазини']
   ];
-  var LIMITS = Object.freeze({ name: 80, slug: 60, about: 1200, hours: 120, phones: 4, links: 6, photos: 12, linkLabel: 40, fileBytes: 5 * 1024 * 1024 });
+  var LIMITS = Object.freeze({ name: 80, slug: 60, about: 1200, hours: 120, phones: 4, links: 6, photos: 12, videos: 3, videoBytes: 50 * 1024 * 1024, linkLabel: 40, fileBytes: 5 * 1024 * 1024 });
   var IMAGE_SIDE = Object.freeze({ logo: 512, wordmark: 1024, photo: 1600 });
   var IMAGE_QUALITY = 0.85;
   var SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -531,7 +540,8 @@ input[aria-invalid=true]{border-color:var(--danger)}
     var media = Object.freeze({
       logo_url: unit.vacant ? null : (unit.logo_url || null),
       wordmark_url: unit.vacant ? null : (unit.wordmark_url || null),
-      photos: Object.freeze(unit.vacant ? [] : (Array.isArray(unit.photos) ? unit.photos.slice(0, LIMITS.photos) : []))
+      photos: Object.freeze(unit.vacant ? [] : (Array.isArray(unit.photos) ? unit.photos.slice(0, LIMITS.photos) : [])),
+      videos: Object.freeze(unit.vacant ? [] : (Array.isArray(unit.videos) ? unit.videos.slice(0, LIMITS.videos) : []))
     });
     setState({ currentId: id, media: media, slugTouched: !unit.vacant && !!unit.slug, flash: flash, busy: 0 });
     renderEditor(unit);
@@ -622,6 +632,17 @@ input[aria-invalid=true]{border-color:var(--danger)}
         '<button type="button" class="btn btn-small" data-action="add-photos" id="add-photos">+ Додати фото</button>' +
         '<input type="file" id="file-photos" accept="image/png,image/jpeg,image/webp" multiple hidden>' +
         '<div class="status" id="photos-status" role="status"></div>' +
+      '</div>' +
+
+      '<div class="section"><h2>Відео <span class="counter" id="videos-count"></span></h2>' +
+        '<div class="videos" id="videos"></div>' +
+        '<button type="button" class="btn btn-small" data-action="add-video" id="add-video">+ Завантажити відео</button>' +
+        '<input type="file" id="file-video" accept="video/mp4,video/quicktime,video/webm" hidden>' +
+        '<div class="field" style="margin:16px 0 0"><label for="f-youtube">Або посилання на YouTube</label>' +
+          '<div class="row" style="margin:0"><div class="grow"><input type="url" id="f-youtube" placeholder="https://youtu.be/…" inputmode="url" autocapitalize="off" spellcheck="false"></div>' +
+          '<button type="button" class="btn btn-small" data-action="add-youtube" id="add-youtube">Додати</button></div></div>' +
+        '<span class="hint">До ' + LIMITS.videos + ' відео. Файл — до ' + (LIMITS.videoBytes / BYTES_IN_MB) + ' МБ (приблизно хвилина з телефону). Довше відео викладіть на YouTube і вставте посилання.</span>' +
+        '<div class="status" id="videos-status" role="status"></div>' +
       '</div>' +
 
       (vacant || state.role !== 'admin' ? '' :
@@ -749,6 +770,80 @@ input[aria-invalid=true]{border-color:var(--danger)}
     renderSingleMedia('logo', 'media-logo', state.media.logo_url, false);
     renderSingleMedia('wordmark', 'media-wordmark', state.media.wordmark_url, true);
     renderPhotos();
+    renderVideos();
+  }
+
+  /* ---------- Відео ---------- */
+  function renderVideos() {
+    var box = document.getElementById('videos');
+    if (!box) return;
+    var videos = state.media.videos;
+    var unit = findUnit(state.currentId);
+    var title = unit ? (unit.name || '') : '';
+    box.innerHTML = videos.map(function (url, i) {
+      return '<div class="video-item">' + window.GPVideo.html(url, title) +
+        '<button type="button" class="icon-btn" data-action="video-remove" data-index="' + i + '" aria-label="Видалити відео ' + (i + 1) + '">×</button></div>';
+    }).join('');
+    var full = videos.length >= LIMITS.videos;
+    document.getElementById('videos-count').textContent = videos.length + ' з ' + LIMITS.videos;
+    document.getElementById('add-video').disabled = full;
+    document.getElementById('add-youtube').disabled = full;
+    document.getElementById('f-youtube').disabled = full;
+  }
+
+  function addVideo(url) {
+    setMedia({ videos: Object.freeze(state.media.videos.concat([url])) });
+    renderVideos();
+  }
+
+  function addYoutubeLink() {
+    var input = document.getElementById('f-youtube');
+    var raw = input.value.trim();
+    if (!raw || state.media.videos.length >= LIMITS.videos) return;
+    var video = window.GPVideo.parse(raw);
+    if (!video || video.kind !== 'youtube') {
+      setStatus('videos-status', 'Це не схоже на посилання YouTube. Відкрийте відео на YouTube, натисніть «Поділитися» й скопіюйте посилання.', true);
+      return;
+    }
+    var url = window.GPVideo.normalize(raw);
+    if (state.media.videos.indexOf(url) !== -1) { setStatus('videos-status', 'Це відео вже додано.', true); return; }
+    input.value = '';
+    addVideo(url);
+    setStatus('videos-status', 'Відео додано. Натисніть «Зберегти», щоб воно з\'явилось на сайті.', false);
+  }
+
+  async function onVideoFile(file) {
+    var unitId = state.currentId;
+    if (state.media.videos.length >= LIMITS.videos) return;
+    if (VIDEO_TYPES.indexOf(file.type) === -1) {
+      setStatus('videos-status', 'Цей файл не підходить. Оберіть відео з галереї телефона (MP4 або MOV).', true);
+      return;
+    }
+    if (file.size > LIMITS.videoBytes) {
+      setStatus('videos-status', 'Відео завелике: ' + Math.round(file.size / BYTES_IN_MB) + ' МБ, а можна до ' + (LIMITS.videoBytes / BYTES_IN_MB) +
+        ' МБ. Обріжте його або викладіть на YouTube і додайте посилання.', true);
+      return;
+    }
+    setStatus('videos-status', 'Завантажуємо відео… Це може тривати хвилину, не закривайте сторінку.', false);
+    changeBusy(1);
+    try {
+      // MOV з айфона зберігаємо як MP4: формат той самий, а так його відтворюють усі браузери
+      var isWebm = file.type === 'video/webm';
+      var path = unitId + '/' + Date.now() + '-' + randomPart() + (isWebm ? '.webm' : '.mp4');
+      var res = await client.storage.from(VIDEO_BUCKET).upload(path, file, { contentType: isWebm ? 'video/webm' : 'video/mp4', cacheControl: '31536000', upsert: false });
+      if (res.error) throw res.error;
+      var pub = client.storage.from(VIDEO_BUCKET).getPublicUrl(path);
+      var url = pub && pub.data && pub.data.publicUrl;
+      if (!url) throw new Error('Сховище не повернуло адресу відео');
+      if (state.currentId !== unitId) return;
+      addVideo(url);
+      setStatus('videos-status', 'Відео додано. Натисніть «Зберегти», щоб воно з\'явилось на сайті.', false);
+    } catch (err) {
+      console.error('[кабінет] завантаження відео:', err);
+      setStatus('videos-status', 'Не вдалося завантажити відео. Перевірте інтернет і спробуйте ще раз; якщо не допоможе — викладіть його на YouTube і додайте посилання.', true);
+    } finally {
+      changeBusy(-1);
+    }
   }
 
   function renderSingleMedia(kind, boxId, url, wide) {
@@ -1127,6 +1222,12 @@ input[aria-invalid=true]{border-color:var(--danger)}
       setMedia({ photos: Object.freeze(state.media.photos.filter(function (_, i) { return i !== index; })) });
       renderPhotos();
     }
+    else if (action === 'add-video') document.getElementById('file-video').click();
+    else if (action === 'add-youtube') addYoutubeLink();
+    else if (action === 'video-remove') {
+      setMedia({ videos: Object.freeze(state.media.videos.filter(function (_, i) { return i !== index; })) });
+      renderVideos();
+    }
     else if (action === 'vacate') onVacate();
     else if (action === 'access-grant') changeAccess('grant');
     else if (action === 'access-revoke') changeAccess('revoke');
@@ -1171,6 +1272,7 @@ input[aria-invalid=true]{border-color:var(--danger)}
     target.value = '';
     if (!files.length) return;
     if (target.id === 'file-photos') onPhotoFiles(files);
+    else if (target.id === 'file-video') onVideoFile(files[0]);
     else onSingleFile(target.id === 'file-logo' ? 'logo' : 'wordmark', files[0]);
   }
 
@@ -1255,7 +1357,8 @@ input[aria-invalid=true]{border-color:var(--danger)}
       }),
       logo_url: state.media.logo_url,
       wordmark_url: state.media.wordmark_url,
-      photos: state.media.photos.slice()
+      photos: state.media.photos.slice(),
+      videos: state.media.videos.slice()
     };
   }
 
@@ -1306,7 +1409,8 @@ input[aria-invalid=true]{border-color:var(--danger)}
         vacant: false, name: draft.name, cat: draft.cat, slug: draft.slug, about: draft.about, hours: draft.hours,
         phones: phones.slice(0, LIMITS.phones), links: links.slice(0, LIMITS.links),
         logo_url: draft.logo_url || null, wordmark_url: draft.wordmark_url || null,
-        photos: draft.photos.slice(0, LIMITS.photos)
+        photos: draft.photos.slice(0, LIMITS.photos),
+        videos: draft.videos.slice(0, LIMITS.videos)
       }
     };
   }
@@ -1326,7 +1430,7 @@ input[aria-invalid=true]{border-color:var(--danger)}
   function ownerPayload(payload) {
     return {
       about: payload.about, hours: payload.hours, phones: payload.phones, links: payload.links,
-      logo_url: payload.logo_url, wordmark_url: payload.wordmark_url, photos: payload.photos
+      logo_url: payload.logo_url, wordmark_url: payload.wordmark_url, photos: payload.photos, videos: payload.videos
     };
   }
 
@@ -1363,7 +1467,7 @@ input[aria-invalid=true]{border-color:var(--danger)}
     if (!ok) return;
     var payload = {
       vacant: true, name: '', slug: null, about: '', hours: '', phones: [], links: [],
-      logo_url: null, wordmark_url: null, photos: []
+      logo_url: null, wordmark_url: null, photos: [], videos: []
     };
     try {
       await updateUnit(unit.unit_id, payload);

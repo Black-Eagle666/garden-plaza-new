@@ -6,7 +6,7 @@
   var UP = '../../';
   var TIMEOUT_MS = 5000;
   var ICON_PHONE = "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z\"/></svg>";
-  var COLUMNS = 'unit_id,vacant,slug,name,about,hours,phones,links,logo_url,photos';
+  var COLUMNS = 'unit_id,vacant,slug,name,about,hours,phones,links,logo_url,photos,videos';
 
   function safeUrl(s) { return typeof s === 'string' && /^(https:\/\/|shops\/)[^"'<>\s]+$/.test(s) ? s : null; }
   function assetUrl(s) { return /^https:\/\//.test(s) ? s : UP + s; }
@@ -74,6 +74,14 @@
     section.hidden = photos.length === 0;
   }
 
+  function applyVideos(videos, name) {
+    var section = document.querySelector('[data-live="vids"]');
+    if (!section || !window.GPVideo) return;
+    var players = videos.map(function (url) { return window.GPVideo.html(url, 'Відео закладу ' + name); }).join('');
+    section.querySelector('.vids').innerHTML = players;
+    section.hidden = !players;
+  }
+
   function apply(row) {
     var name = String(row.name || '').trim();
     if (!name) return;
@@ -94,6 +102,7 @@
     applyButtons(phones, links);
     applyLogo(safeUrl(row.logo_url), name);
     applyPhotos(photos, name);
+    applyVideos((Array.isArray(row.videos) ? row.videos : []).filter(function (u) { return typeof u === 'string'; }), name);
   }
 
   var ctrl = 'AbortController' in window ? new AbortController() : null;

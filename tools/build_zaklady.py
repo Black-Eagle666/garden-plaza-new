@@ -36,6 +36,23 @@ SCHEMA_TYPE_BY_CAT = {
 }
 SCHEMA_TYPE_DEFAULT = "LocalBusiness"
 
+# відео закладу: посилання на YouTube або файл зі сховища. Ті самі правила й розмітка, що в gp-video.js
+YOUTUBE_RE = re.compile(r"^https?://(?:www\.|m\.)?(?:youtube\.com/(?:watch\?(?:[^#]*&)?v=|shorts/|embed/|live/)|youtu\.be/)([A-Za-z0-9_-]{11})(?:[?&#/].*)?$")
+VIDEO_FILE_RE = re.compile(r"^https://[^\"'<>\s]+\.(?:mp4|webm)$", re.I)
+
+
+def video_html(url, title):
+    """Плеєр для сторінки закладу; порожній рядок, якщо адреса не схожа на відео."""
+    youtube = YOUTUBE_RE.match(url)
+    if youtube:
+        tall = " is-tall" if "youtube.com/shorts/" in url else ""
+        return (f'<button type="button" class="gp-vid gp-yt{tall}" data-yt="{youtube.group(1)}" aria-label="Увімкнути відео: {esc(title)}">'
+                f'<img src="https://i.ytimg.com/vi/{youtube.group(1)}/hqdefault.jpg" alt="" loading="lazy" decoding="async">'
+                '<span class="gp-yt-play" aria-hidden="true"></span></button>')
+    if VIDEO_FILE_RE.match(url):
+        return f'<video class="gp-vid" controls playsinline preload="metadata" src="{esc(url)}" aria-label="{esc(title)}"></video>'
+    return ""
+
 
 # ——— читання даних із JS на головній ———
 
@@ -174,6 +191,7 @@ def build_places(rows, data):
             "about": r.get("about") or "", "hours": r.get("hours") or data["default_hours"],
             "phones": r.get("phones") or [data["mall_phone"]],
             "logo": r.get("logo_url"), "pics": r.get("photos") or [],
+            "vids": [v for v in (r.get("videos") or []) if isinstance(v, str)],
             "links": [l for l in (r.get("links") or []) if str(l.get("href", "")).startswith(("https://", "http://"))],
             "wordmark": r.get("wordmark_url"),
             "mark": mark if same_tenant else None,
@@ -338,6 +356,8 @@ def place_page(place, places, data):
                    for i, p in enumerate(place["pics"]))
     # секція є завжди (порожня схована): скрипт покаже її, якщо фото з'являться в базі
     pics = f'<section data-live="pics"{"" if imgs else " hidden"}><h2>Фото</h2><div class="pics">{imgs}</div></section>'
+    players = "".join(video_html(v, f"Відео закладу {place['name']}") for v in place["vids"])
+    vids = f'<section data-live="vids"{"" if players else " hidden"}><h2>Відео</h2><div class="vids">{players}</div></section>'
     phones_text = ", ".join(tel_label(n) for n in place["phones"]) or "уточнюйте в закладі"
     neighbours = sorted((p for p in places.values() if p["floor"] == place["floor"] and p["slug"] != place["slug"]),
                         key=lambda p: p["name"].lower())
@@ -363,6 +383,7 @@ def place_page(place, places, data):
   <div class="acts">{acts}</div>
   <section><h2>Про заклад</h2><p class="about" data-live="about">{esc(about)}</p></section>
   {pics}
+  {vids}
   <section><h2>Як знайти</h2>
     <dl class="facts">
       <dt>Поверх</dt><dd>{FLOOR_NAMES[place["floor"]]}</dd>
@@ -376,6 +397,7 @@ def place_page(place, places, data):
 </main>
 {footer_html(up, data)}
 <script src="{up}gp-config.js"></script>
+<script src="{up}gp-video.js" defer></script>
 <script src="../live.js" defer></script>
 <script src="{up}gp-lightbox.js" defer></script>
 </body>
@@ -395,7 +417,7 @@ LIVE_JS = r"""(function () {
   var UP = '../../';
   var TIMEOUT_MS = 5000;
   var ICON_PHONE = __ICON_PHONE__;
-  var COLUMNS = 'unit_id,vacant,slug,name,about,hours,phones,links,logo_url,photos';
+  var COLUMNS = 'unit_id,vacant,slug,name,about,hours,phones,links,logo_url,photos,videos';
 
   function safeUrl(s) { return typeof s === 'string' && /^(https:\/\/|shops\/)[^"'<>\s]+$/.test(s) ? s : null; }
   function assetUrl(s) { return /^https:\/\//.test(s) ? s : UP + s; }
@@ -463,6 +485,14 @@ LIVE_JS = r"""(function () {
     section.hidden = photos.length === 0;
   }
 
+  function applyVideos(videos, name) {
+    var section = document.querySelector('[data-live="vids"]');
+    if (!section || !window.GPVideo) return;
+    var players = videos.map(function (url) { return window.GPVideo.html(url, 'Відео закладу ' + name); }).join('');
+    section.querySelector('.vids').innerHTML = players;
+    section.hidden = !players;
+  }
+
   function apply(row) {
     var name = String(row.name || '').trim();
     if (!name) return;
@@ -483,6 +513,7 @@ LIVE_JS = r"""(function () {
     applyButtons(phones, links);
     applyLogo(safeUrl(row.logo_url), name);
     applyPhotos(photos, name);
+    applyVideos((Array.isArray(row.videos) ? row.videos : []).filter(function (u) { return typeof u === 'string'; }), name);
   }
 
   var ctrl = 'AbortController' in window ? new AbortController() : null;
@@ -584,6 +615,7 @@ h2{margin:0 0 14px;font:500 32px/1.1 var(--serif)}
 .about{margin:0;max-width:64ch;font-size:16.5px;line-height:1.7;color:#D9CDBB}
 /* фото показуємо цілими, у їхньому власному форматі (4:3, 16:9, 9:16…): однакова висота, ширина — за пропорцією */
 .pics{display:flex;flex-wrap:wrap;gap:10px}
+.vids{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;max-width:900px}
 .pics img{display:block;height:300px;width:auto;max-width:100%;object-fit:contain;border-radius:14px;border:1px solid rgba(201,164,106,.25);background:#1A140F}
 .facts{display:grid;grid-template-columns:max-content 1fr;gap:10px 22px;margin:0;padding:18px 20px;border-radius:16px;border:1px solid rgba(201,164,106,.18);background:rgba(20,16,12,.7)}
 .facts dt{color:var(--muted)}

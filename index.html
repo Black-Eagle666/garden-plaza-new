@@ -346,6 +346,9 @@ p{margin:0}
 .cut-info.no-pics{grid-template-columns:minmax(170px,auto) 1fr auto}
 .cut-info[hidden]{display:none}
 .cut-info .pics{display:grid;grid-template-columns:auto auto;gap:8px}
+/* відео закладу: під фото, по одному в рядок */
+.cut-info .vids,.card .vids{display:grid;gap:8px}
+.post .gp-vid{border:0;border-radius:0}
 .cut-info .pics img{display:block;width:112px;height:84px;object-fit:cover;border-radius:8px;border:1px solid rgba(201,164,106,.3);background:#1A140F}
 .who{display:flex;align-items:center;gap:14px;min-width:0}
 .brand-logo{flex:none;width:56px;height:56px;border-radius:12px;object-fit:cover;border:1px solid rgba(201,164,106,.3);background:#0B0907}
@@ -446,7 +449,7 @@ p{margin:0}
   .info-cap b{font:500 20px/1 var(--serif);letter-spacing:0;color:var(--gold-hi)}
   .cut-info .who{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
   .cut-info h3{font-size:clamp(26px,2.2vw,34px)}
-  .cut-info .pics{order:5}
+  .cut-info .pics,.cut-info .vids{order:5}
   .info-empty{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:6px}
   .info-empty .ic{width:46px;height:46px;border-radius:12px;border:1px solid var(--gold);display:grid;place-items:center;color:var(--gold-hi);font-size:20px}
   .info-empty h3{font:500 30px/1.05 var(--serif);color:#fff}
@@ -468,6 +471,7 @@ p{margin:0}
   .cut-info .acts:has(> :nth-child(3)){grid-template-columns:1fr 1fr}
   .cut-info .acts a{flex:1 1 120px}
   .cut-info p{order:3}
+  .cut-info .vids{order:4}
   .cut-info .pics{order:4;grid-template-columns:1fr 1fr}
   .cut-info .pics img{width:100%;height:auto;aspect-ratio:4/3}
   .cut-info .pics:has(> img:only-child){grid-template-columns:1fr}
@@ -548,6 +552,7 @@ p{margin:0}
   .cut-info .acts:has(> :nth-child(3)){grid-template-columns:1fr 1fr}
   .cut-info .acts a{flex:1 1 140px;padding:13px 16px}
   .cut-info p{order:3;font-size:14.5px}
+  .cut-info .vids{order:4}
   .cut-info .pics{order:4;grid-template-columns:1fr 1fr}
   .cut-info .pics img{width:100%;height:auto;aspect-ratio:4/3}
   .cut-info .pics:has(> img:only-child){grid-template-columns:minmax(0,240px)}
@@ -1104,6 +1109,7 @@ footer a:hover{color:var(--gold-hi)}
 </nav>
 
 <script src="gp-config.js"></script>
+<script src="gp-video.js"></script>
 <script>
 (() => {
   const $ = (s) => document.querySelector(s);
@@ -1267,6 +1273,7 @@ footer a:hover{color:var(--gold-hi)}
       ...(row.hours ? {hours:escapeHtml(String(row.hours))} : {}), phones:phones.length ? phones : undefined,
       links:(row.links || []).filter((l) => /^https?:\/\//.test(l.href || "")).map((l) => ({href:escapeHtml(l.href), label:escapeHtml(l.label || l.href)})),
       logo:safeUrl(row.logo_url), wordmark:safeUrl(row.wordmark_url), pics:photos,
+      vids:(Array.isArray(row.videos) ? row.videos : []).filter((u) => GPVideo.parse(u)),
       thumb:(sameTenant && own.thumb && sameList(photos, own.pics) ? own.thumb : null) || safeUrl(row.logo_url) || photos[0] || null,
       tags:sameTenant ? own.tags : `${rawName} ${CATS[cat].name} ${(slug || "").replace(/-/g, " ")}`};
   }
@@ -1314,14 +1321,14 @@ footer a:hover{color:var(--gold-hi)}
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), BASE_TIMEOUT_MS);
     try {
-      const query = `select=id,kind,title,body,photo_url,unit_ids,valid_until,created_at&published=eq.true&order=created_at.desc&limit=${NEWS_LIMIT}`;
+      const query = `select=id,kind,title,body,photo_url,video_url,unit_ids,valid_until,created_at&published=eq.true&order=created_at.desc&limit=${NEWS_LIMIT}`;
       const res = await fetch(`${cfg.supabaseUrl}/rest/v1/news?${query}`, {headers:{apikey:cfg.supabaseKey}, signal:ctrl.signal});
       if (!res.ok) throw new Error(`база відповіла ${res.status}`);
       const today = localDay(new Date());
       return (await res.json())
         .filter((r) => r && typeof r.title === "string" && r.title && (!r.valid_until || r.valid_until >= today))
         .map((r) => ({id:Number(r.id), kind:NEWS_KINDS[r.kind] ? r.kind : "news", title:escapeHtml(r.title),
-          body:escapeHtml(String(r.body || "")), photo:safeUrl(r.photo_url), units:Array.isArray(r.unit_ids) ? r.unit_ids.map(String) : [],
+          body:escapeHtml(String(r.body || "")), photo:safeUrl(r.photo_url), video:GPVideo.parse(r.video_url) ? String(r.video_url) : null, units:Array.isArray(r.unit_ids) ? r.unit_ids.map(String) : [],
           until:typeof r.valid_until === "string" ? r.valid_until : null, date:String(r.created_at || "")}));
     } catch (err) {
       console.warn("Новини з бази не завантажились, секцію не показуємо:", err);
@@ -1346,11 +1353,13 @@ footer a:hover{color:var(--gold-hi)}
 
   function newsCardHtml(item) {
     const photo = item.photo ? `<img src="${item.photo}" alt="" loading="lazy" decoding="async" width="960" height="640">` : "";
+    // якщо до запису прикріплено відео — показуємо його замість фото; фото стає обкладинкою відеофайлу
+    const media = item.video ? GPVideo.html(item.video, "Відео до новини", item.photo) : photo;
     const long = item.body.length > NEWS_CUT_CHARS;
     const text = item.body ? `<p${long ? ' class="is-cut"' : ""}>${item.body.replace(/\n/g, "<br>")}</p>` : "";
     const more = long ? `<button type="button" class="post-more" data-more aria-expanded="false">Читати далі</button>` : "";
     const until = item.until ? `<span class="post-until">Діє до ${dayLabel(item.until)}</span>` : "";
-    return `<article class="post k-${item.kind}">${photo}<div class="post-body"><div class="post-meta"><span class="post-kind">${NEWS_KIND_ONE[item.kind]}</span><span>${dayLabel(item.date)}</span></div><h3>${item.title}</h3>${text}${more}${until}${newsUnitsHtml(item)}</div></article>`;
+    return `<article class="post k-${item.kind}">${media}<div class="post-body"><div class="post-meta"><span class="post-kind">${NEWS_KIND_ONE[item.kind]}</span><span>${dayLabel(item.date)}</span></div><h3>${item.title}</h3>${text}${more}${until}${newsUnitsHtml(item)}</div></article>`;
   }
 
   function renderNews() {
@@ -1707,12 +1716,12 @@ footer a:hover{color:var(--gold-hi)}
     const zone = PLATE_ZONES.find((zn) => zn.id === id);
     if (zone) {
       return {name:zone.name, tag:"Відвідувачам", color:"var(--gold)", where:`${zone.note}, перед входом`, hours:"цілодобово",
-        about:"Безкоштовний паркінг на 120 місць біля входу для відвідувачів центру, ресторану й готелю. Є 2 місця для електромобілів і 2 місця для людей з інвалідністю.", phones:[MALL_PHONE], logo:null, pics:[], links:SHOP_LINKS[id] || []};
+        about:"Безкоштовний паркінг на 120 місць біля входу для відвідувачів центру, ресторану й готелю. Є 2 місця для електромобілів і 2 місця для людей з інвалідністю.", phones:[MALL_PHONE], logo:null, pics:[], vids:[], links:SHOP_LINKS[id] || []};
     }
     if (!unit) return null;
     return {id:unit.id, slug:unit.slug, name:unit.name, tag:CATS[unit.cat].name, color:cssVar(CATS[unit.cat].c), where:`${unit.f} поверх, приміщення ${unit.id}`,
       hours:unit.hours || DEFAULT_HOURS, about:unit.about, phones:unit.phones || [unit.phone || MALL_PHONE], logo:unit.logo || null,
-      pics:unit.pics || [], links:unit.links || []};
+      pics:unit.pics || [], vids:unit.vids || [], links:unit.links || []};
   }
   // мініатюра в списку закладів: готовий маленький кадр, логотип або перше фото (thumb задає BUILTIN чи fromBase)
   const thumbHtml = (u) => (u.thumb
@@ -1722,6 +1731,8 @@ footer a:hover{color:var(--gold-hi)}
       : `<span class="ph" aria-hidden="true">${u.name[0]}</span>`);
   const picsHtml = (s) => s.pics.map((src, i) =>
     `<img src="${src}" alt="${s.name}, фото ${i + 1}" loading="lazy" decoding="async" width="640" height="480">`).join("");
+  // відео закладу: файл або YouTube (плеєр і його стилі — у gp-video.js)
+  const vidsHtml = (s) => (s.vids.length ? `<div class="vids">${s.vids.map((url) => GPVideo.html(url, `Відео закладу ${s.text || ""}`.trim())).join("")}</div>` : "");
   const logoHtml = (s) => {
     if (s.logo) return `<img class="brand-logo" src="${s.logo}" alt="Логотип ${s.name}" loading="lazy" decoding="async" width="160" height="160">`;
     const mark = s.id ? brandMark(s.id) : null;
@@ -1736,6 +1747,7 @@ footer a:hover{color:var(--gold-hi)}
     return `
       <div class="who">${logoHtml(s)}<div><span class="tag" style="--c:${s.color}"><i></i>${s.tag}</span><h3>${s.name}</h3></div></div>
       ${s.pics.length ? `<div class="pics">${picsHtml(s)}</div>` : ""}
+      ${vidsHtml(s)}
       <p>${s.about}</p>
       <dl><dt>Поверх</dt><dd>${u.f}</dd><dt>Приміщення</dt><dd>${u.id}</dd><dt>Графік</dt><dd>${s.hours}</dd></dl>
       <div class="acts">
@@ -1983,7 +1995,7 @@ footer a:hover{color:var(--gold-hi)}
 
   function infoHtml(s) {
     const pics = s.pics.length ? `<div class="pics">${picsHtml(s)}</div>` : "";
-    return `${infoCap(s.id || "")}${pics}<div class="who">${logoHtml(s)}<div><span class="tag" style="--c:${s.color}"><i></i>${s.tag}</span><h3>${s.name}</h3><div class="meta">${s.where}</div><div class="hrs">Графік: ${s.hours}</div></div></div><p>${s.about}${pageLink(s)}</p><div class="acts">${phonesHtml(s, "call")}${linksHtml(s, s.phones.length ? "" : "call")}</div>${INFO_FOOT}`;
+    return `${infoCap(s.id || "")}${pics}${vidsHtml(s)}<div class="who">${logoHtml(s)}<div><span class="tag" style="--c:${s.color}"><i></i>${s.tag}</span><h3>${s.name}</h3><div class="meta">${s.where}</div><div class="hrs">Графік: ${s.hours}</div></div></div><p>${s.about}${pageLink(s)}</p><div class="acts">${phonesHtml(s, "call")}${linksHtml(s, s.phones.length ? "" : "call")}</div>${INFO_FOOT}`;
   }
 
   // Розставляє підписи над блоками, щоб вони не перекривались і не виходили за край плану.
