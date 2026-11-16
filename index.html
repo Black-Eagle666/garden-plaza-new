@@ -280,7 +280,15 @@ p{margin:0}
 .blk:hover .top.poly svg:not(.glow) polygon,.blk:focus-visible .top.poly svg:not(.glow) polygon{fill:#4A3A28;fill:color-mix(in srgb,var(--c) 64%,#1A140F)}
 .zone{position:absolute;transform-style:preserve-3d;cursor:pointer;outline:none}
 /* прозорість зони анімуємо на ::before: анімація на самому елементі «сплющила» б його, і підпис ліг би на підлогу */
-.zone::before{content:"";position:absolute;inset:0;border:1px dashed var(--gold-lo);background:repeating-linear-gradient(90deg,rgba(201,164,106,.16) 0 1px,transparent 1px calc(var(--u) * .5)),rgba(201,164,106,.05);animation:pinin .5s ease 1.6s both}
+.zone::before{content:"";position:absolute;inset:0;border:1px dashed var(--gold-lo);background:rgba(201,164,106,.05);animation:pinin .5s ease 1.6s both}
+/* розмітка паркінгу: лінії місць, сині місця для людей з інвалідністю, зелені для електромобілів */
+.lot-art{overflow:visible;pointer-events:none}
+.zone .lot-art{position:absolute;inset:0;width:100%;height:100%;transform:translateZ(.5px);animation:pinin .5s ease 1.6s both}
+.lot-art path,.lot-art circle{fill:none;stroke:rgba(232,204,148,.6);stroke-width:1.2;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.lot-art .ev{fill:rgba(141,178,85,.42);stroke:none}
+.lot-art .dis{fill:rgba(74,134,220,.5);stroke:none}
+.lot-art .ico :is(path,circle){stroke:#fff;stroke-width:1.4}
+.lot-art .way{stroke-opacity:.45}
 .zone:focus-visible::before{border-color:var(--gold-hi)}
 
 /* логотип закладу лежить на верхній грані блока; розмір — від самої грані (cqw/cqh). Назва стоїть над блоком на ніжці */
@@ -1374,7 +1382,52 @@ footer a:hover{color:var(--gold-hi)}
   }
 
   // зони поза приміщеннями; координати в клітинках плану, y більший за висоту поверху — перед фасадом
-  const PLATE_ZONES = [{id:"parking", f:1, x:2.4, y:5.85, w:9.6, h:3.3, name:"Паркінг", note:"120 місць"}];
+  const PLATE_ZONES = [{id:"parking", f:1, x:2.1, y:5.6, w:5, h:3.55, name:"Паркінг", note:"120 місць"}];
+  // розмітка паркінгу перед входом, як на фото згори: ряд уздовж крила (ALMA), проїзд до вулиці, ряд біля паркану.
+  // Одиниці — клітинки плану від кута зони; y росте від фасаду до вулиці. kinds — особливі місця ряду, рахуючи від фасаду
+  const LOT = {
+    stallW:.42,
+    wingRow:{n:8, y:.12, len:1},
+    fenceRow:{n:7, y:.4, len:1.05, kinds:["ev", "ev", "dis", "dis"]},
+    rack:{bars:5, right:.12, y:.06, w:.5, h:.2},
+    arrow:{len:.5, head:.1, gap:.22, at:[.2, .8]}
+  };
+  const LOT_ICONS = {
+    ev:'<path d="M13 2 5 14h6l-1 8 8-12h-6z"/>',
+    dis:'<circle cx="11" cy="4.5" r="2"/><path d="M11 8v6h5l2.5 5"/><path d="M8.5 11.5a5 5 0 1 0 6.5 6.5"/>'
+  };
+  const LOT_ICON_BOX = 24;
+
+  // малюнок розмітки для зони паркінгу; attrs — розміщення (у 2D-плані це x, y, width, height)
+  function lotArtSvg(zn, attrs = "") {
+    const S = CELL, w = zn.w * S, sw = LOT.stallW * S;
+    const {wingRow:a, fenceRow:b, rack, arrow} = LOT;
+    const seg = (x1, y1, x2, y2, cls = "") => `<path${cls ? ` class="${cls}"` : ""} d="M${x1} ${y1}L${x2} ${y2}"/>`;
+    const wing = Array.from({length:a.n + 1}, (_, i) => seg(0, a.y * S + i * sw, a.len * S, a.y * S + i * sw)).join("");
+    const inX = w - b.len * S;
+    const inY = (i) => b.y * S + i * sw;
+    const fence = Array.from({length:b.n + 1}, (_, i) => seg(inX, inY(i), w, inY(i))).join("");
+    const special = b.kinds.map((kind, i) => {
+      const scale = sw * .62 / LOT_ICON_BOX;
+      const cx = (inX + w) / 2, cy = inY(i) + sw / 2;
+      return `<path class="${kind}" d="M${inX} ${inY(i)}H${w}V${inY(i + 1)}H${inX}Z"/>`
+        + `<g class="ico" transform="translate(${cx - LOT_ICON_BOX * scale / 2} ${cy - LOT_ICON_BOX * scale / 2}) scale(${scale})">${LOT_ICONS[kind]}</g>`;
+    }).join("");
+    const rackX = w - (rack.right + rack.w) * S;
+    const bikes = Array.from({length:rack.bars}, (_, i) => {
+      const x = rackX + i * rack.w * S / (rack.bars - 1);
+      return seg(x, rack.y * S, x, (rack.y + rack.h) * S);
+    }).join("");
+    // проїзд: до фасаду їдуть ближче до паркану, до вулиці — ближче до крила
+    const mid = (a.len * S + inX) / 2, head = arrow.head * S;
+    const arrows = arrow.at.map((t) => {
+      const top = zn.h * S * t - arrow.len * S / 2, bottom = top + arrow.len * S;
+      const inbound = mid + arrow.gap * S, outbound = mid - arrow.gap * S;
+      return seg(inbound, bottom, inbound, top, "way") + `<path class="way" d="M${inbound - head} ${top + head}L${inbound} ${top}L${inbound + head} ${top + head}"/>`
+        + seg(outbound, top, outbound, bottom, "way") + `<path class="way" d="M${outbound - head} ${bottom - head}L${outbound} ${bottom}L${outbound + head} ${bottom - head}"/>`;
+    }).join("");
+    return `<svg class="lot-art" viewBox="0 0 ${w} ${zn.h * S}" aria-hidden="true"${attrs}>${special}${wing}${fence}${bikes}${arrows}</svg>`;
+  }
   // скільки закладів видно в каталозі на телефоні до кнопки «Показати всі»
   const LIST_PREVIEW = 6;
 
@@ -1511,6 +1564,7 @@ footer a:hover{color:var(--gold-hi)}
     if (grid.wing) svg.append(svgEl("rect", {class:"corridor", x:grid.wing.x*CELL, y:walkway.height, width:grid.wing.w*CELL, height:grid.rows*CELL - walkway.height}));
     PLATE_ZONES.filter((zn) => zn.f === state.floor).forEach((zn) => {
       svg.append(svgEl("rect", {class:"lot", x:zn.x*CELL, y:zn.y*CELL, width:zn.w*CELL, height:zn.h*CELL, rx:6}));
+      svg.insertAdjacentHTML("beforeend", lotArtSvg(zn, ` x="${zn.x*CELL}" y="${zn.y*CELL}" width="${zn.w*CELL}" height="${zn.h*CELL}"`));
       const t = svgEl("text", {class:"mark", x:(zn.x + zn.w / 2)*CELL, y:(zn.y + zn.h / 2)*CELL + 6, "text-anchor":"middle"});
       t.textContent = `${zn.name} · ${zn.note}`;
       svg.append(t);
@@ -1833,7 +1887,7 @@ footer a:hover{color:var(--gold-hi)}
       return `<div class="blk${u.shape ? " shaped" : ""}" role="button" tabindex="0" data-cut-unit="${u.id}" aria-label="${u.name}, приміщення ${u.id}" style="${style}">${u.shape ? shapeWalls(u) : '<i class="ws"></i><i class="wf"></i><i class="wb"></i><i class="we"></i>'}${top}<span class="lbl"><span class="pin">${u.name}<small>${u.id}</small></span></span></div>`;
     }).join("");
     const zones = PLATE_ZONES.filter((zn) => zn.f === f).map((zn) =>
-      `<div class="zone" role="button" tabindex="0" data-cut-unit="${zn.id}" aria-label="${zn.name}" style="--c:var(--gold);--i:9;left:${cells(zn.x)};top:${cells(zn.y)};width:${cells(zn.w)};height:${cells(zn.h)}"><span class="lbl"><span class="pin">${zn.name}<small>${zn.note}</small></span></span></div>`).join("");
+      `<div class="zone" role="button" tabindex="0" data-cut-unit="${zn.id}" aria-label="${zn.name}" style="--c:var(--gold);--i:9;left:${cells(zn.x)};top:${cells(zn.y)};width:${cells(zn.w)};height:${cells(zn.h)}">${lotArtSvg(zn)}<span class="lbl"><span class="pin">${zn.name}<small>${zn.note}</small></span></span></div>`).join("");
     return slabHtml(f) + rooms + marks + zones + blocks;
   }
 
