@@ -23,6 +23,19 @@ MAPS_URL = "https://www.google.com/maps/search/?api=1&query=48.1196052,23.772182
 FLOOR_NAMES = {1: "1 поверх", 2: "2 поверх", 3: "3 поверх", 4: "4 поверх"}
 FLOOR_IN = {1: "1 поверсі", 2: "2 поверсі", 3: "3 поверсі", 4: "4 поверсі"}
 
+# ——— для пошуковиків ———
+MALL_NAME = "ТЦ Garden Plaza New"
+LOCALITY = "Нересниця"
+GEO = {"latitude": 48.1196052, "longitude": 23.7721827}
+# опис у видачі Google обрізається приблизно тут
+DESCRIPTION_MAX = 160
+# тип закладу в розмітці schema.org: за категорією з кабінету
+SCHEMA_TYPE_BY_CAT = {
+    "grocery": "GroceryStore", "fashion": "ClothingStore", "tech": "ElectronicsStore", "food": "FoodEstablishment",
+    "fun": "SportsActivityLocation", "beauty": "Store", "shop": "Store",
+}
+SCHEMA_TYPE_DEFAULT = "LocalBusiness"
+
 
 # ——— читання даних із JS на головній ———
 
@@ -155,7 +168,9 @@ def build_places(rows, data):
         mark = next((p for p in data["popular"] if p["unit"] == r["unit_id"] or r["unit_id"] in p.get("also", [])), None)
         places[r["slug"]] = {
             "slug": r["slug"], "id": r["unit_id"], "name": r["name"], "floor": r["floor"], "spots": [r["unit_id"]],
-            "cat": cat["name"], "color": data["colors"][cat["c"]],
+            "cat": cat["name"], "cat_code": r["cat"] if r["cat"] in data["cats"] else "shop",
+            "updated": str(r.get("updated_at") or "")[:10],
+            "color": data["colors"][cat["c"]],
             "about": r.get("about") or "", "hours": r.get("hours") or data["default_hours"],
             "phones": r.get("phones") or [data["mall_phone"]],
             "logo": r.get("logo_url"), "pics": r.get("photos") or [],
@@ -229,6 +244,9 @@ def head_html(title, description, canonical, image, up, data, extra=""):
 <meta property="og:description" content="{esc(description)}">
 <meta property="og:url" content="{canonical}">
 <meta property="og:image" content="{image}">
+<meta property="og:site_name" content="{MALL_NAME}">
+<meta property="og:locale" content="uk_UA">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#07080C">
 <link rel="icon" type="image/png" sizes="64x64" href="{up}favicon.png">
 <link rel="icon" type="image/svg+xml" href="{up}favicon.svg">
@@ -259,20 +277,64 @@ def footer_html(up, data):
 </div></footer>"""
 
 
+def clip(text, limit):
+    """Обрізає текст по слову й ставить три крапки, якщо він довший за limit."""
+    return text if len(text) <= limit else text[:max(limit - 1, 1)].rsplit(" ", 1)[0].rstrip(" ,.;:—-") + "…"
+
+
+def seo_description(place, about):
+    """Опис для видачі: що за заклад + де він і коли працює. Адреса й графік мають уміститись завжди."""
+    where = f"{FLOOR_NAMES[place['floor']]} {MALL_NAME}, {LOCALITY}."
+    hours = f" Графік: {place['hours']}." if place["hours"] else ""
+    tail = where + hours if len(where + hours) <= DESCRIPTION_MAX // 2 else where
+    lead = about if about.endswith((".", "!", "?", "…")) else about + "."
+    return f"{clip(lead, DESCRIPTION_MAX - len(tail) - 1)} {tail}"
+
+
+def place_schema(place, about, canonical, images):
+    """Розмітка schema.org: сам заклад і «хлібні крихти» до нього."""
+    business = {
+        "@context": "https://schema.org",
+        "@type": SCHEMA_TYPE_BY_CAT.get(place["cat_code"], SCHEMA_TYPE_DEFAULT),
+        "@id": canonical + "#place", "name": place["name"], "description": about, "url": canonical, "image": images,
+        "address": {"@type": "PostalAddress", "streetAddress": "вул. Грушевського, 30", "addressLocality": LOCALITY,
+                    "addressRegion": "Закарпатська область", "addressCountry": "UA"},
+        "geo": {"@type": "GeoCoordinates", **GEO},
+        "hasMap": MAPS_URL,
+        "containedInPlace": {"@type": "ShoppingCenter", "name": MALL_NAME, "url": BASE_URL},
+    }
+    if place["logo"]:
+        business["logo"] = absolute(place["logo"])
+    if place["phones"]:
+        business["telephone"] = "+38" + place["phones"][0]
+    if place["links"]:
+        business["sameAs"] = [l["href"] for l in place["links"]]
+    crumbs = {
+        "@context": "https://schema.org", "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": i + 1, "name": name, "item": url}
+            for i, (name, url) in enumerate([(MALL_NAME, BASE_URL), ("Заклади", f"{BASE_URL}zaklady/"), (place["name"], canonical)])
+        ],
+    }
+    return "".join(f'<script type="application/ld+json">{json.dumps(block, ensure_ascii=False)}</script>' for block in (business, crumbs))
+
+
 def place_page(place, places, data):
     up = "../../"
     canonical = f"{BASE_URL}zaklady/{place['slug']}/"
-    title = f"{place['name']} — ТЦ Garden Plaza New, Нересниця"
-    about = place["about"] or f"{place['name']} у ТЦ Garden Plaza New."
-    description = about if len(about) <= 160 else about[:157].rsplit(" ", 1)[0] + "…"
-    image = absolute(place["logo"] or (place["pics"][0] if place["pics"] else "og.jpg"))
+    title = f"{place['name']}, {LOCALITY} — {FLOOR_NAMES[place['floor']]} {MALL_NAME}"
+    about = place["about"] or f"{place['name']} у {MALL_NAME}."
+    description = seo_description(place, about)
+    # у соцмережах і видачі краще виглядає фото закладу; логотип — коли фото немає
+    images = [absolute(p) for p in place["pics"]] or [absolute(place["logo"] or "og.jpg")]
+    image = images[0]
 
     phones = "".join(f'<a class="btn main live" href="tel:+38{n}">{ICON_PHONE}{tel_label(n)}</a>' for n in place["phones"])
     links = "".join(f'<a class="btn live" href="{esc(l["href"])}" target="_blank" rel="noopener">{esc(l["label"])}</a>' for l in place["links"])
     acts = (phones + links
             + f'<a class="btn" href="{up}?zaklad={esc(place["id"])}">{ICON_CUBE}Показати на 3D-плані</a>'
             + f'<a class="btn" href="{MAPS_URL}" target="_blank" rel="noopener">{ICON_PIN}Прокласти маршрут</a>')
-    imgs = "".join(f'<img src="{esc(asset(p, up))}" alt="{esc(place["name"])}, фото {i + 1}" loading="lazy" decoding="async" width="640" height="480">'
+    imgs = "".join(f'<img src="{esc(asset(p, up))}" alt="{esc(place["name"])} у {MALL_NAME}, {LOCALITY} — фото {i + 1}" loading="lazy" decoding="async" width="640" height="480">'
                    for i, p in enumerate(place["pics"]))
     # секція є завжди (порожня схована): скрипт покаже її, якщо фото з'являться в базі
     pics = f'<section data-live="pics"{"" if imgs else " hidden"}><h2>Фото</h2><div class="pics">{imgs}</div></section>'
@@ -282,18 +344,7 @@ def place_page(place, places, data):
     tiles = "".join(tile_html(p, data, up, f"{up}zaklady/{p['slug']}/") for p in neighbours)
     more = f'<section><h2>Ще на {FLOOR_IN[place["floor"]]}</h2><div class="tiles">{tiles}</div></section>' if tiles else ""
 
-    ld = {
-        "@context": "https://schema.org", "@type": "LocalBusiness", "name": place["name"],
-        "description": about, "url": canonical, "image": image,
-        "address": {"@type": "PostalAddress", "streetAddress": "вул. Грушевського, 30", "addressLocality": "Нересниця",
-                    "addressRegion": "Закарпатська область", "addressCountry": "UA"},
-        "containedInPlace": {"@type": "ShoppingCenter", "name": "ТЦ Garden Plaza New", "url": BASE_URL},
-    }
-    if place["phones"]:
-        ld["telephone"] = "+38" + place["phones"][0]
-    if place["links"]:
-        ld["sameAs"] = [l["href"] for l in place["links"]]
-    extra = f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>'
+    extra = place_schema(place, about, canonical, images)
 
     return f"""{head_html(title, description, canonical, image, up, data, extra)}
 <body>
@@ -477,9 +528,12 @@ def all_places_page(places, data):
 
 
 def sitemap_xml(places):
-    # без lastmod: інакше файл мінявся б щодня й GitHub щодня робив би зайвий коміт
-    urls = [BASE_URL, f"{BASE_URL}zaklady/"] + [f"{BASE_URL}zaklady/{slug}/" for slug in places]
-    rows = "".join(f"  <url><loc>{u}</loc></url>\n" for u in urls)
+    # lastmod — лише в закладів і лише дата їхньої останньої зміни в кабінеті: файл не міняється без причини,
+    # тож GitHub не робить зайвих комітів
+    rows = "".join(f"  <url><loc>{u}</loc></url>\n" for u in (BASE_URL, f"{BASE_URL}zaklady/"))
+    for slug, place in places.items():
+        lastmod = f"<lastmod>{place['updated']}</lastmod>" if place.get("updated") else ""
+        rows += f"  <url><loc>{BASE_URL}zaklady/{slug}/</loc>{lastmod}</url>\n"
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{rows}</urlset>\n'
 
 
