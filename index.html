@@ -295,8 +295,10 @@ p{margin:0}
 /* логотип закладу лежить на верхній грані блока; розмір — від самої грані (cqw/cqh). Назва стоїть над блоком на ніжці */
 .blk .top{container-type:size}
 .face{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
-/* номер кімнати готелю на грані блока: видно навіть із прихованими назвами */
-.face.room-no{font:600 min(46cqw,46cqh)/1 var(--sans);color:var(--gold-hi);letter-spacing:-.02em}
+/* номер і тип кімнати готелю на грані блока: видно навіть із прихованими назвами */
+.face.room-no{align-content:center;gap:min(4cqw,4cqh);color:var(--gold-hi);text-align:center}
+.face.room-no b{font:600 min(40cqw,40cqh)/1 var(--sans);letter-spacing:-.02em}
+.face.room-no small{font:500 min(14cqw,14cqh)/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--cream)}
 .face img{width:min(66cqw,66cqh);aspect-ratio:1;object-fit:cover;border-radius:14%;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
 .blk.shaped .face{inset:auto;left:var(--fx,var(--lx,50%));top:var(--fy,var(--ly,50%));transform:translate(-50%,-50%)}
 .blk.shaped .face img{width:var(--fw,12cqw)}
@@ -1936,7 +1938,7 @@ footer a:hover{color:var(--gold-hi)}
     const blocks = UNITS.filter((u) => u.f === f).map((u, i) => {
       // заклад із кількох кімнат: блок на кожну кімнату, усі відкривають картку закладу
       if (UNIT_PARTS[u.id]) return UNIT_PARTS[u.id].map((part, k) =>
-        `<div class="blk" role="button" tabindex="0" data-cut-unit="${u.id}" aria-label="${u.name}, номер ${part.no}, ${part.kind.toLowerCase()}" style="--c:${cssVar(CATS[u.cat].c)};--i:${k};left:calc(${cells(part.x)} + 3px);top:calc(${cells(part.y)} + 3px);width:calc(${cells(part.w)} - 6px);height:calc(${cells(part.h)} - 6px)">${boxWalls}<i class="top"><span class="face room-no" aria-hidden="true">${part.no}</span></i><span class="lbl"><span class="pin">№ ${part.no}<small>${part.kind}</small></span></span></div>`).join("");
+        `<div class="blk" role="button" tabindex="0" data-cut-unit="${u.id}" aria-label="${u.name}, номер ${part.no}, ${part.kind.toLowerCase()}" style="--c:${cssVar(CATS[u.cat].c)};--i:${k};left:calc(${cells(part.x)} + 3px);top:calc(${cells(part.y)} + 3px);width:calc(${cells(part.w)} - 6px);height:calc(${cells(part.h)} - 6px)">${boxWalls}<i class="top"><span class="face room-no" aria-hidden="true"><b>${part.no}</b><small>${part.kind}</small></span></i><span class="lbl"><span class="pin">№ ${part.no}<small>${part.kind}</small></span></span></div>`).join("");
       const style = `--c:${cssVar(CATS[u.cat].c)};--i:${i};left:calc(${cells(u.x)} + 3px);top:calc(${cells(u.y)} + 3px);width:calc(${cells(u.w)} - 6px);height:calc(${cells(u.h)} - 6px)${labelSpot(u)}${u.shape ? `;--bw:${u.w};--bh:${u.h}` : ""}`;
       const top = u.shape ? `<i class="top poly">${shapeSvg(u, "glow")}${shapeSvg(u, "")}${faceHtml(u)}</i>` : `<i class="top">${faceHtml(u)}</i>`;
       return `<div class="blk${u.shape ? " shaped" : ""}" role="button" tabindex="0" data-cut-unit="${u.id}" aria-label="${u.name}, приміщення ${u.id}" style="${style}">${u.shape ? shapeWalls(u) : boxWalls}${top}<span class="lbl"><span class="pin">${u.name}<small>${u.id}</small></span></span></div>`;
