@@ -3,7 +3,7 @@
   // він збирає чисту копію публічних файлів у тимчасовій теці й запускає wrangler звідти.
   "name": "tc-garden-plaza",
   "compatibility_date": "2026-11-01",
-  "assets": { "directory": "./public" },
+  "assets": { "directory": "./public", "not_found_handling": "404-page" },
   "workers_dev": true,
   "routes": [
     { "pattern": "tcgardenplaza.com.ua", "custom_domain": true },
