@@ -7,6 +7,7 @@
     python3 tools/build_zaklady.py . --from-base  # лише з бази; без бази нічого не змінює (так запускає GitHub)
 
 Пише: zaklady/<slug>/index.html (сторінка закладу), zaklady/index.html (усі заклади), sitemap.xml.
+Усе для пошуковиків (заголовок, опис, розмітка schema.org) — у zaklady_seo.py.
 GitHub запускає його кожні 15 хвилин (.github/workflows/zaklady.yml) і заливає сторінки, якщо щось змінилось.
 """
 import html
@@ -17,24 +18,12 @@ import sys
 import urllib.request
 from pathlib import Path
 
-BASE_URL = "https://tcgardenplaza.com.ua/"
-ADDRESS = "вул. Грушевського, 30, с. Нересниця"
-MAPS_URL = "https://www.google.com/maps/search/?api=1&query=48.1196052,23.7721827"
-FLOOR_NAMES = {1: "1 поверх", 2: "2 поверх", 3: "3 поверх", 4: "4 поверх"}
-FLOOR_IN = {1: "1 поверсі", 2: "2 поверсі", 3: "3 поверсі", 4: "4 поверсі"}
+import zaklady_seo as seo
+from zaklady_seo import BASE_URL, FLOOR_IN, FLOOR_NAMES, LOCALITY, MALL_NAME, MAPS_URL, STREET, absolute
 
-# ——— для пошуковиків ———
-MALL_NAME = "ТЦ Garden Plaza New"
-LOCALITY = "Нересниця"
-GEO = {"latitude": 48.1196052, "longitude": 23.7721827}
-# опис у видачі Google обрізається приблизно тут
-DESCRIPTION_MAX = 160
-# тип закладу в розмітці schema.org: за категорією з кабінету
-SCHEMA_TYPE_BY_CAT = {
-    "grocery": "GroceryStore", "fashion": "ClothingStore", "tech": "ElectronicsStore", "food": "FoodEstablishment",
-    "fun": "SportsActivityLocation", "beauty": "Store", "shop": "Store",
-}
-SCHEMA_TYPE_DEFAULT = "LocalBusiness"
+ADDRESS = f"{STREET}, с. {LOCALITY}"
+# карта сайту: фото закладу, які показуємо пошуковику
+SITEMAP_IMAGES_MAX = 10
 
 # відео закладу: посилання на YouTube або файл зі сховища. Ті самі правила й розмітка, що в gp-video.js
 YOUTUBE_RE = re.compile(r"^https?://(?:www\.|m\.)?(?:youtube\.com/(?:watch\?(?:[^#]*&)?v=|shorts/|embed/|live/)|youtu\.be/)([A-Za-z0-9_-]{11})(?:[?&#/].*)?$")
@@ -174,7 +163,7 @@ def build_places(rows, data):
     builtin_slug = {u["id"]: u.get("slug") for u in data["units"]}
     places = {}
     for r in sorted(rows, key=lambda r: r["unit_id"]):
-        if r["vacant"] or not r.get("slug"):
+        if r["vacant"] or not r.get("slug") or not str(r.get("name") or "").strip() or r.get("floor") not in FLOOR_NAMES:
             continue
         place = places.get(r["slug"])
         if place:
@@ -188,8 +177,10 @@ def build_places(rows, data):
             "cat": cat["name"], "cat_code": r["cat"] if r["cat"] in data["cats"] else "shop",
             "updated": str(r.get("updated_at") or "")[:10],
             "color": data["colors"][cat["c"]],
-            "about": r.get("about") or "", "hours": r.get("hours") or data["default_hours"],
+            "about": r.get("about") or "", "hours": r.get("hours") or data["default_hours"], "hours_own": r.get("hours") or "",
             "phones": r.get("phones") or [data["mall_phone"]],
+            # власні телефони закладу: номер адміністрації центру в розмітку закладу не ставимо
+            "phones_own": r.get("phones") or [],
             "logo": r.get("logo_url"), "pics": r.get("photos") or [],
             "vids": [v for v in (r.get("videos") or []) if isinstance(v, str)],
             "links": [l for l in (r.get("links") or []) if str(l.get("href", "")).startswith(("https://", "http://"))],
@@ -202,10 +193,6 @@ def build_places(rows, data):
 def asset(path, up):
     """Адреса файлу: зі сховища бази — як є, файл сайту — відносно сторінки."""
     return path if path.startswith(("https://", "http://")) else up + path
-
-
-def absolute(path):
-    return path if path.startswith(("https://", "http://")) else BASE_URL + path
 
 
 # ——— розмітка ———
@@ -242,8 +229,9 @@ def rooms(place):
     return " і ".join(place["spots"])
 
 
-def tile_html(place, data, up, href):
-    return (f'<a class="tile" href="{href}">{mark_html(place, data, up)}'
+def tile_html(place, data, up, href, with_kind=False):
+    kind = f'<small class="kind">{esc(seo.kind_of(place)["kind"])}</small>' if with_kind else ""
+    return (f'<a class="tile" href="{href}" title="{esc(seo.headline(place))}">{mark_html(place, data, up)}{kind}'
             f'<small>{FLOOR_NAMES[place["floor"]]} · {esc(place["id"])}</small></a>')
 
 
@@ -265,6 +253,7 @@ def head_html(title, description, canonical, image, up, data, extra=""):
 <meta property="og:site_name" content="{MALL_NAME}">
 <meta property="og:locale" content="uk_UA">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="max-image-preview:large">
 <meta name="theme-color" content="#07080C">
 <link rel="icon" type="image/png" sizes="64x64" href="{up}favicon.png">
 <link rel="icon" type="image/svg+xml" href="{up}favicon.svg">
@@ -295,54 +284,18 @@ def footer_html(up, data):
 </div></footer>"""
 
 
-def clip(text, limit):
-    """Обрізає текст по слову й ставить три крапки, якщо він довший за limit."""
-    return text if len(text) <= limit else text[:max(limit - 1, 1)].rsplit(" ", 1)[0].rstrip(" ,.;:—-") + "…"
-
-
-def seo_description(place, about):
-    """Опис для видачі: що за заклад + де він і коли працює. Адреса й графік мають уміститись завжди."""
-    where = f"{FLOOR_NAMES[place['floor']]} {MALL_NAME}, {LOCALITY}."
-    hours = f" Графік: {place['hours']}." if place["hours"] else ""
-    tail = where + hours if len(where + hours) <= DESCRIPTION_MAX // 2 else where
-    lead = about if about.endswith((".", "!", "?", "…")) else about + "."
-    return f"{clip(lead, DESCRIPTION_MAX - len(tail) - 1)} {tail}"
-
-
-def place_schema(place, about, canonical, images):
-    """Розмітка schema.org: сам заклад і «хлібні крихти» до нього."""
-    business = {
-        "@context": "https://schema.org",
-        "@type": SCHEMA_TYPE_BY_CAT.get(place["cat_code"], SCHEMA_TYPE_DEFAULT),
-        "@id": canonical + "#place", "name": place["name"], "description": about, "url": canonical, "image": images,
-        "address": {"@type": "PostalAddress", "streetAddress": "вул. Грушевського, 30", "addressLocality": LOCALITY,
-                    "addressRegion": "Закарпатська область", "addressCountry": "UA"},
-        "geo": {"@type": "GeoCoordinates", **GEO},
-        "hasMap": MAPS_URL,
-        "containedInPlace": {"@type": "ShoppingCenter", "name": MALL_NAME, "url": BASE_URL},
-    }
-    if place["logo"]:
-        business["logo"] = absolute(place["logo"])
-    if place["phones"]:
-        business["telephone"] = "+38" + place["phones"][0]
-    if place["links"]:
-        business["sameAs"] = [l["href"] for l in place["links"]]
-    crumbs = {
-        "@context": "https://schema.org", "@type": "BreadcrumbList",
-        "itemListElement": [
-            {"@type": "ListItem", "position": i + 1, "name": name, "item": url}
-            for i, (name, url) in enumerate([(MALL_NAME, BASE_URL), ("Заклади", f"{BASE_URL}zaklady/"), (place["name"], canonical)])
-        ],
-    }
-    return "".join(f'<script type="application/ld+json">{json.dumps(block, ensure_ascii=False)}</script>' for block in (business, crumbs))
+def ld_json(*blocks):
+    """Блоки розмітки schema.org; «<» екрануємо, щоб текст закладу не закрив і не зламав тег script."""
+    texts = (json.dumps(block, ensure_ascii=False).replace("<", "\\u003c") for block in blocks)
+    return "".join(f'<script type="application/ld+json">{text}</script>' for text in texts)
 
 
 def place_page(place, places, data):
     up = "../../"
     canonical = f"{BASE_URL}zaklady/{place['slug']}/"
-    title = f"{place['name']}, {LOCALITY} — {FLOOR_NAMES[place['floor']]} {MALL_NAME}"
+    title = seo.seo_title(place)
     about = place["about"] or f"{place['name']} у {MALL_NAME}."
-    description = seo_description(place, about)
+    description = seo.seo_description(place)
     # у соцмережах і видачі краще виглядає фото закладу; логотип — коли фото немає
     images = [absolute(p) for p in place["pics"]] or [absolute(place["logo"] or "og.jpg")]
     image = images[0]
@@ -352,7 +305,7 @@ def place_page(place, places, data):
     acts = (phones + links
             + f'<a class="btn" href="{up}?zaklad={esc(place["id"])}">{ICON_CUBE}Показати на 3D-плані</a>'
             + f'<a class="btn" href="{MAPS_URL}" target="_blank" rel="noopener">{ICON_PIN}Прокласти маршрут</a>')
-    imgs = "".join(f'<img src="{esc(asset(p, up))}" alt="{esc(place["name"])} у {MALL_NAME}, {LOCALITY} — фото {i + 1}" loading="lazy" decoding="async" width="640" height="480">'
+    imgs = "".join(f'<img src="{esc(asset(p, up))}" alt="{esc(seo.photo_alt(place, i + 1))}" loading="lazy" decoding="async" width="640" height="480">'
                    for i, p in enumerate(place["pics"]))
     # секція є завжди (порожня схована): скрипт покаже її, якщо фото з'являться в базі
     pics = f'<section data-live="pics"{"" if imgs else " hidden"}><h2>Фото</h2><div class="pics">{imgs}</div></section>'
@@ -364,12 +317,13 @@ def place_page(place, places, data):
     tiles = "".join(tile_html(p, data, up, f"{up}zaklady/{p['slug']}/") for p in neighbours)
     more = f'<section><h2>Ще на {FLOOR_IN[place["floor"]]}</h2><div class="tiles">{tiles}</div></section>' if tiles else ""
 
-    extra = place_schema(place, about, canonical, images)
+    trail = [(MALL_NAME, BASE_URL), ("Заклади", f"{BASE_URL}zaklady/"), (seo.clean_name(place["name"]), canonical)]
+    extra = ld_json(seo.business_schema(place, seo.plain_text(about), canonical, images), seo.breadcrumbs_schema(trail))
 
     return f"""{head_html(title, description, canonical, image, up, data, extra)}
 <body>
 {topbar_html(up, data)}
-<main class="wrap" data-unit="{esc(place["id"])}" data-slug="{esc(place["slug"])}" data-default-hours="{esc(data["default_hours"])}" data-mall-phone="{esc(data["mall_phone"])}">
+<main class="wrap" data-unit="{esc(place["id"])}" data-slug="{esc(place["slug"])}" data-seo-name="{esc(seo.clean_name(place["name"]))}" data-photo-alt="{esc(seo.photo_alt(place, 0)[:-1])}" data-default-hours="{esc(data["default_hours"])}" data-mall-phone="{esc(data["mall_phone"])}">
   <nav class="crumbs" aria-label="Ви тут"><a href="{up}">Головна</a> <span>›</span> <a href="{up}zaklady/">Заклади</a> <span>›</span> {FLOOR_NAMES[place["floor"]]}</nav>
   <article class="hero">
     {logo_html(place, data, up)}
@@ -385,6 +339,7 @@ def place_page(place, places, data):
   {pics}
   {vids}
   <section><h2>Як знайти</h2>
+    <p class="intro" data-live="intro">{esc(seo.intro(place))}</p>
     <dl class="facts">
       <dt>Поверх</dt><dd>{FLOOR_NAMES[place["floor"]]}</dd>
       <dt>Приміщення</dt><dd>{esc(rooms(place))}</dd>
@@ -475,7 +430,7 @@ LIVE_JS = r"""(function () {
     box.replaceChildren.apply(box, photos.map(function (src, i) {
       var img = document.createElement('img');
       img.src = assetUrl(src);
-      img.alt = name + ', фото ' + (i + 1);
+      img.alt = (main.dataset.photoAlt || name + ', фото ') + (i + 1);
       img.loading = 'lazy';
       img.decoding = 'async';
       img.width = 640;
@@ -503,9 +458,17 @@ LIVE_JS = r"""(function () {
       .map(function (l) { return { href: String(l.href), label: String(l.label || l.href) }; });
     var photos = (Array.isArray(row.photos) ? row.photos : []).map(safeUrl).filter(Boolean);
     var h1 = document.querySelector('article.hero h1');
-    if (h1 && h1.textContent !== name) {
-      document.title = document.title.replace(h1.textContent, name);
-      h1.textContent = name;
+    if (h1 && h1.textContent !== name) h1.textContent = name;
+    // назва для пошуковиків — без крапки в кінці; якщо заклад перейменували, міняємо її в заголовку вкладки й вступі
+    var seoName = name.replace(/[.\s]+$/, '');
+    var oldName = main.dataset.seoName;
+    if (oldName && seoName && oldName !== seoName) {
+      // функція замість рядка: у назві можуть бути «$&», які replace інакше сприйме як команду
+      var rename = function (text) { return text.replace(oldName, function () { return seoName; }); };
+      document.title = rename(document.title);
+      document.querySelectorAll('[data-live="intro"]').forEach(function (el) { el.textContent = rename(el.textContent); });
+      if (main.dataset.photoAlt) main.dataset.photoAlt = rename(main.dataset.photoAlt);
+      main.dataset.seoName = seoName;
     }
     setText('[data-live="about"]', String(row.about || '').trim() || name + ' у ТЦ Garden Plaza New.');
     setText('[data-live="hours"]', hours);
@@ -536,20 +499,23 @@ LIVE_JS = r"""(function () {
 def all_places_page(places, data):
     up = "../"
     canonical = f"{BASE_URL}zaklady/"
-    title = "Усі заклади — ТЦ Garden Plaza New, Нересниця"
-    description = "Магазини, ресторан, готель, спортзал, клініка й послуги ТЦ Garden Plaza New у Нересниці: поверх, графік і телефон кожного закладу."
+    title = f"Магазини й заклади {MALL_NAME} у Нересниці — повний список"
+    description = (f"Усі {len(places)} закладів {MALL_NAME} у Нересниці: супермаркет, аптека, одяг і взуття, ювелірні магазини, "
+                   "ресторан, готель, спортзал. Поверх, графік і телефон кожного.")
+    ordered = sorted(places.values(), key=lambda p: (p["floor"], p["name"].lower()))
+    extra = ld_json(seo.places_list_schema(ordered), seo.breadcrumbs_schema([(MALL_NAME, BASE_URL), ("Заклади", canonical)]))
     floors = ""
     for f in (1, 2, 3, 4):
         group = sorted((p for p in places.values() if p["floor"] == f), key=lambda p: p["name"].lower())
-        tiles = "".join(tile_html(p, data, up, f"{p['slug']}/") for p in group)
+        tiles = "".join(tile_html(p, data, up, f"{p['slug']}/", with_kind=True) for p in group)
         floors += f'<section><h2>{FLOOR_NAMES[f]}</h2><div class="tiles">{tiles}</div></section>'
-    return f"""{head_html(title, description, canonical, BASE_URL + "og.jpg", up, data)}
+    return f"""{head_html(title, description, canonical, BASE_URL + "og.jpg", up, data, extra)}
 <body>
 {topbar_html(up, data)}
 <main class="wrap">
   <nav class="crumbs" aria-label="Ви тут"><a href="{up}">Головна</a> <span>›</span> Заклади</nav>
-  <h1 class="page-title">Усі заклади</h1>
-  <p class="lead">{len(places)} закладів на чотирьох поверхах. Оберіть заклад: покажемо опис, графік, телефон і де він на плані.</p>
+  <h1 class="page-title">Магазини й заклади</h1>
+  <p class="lead">{len(places)} закладів на чотирьох поверхах {MALL_NAME} у Нересниці ({STREET}). Оберіть заклад: покажемо опис, графік, телефон і де він на плані.</p>
   {floors}
 </main>
 {footer_html(up, data)}
@@ -559,13 +525,19 @@ def all_places_page(places, data):
 
 
 def sitemap_xml(places):
-    # lastmod — лише в закладів і лише дата їхньої останньої зміни в кабінеті: файл не міняється без причини,
-    # тож GitHub не робить зайвих комітів
-    rows = "".join(f"  <url><loc>{u}</loc></url>\n" for u in (BASE_URL, f"{BASE_URL}zaklady/"))
+    # lastmod — дата останньої зміни закладу в кабінеті (у списку закладів — найсвіжіша з них): файл не міняється
+    # без причини, тож GitHub не робить зайвих комітів
+    def entry(loc, lastmod="", images=()):
+        date = f"<lastmod>{lastmod}</lastmod>" if lastmod else ""
+        pics = "".join(f"<image:image><image:loc>{esc(absolute(p))}</image:loc></image:image>" for p in images)
+        return f"  <url><loc>{loc}</loc>{date}{pics}</url>\n"
+
+    newest = max((p["updated"] for p in places.values() if p.get("updated")), default="")
+    rows = entry(BASE_URL) + entry(f"{BASE_URL}zaklady/", newest)
     for slug, place in places.items():
-        lastmod = f"<lastmod>{place['updated']}</lastmod>" if place.get("updated") else ""
-        rows += f"  <url><loc>{BASE_URL}zaklady/{slug}/</loc>{lastmod}</url>\n"
-    return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{rows}</urlset>\n'
+        rows += entry(f"{BASE_URL}zaklady/{slug}/", place.get("updated", ""), place["pics"][:SITEMAP_IMAGES_MAX])
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+            f'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n{rows}</urlset>\n')
 
 
 PAGE_CSS = """
@@ -612,7 +584,8 @@ section{margin-top:36px}
 h2{margin:0 0 14px;font:500 32px/1.1 var(--serif)}
 .page-title{margin:4px 0 10px}
 .lead{max-width:60ch;color:#D9CDBB}
-.about{margin:0;max-width:64ch;font-size:16.5px;line-height:1.7;color:#D9CDBB}
+.about{margin:0;max-width:64ch;font-size:16.5px;line-height:1.7;color:#D9CDBB;white-space:pre-line}
+.intro{margin:0 0 14px;max-width:64ch;color:#D9CDBB}
 /* фото показуємо цілими, у їхньому власному форматі (4:3, 16:9, 9:16…): однакова висота, ширина — за пропорцією */
 .pics{display:flex;flex-wrap:wrap;gap:10px}
 .vids{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;max-width:900px}
@@ -624,6 +597,7 @@ h2{margin:0 0 14px;font:500 32px/1.1 var(--serif)}
 .tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;min-height:94px;padding:10px;border-radius:14px;border:1px solid rgba(201,164,106,.18);background:linear-gradient(180deg,#14100C,#0B0907);text-decoration:none;text-align:center;transition:border-color .2s}
 .tile:hover{border-color:var(--gold)}
 .tile small{font:400 11.5px/1 var(--sans);color:var(--muted)}
+.tile small.kind{line-height:1.25;color:#D9CDBB}
 footer{margin-top:52px;padding:26px 0 calc(32px + env(safe-area-inset-bottom));border-top:1px solid rgba(201,164,106,.15);font-size:14px;color:var(--muted)}
 footer p{margin:0 0 8px}
 footer strong{color:var(--cream)}

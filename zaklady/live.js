@@ -64,7 +64,7 @@
     box.replaceChildren.apply(box, photos.map(function (src, i) {
       var img = document.createElement('img');
       img.src = assetUrl(src);
-      img.alt = name + ', фото ' + (i + 1);
+      img.alt = (main.dataset.photoAlt || name + ', фото ') + (i + 1);
       img.loading = 'lazy';
       img.decoding = 'async';
       img.width = 640;
@@ -92,9 +92,17 @@
       .map(function (l) { return { href: String(l.href), label: String(l.label || l.href) }; });
     var photos = (Array.isArray(row.photos) ? row.photos : []).map(safeUrl).filter(Boolean);
     var h1 = document.querySelector('article.hero h1');
-    if (h1 && h1.textContent !== name) {
-      document.title = document.title.replace(h1.textContent, name);
-      h1.textContent = name;
+    if (h1 && h1.textContent !== name) h1.textContent = name;
+    // назва для пошуковиків — без крапки в кінці; якщо заклад перейменували, міняємо її в заголовку вкладки й вступі
+    var seoName = name.replace(/[.\s]+$/, '');
+    var oldName = main.dataset.seoName;
+    if (oldName && seoName && oldName !== seoName) {
+      // функція замість рядка: у назві можуть бути «$&», які replace інакше сприйме як команду
+      var rename = function (text) { return text.replace(oldName, function () { return seoName; }); };
+      document.title = rename(document.title);
+      document.querySelectorAll('[data-live="intro"]').forEach(function (el) { el.textContent = rename(el.textContent); });
+      if (main.dataset.photoAlt) main.dataset.photoAlt = rename(main.dataset.photoAlt);
+      main.dataset.seoName = seoName;
     }
     setText('[data-live="about"]', String(row.about || '').trim() || name + ' у ТЦ Garden Plaza New.');
     setText('[data-live="hours"]', hours);
