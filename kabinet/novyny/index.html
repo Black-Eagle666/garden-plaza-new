@@ -80,7 +80,7 @@ textarea{min-height:170px;resize:vertical}
 .video-box{display:grid;gap:12px;max-width:420px}
 .video-box .pair{display:flex;gap:8px;align-items:center}
 .video-box .pair input{flex:1;min-width:0}
-.photo-box img{width:200px;max-width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
+.photo-box img{width:200px;max-width:100%;height:auto;max-height:250px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
 .check{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
 .check input{width:22px;height:22px;margin-top:2px;accent-color:#C9A46A;flex:none}
 .actions{position:fixed;left:0;right:0;bottom:0;z-index:15;display:flex;gap:10px;justify-content:flex-end;padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom));background:rgba(10,8,6,.94);border-top:1px solid var(--line)}
@@ -98,6 +98,7 @@ textarea{min-height:170px;resize:vertical}
 </style>
 <script src="../../gp-config.js"></script>
 <script src="../../gp-video.js"></script>
+<script src="../gp-crop.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
@@ -302,7 +303,7 @@ textarea{min-height:170px;resize:vertical}
         '<div class="field"><label for="f-body">Текст <span class="counter" id="c-body"></span></label>' +
           '<textarea id="f-body" maxlength="' + LIMITS.body + '" placeholder="Коротко: що, де, до якого числа.">' + escapeHtml(item ? item.body : '') + '</textarea></div>' +
         '<div class="field"><span class="label">Фотографія</span><div class="photo-box" id="photo-box"></div>' +
-          '<span class="hint" id="photo-status">JPG, PNG або WEBP. Найкраще виглядає горизонтальне фото.</span></div>' +
+          '<span class="hint" id="photo-status">JPG, PNG або WEBP. Після вибору фото можна обрізати; на сайті воно займає всю ширину картки.</span></div>' +
         '<div class="field"><span class="label">Відео (необов\'язково)</span><div class="video-box" id="video-box"></div>' +
           '<span class="hint" id="video-status">Файл до ' + (VIDEO_MAX_BYTES / BYTES_IN_MB) + ' МБ (приблизно хвилина з телефону) або посилання на YouTube. Якщо є і фото, і відео — на сайті буде відео.</span></div>' +
         '<div class="field"><span class="label">' + (isOwner() ? 'Ваш заклад' : 'Заклади, яких це стосується') + '</span>' +
@@ -353,6 +354,7 @@ textarea{min-height:170px;resize:vertical}
     box.innerHTML = (state.photo ? '<img src="' + escapeHtml(assetUrl(state.photo)) + '" alt="Фото запису">' : '') +
       '<label class="btn btn-small">' + (state.photo ? 'Замінити фото' : 'Обрати фото') +
       '<input type="file" id="f-photo" accept="image/png,image/jpeg,image/webp" hidden></label>' +
+      (state.photo ? '<button type="button" class="btn btn-small" id="photo-crop">Обрізати</button>' : '') +
       (state.photo ? '<button type="button" class="btn btn-small btn-danger" id="photo-remove">Прибрати</button>' : '');
     document.getElementById('f-photo').addEventListener('change', function (event) {
       var file = event.target.files && event.target.files[0];
@@ -360,6 +362,8 @@ textarea{min-height:170px;resize:vertical}
     });
     var remove = document.getElementById('photo-remove');
     if (remove) remove.addEventListener('click', function () { setState({ photo: null }); renderPhoto(); });
+    var crop = document.getElementById('photo-crop');
+    if (crop) crop.addEventListener('click', onCropSaved);
   }
 
   /* ---------- Відео ---------- */
@@ -473,26 +477,69 @@ textarea{min-height:170px;resize:vertical}
     return Array.from(bytes, function (b) { return b.toString(16).padStart(2, '0'); }).join('');
   }
 
-  async function onPhotoFile(file) {
-    if (PHOTO_TYPES.indexOf(file.type) === -1) { setPhotoStatus('Цей файл не підходить. Оберіть JPG, PNG або WEBP.', true); return; }
-    if (file.size > LIMITS.sourceBytes) { setPhotoStatus('Файл завеликий. Оберіть фото до 20 МБ.', true); return; }
-    setPhotoStatus('Завантажуємо фото…', false);
+  // Форми кадру новини. На сайті фото займає всю ширину картки у своєму форматі; вищі за 9:16 сайт підрізає сам.
+  var NEWS_SHAPES = [
+    { id: 'wide', label: 'Горизонтальне 3:2', ratio: 3 / 2 },
+    { id: 'pano', label: 'Широке 16:9', ratio: 16 / 9 },
+    { id: 'square', label: 'Квадрат', ratio: 1 },
+    { id: 'tall', label: 'Вертикальне 4:5', ratio: 4 / 5 },
+    { id: 'story', label: 'Високе 9:16', ratio: 9 / 16 }
+  ];
+  var CROP_HINT = 'Оберіть форму, тягніть фото в рамці або рухайте повзунки. У рамці те, що буде видно в новині на сайті.';
+
+  // стискає фото й кладе в сховище; повертає публічну адресу
+  async function uploadPhoto(file) {
+    var prepared = await resizePhoto(file);
+    // магазин може класти файли лише в теку свого приміщення
+    var folder = isOwner() ? state.ownIds[0] + '/news-' : 'news/';
+    var path = folder + Date.now() + '-' + randomPart() + '.' + prepared.ext;
+    var up = await client.storage.from(BUCKET).upload(path, prepared.blob, { contentType: prepared.type, cacheControl: '31536000', upsert: false });
+    if (up.error) throw up.error;
+    return client.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+  }
+
+  // фото, яке вже лежить у сховищі: просимо дозвіл на читання пікселів; окрема адреса, щоб браузер не взяв копію без дозволу
+  function loadSavedImage(src) {
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function () { resolve(img); };
+      img.onerror = function () { reject({ userMessage: 'Не вдалося відкрити це фото для обрізки.' }); };
+      img.src = src + (src.indexOf('?') === -1 ? '?' : '&') + 'crop=1';
+    });
+  }
+
+  // Спільний хід для нового й уже доданого фото: вікно обрізки → завантаження → показ у формі.
+  // original — файл, який піде на сайт, якщо натиснули «Без обрізки» (для вже доданого фото такої кнопки немає).
+  async function cropAndUpload(loadPicture, original, doneText) {
+    var editing = state.current;
     setState({ busy: true });
     try {
-      var prepared = await resizePhoto(file);
-      // магазин може класти файли лише в теку свого приміщення
-      var folder = isOwner() ? state.ownIds[0] + '/news-' : 'news/';
-      var path = folder + Date.now() + '-' + randomPart() + '.' + prepared.ext;
-      var up = await client.storage.from(BUCKET).upload(path, prepared.blob, { contentType: prepared.type, cacheControl: '31536000', upsert: false });
-      if (up.error) throw up.error;
-      setState({ photo: client.storage.from(BUCKET).getPublicUrl(path).data.publicUrl });
+      var picked = await GPCrop.open(await loadPicture(), { shapes: NEWS_SHAPES, allowOriginal: Boolean(original), hint: CROP_HINT });
+      if (!picked || state.current !== editing) return;
+      setPhotoStatus('Завантажуємо фото…', false);
+      var url = await uploadPhoto(picked === 'original' ? original : picked);
+      if (state.current !== editing) return;
+      setState({ photo: url });
       renderPhoto();
-      setPhotoStatus('Фото завантажено. Не забудьте натиснути «Зберегти».', false);
+      setPhotoStatus(doneText, false);
     } catch (err) {
       setPhotoStatus(friendlyError(err, 'завантаження фото'), true);
     } finally {
       setState({ busy: false });
     }
+  }
+
+  function onPhotoFile(file) {
+    if (PHOTO_TYPES.indexOf(file.type) === -1) { setPhotoStatus('Цей файл не підходить. Оберіть JPG, PNG або WEBP.', true); return; }
+    if (file.size > LIMITS.sourceBytes) { setPhotoStatus('Файл завеликий. Оберіть фото до 20 МБ.', true); return; }
+    cropAndUpload(function () { return loadImage(file); }, file, 'Фото завантажено. Не забудьте натиснути «Зберегти».');
+  }
+
+  function onCropSaved() {
+    var current = state.photo;
+    if (!current || state.busy) return;
+    cropAndUpload(function () { return loadSavedImage(assetUrl(current)); }, null, 'Фото обрізано. Не забудьте натиснути «Зберегти».');
   }
 
   /* ---------- Збереження й видалення ---------- */

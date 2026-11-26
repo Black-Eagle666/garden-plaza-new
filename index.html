@@ -851,7 +851,9 @@ footer a:hover{color:var(--gold-hi)}
 .cut-info .pics img,.card .pics img{margin:0 0 8px;break-inside:avoid}
 .cut-info .pics:has(> img:only-child),.card .pics:has(> img:only-child){columns:1}
 .cut-info .pics img,.cut-info .pics img:only-child,.card .pics img,.card .pics img:only-child{width:100%;height:auto;max-height:80vh;aspect-ratio:auto 4/3;object-fit:contain}
-.post img{aspect-ratio:auto 3/2;object-fit:contain;max-height:560px}
+/* фото новини займає всю ширину картки у своєму форматі, без полів; підрізається лише вище за 9:16 або 760px (ціле фото — на дотик) */
+.post{container-type:inline-size}
+.post img{aspect-ratio:auto 3/2;object-fit:cover;max-height:min(178cqw,760px)}
 </style>
 </head>
 <body>
